@@ -2,7 +2,10 @@ import React, { useState } from "react";
 import Navbar from "../header_and_footer/Navbar";
 import { validateForm } from "../utils/formValidation";
 import BASE_URL from "../services";
+import { showError, showSuccess } from "../utils/toastUtils";
+import { useNavigate } from "react-router-dom";
 
+// Type Safety
 interface FormData {
 	name: string;
 	email: string;
@@ -18,6 +21,7 @@ interface FormErrors {
 }
 
 const Signup_email = () => {
+	// State for form data and errors
 	const [formData, setFormData] = useState<FormData>({
 		name: "",
 		email: "",
@@ -31,10 +35,15 @@ const Signup_email = () => {
 		confirmPassword: "",
 	});
 
+	// Use naviagte initialize
+	const navigate = useNavigate();
+
+	// handling signup form submission
 	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
 		setErrors({ name: "", email: "", password: "", confirmPassword: "" });
 		const { isValid, errors: validationErrors } = validateForm(formData);
+		// if form data is valid after validation
 		if (isValid) {
 			try {
 				const response = await BASE_URL.post("/api/auth/register", {
@@ -43,14 +52,18 @@ const Signup_email = () => {
 					password: formData.password,
 				});
 				console.log("Registration successful", response.data);
+
+				//show toast message on successfull signup
+				showSuccess("User Signup Successfull...\n Redirecting...");
+				// simulating redirection
+				setTimeout(() => navigate("/"), 3000);
+
 				setErrors({ name: "", email: "", password: "", confirmPassword: "" }); // Clear errors on success
 			} catch (error: any) {
 				if (error.response) {
+					showError(error.response.data.message);
+					// showError(error.response.);
 					console.error("Server responded with an error:", error.response.data);
-				} else if (error.request) {
-					console.error("No response received from server:", error.request);
-				} else {
-					console.error("Error setting up the request:", error.message);
 				}
 			}
 		} else {

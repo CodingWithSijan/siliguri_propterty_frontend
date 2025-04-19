@@ -3,15 +3,15 @@ import { Transition } from "@headlessui/react";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import { NavLink } from "react-router-dom";
 const Navbar: React.FC = () => {
-	const [isOpen, setIsOpen] = useState(false);
+	const [isOpen, setIsOpen] = useState<boolean>(false);
 
 	return (
-		<nav className="bg-white shadow-md fixed w-full z-10 ">
+		<nav className="bg-white shadow-md fixed w-full z-10 cd..">
 			<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 				<div className="flex justify-between h-16 items-center">
 					{/* Logo */}
 					<div className="flex-shrink-0 text-2xl font-bold text-blue-600 cursor-pointer">
-						MyApp
+						Siliguri Property
 					</div>
 
 					{/* Desktop Menu */}
@@ -59,13 +59,13 @@ const Navbar: React.FC = () => {
 						onClick={() => setIsOpen(false)}
 						className="block w-full text-left text-gray-700 hover:text-blue-600"
 					>
-						Login
+						<NavLink to="/login">Login</NavLink>
 					</button>
 					<button
 						onClick={() => setIsOpen(false)}
 						className="block w-full text-left bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition"
 					>
-						Signup
+						<NavLink to="/signup">Signup</NavLink>
 					</button>
 				</div>
 			</Transition>
