@@ -4,6 +4,7 @@ import { showSuccess, showError } from "../utils/toastUtils";
 import BASE_URL from "../services";
 import { SiGoogle } from "react-icons/si";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../contextAPI/AuthContext";
 
 interface UserFormDataTypes {
 	email: string;
@@ -17,6 +18,7 @@ const Login = () => {
 	});
 	const [loading, setLoading] = useState<boolean>(false);
 
+	const { setUser } = useAuth();
 	const navigate = useNavigate();
 
 	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -35,6 +37,8 @@ const Login = () => {
 			if (response.status === 401 || response.status === 500) {
 				return showError(response.data.message);
 			} else {
+				console.log(response.data);
+				setUser(response.data.name);
 				showSuccess("Login successful! Redirecting...");
 				// Redirect logic here
 				setTimeout(() => {

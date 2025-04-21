@@ -6,19 +6,21 @@ import Signup_email from "./signup/Signup_email";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Login from "./login/Login";
-
+import { AuthProvider } from "./contextAPI/AuthContext";
 const App: React.FC = () => {
 	return (
 		<>
-			<Router>
-				<Routes>
-					<Route path="/" element={<Homepage />} />
-					<Route path="/signup" element={<Signup />} />
-					<Route path="/signup_email" element={<Signup_email />} />
-					<Route path="/login" element={<Login />} />
-				</Routes>
-				<ToastContainer />
-			</Router>
+			<AuthProvider>
+				<Router>
+					<Routes>
+						<Route path="/" element={<Homepage />} />
+						<Route path="/signup" element={<Signup />} />
+						<Route path="/signup_email" element={<Signup_email />} />
+						<Route path="/login" element={<Login />} />
+					</Routes>
+					<ToastContainer />
+				</Router>
+			</AuthProvider>
 		</>
 	);
 };
