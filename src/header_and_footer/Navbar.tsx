@@ -2,17 +2,20 @@ import React, { useState } from "react";
 import { Transition } from "@headlessui/react";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import { NavLink } from "react-router-dom";
+import siliguri_property_logo_noBG from "../assets/siliguri_property_logo_noBG.png";
+
 const Navbar: React.FC = () => {
 	const [isOpen, setIsOpen] = useState<boolean>(false);
 
 	return (
-		<nav className="bg-white shadow-md fixed w-full z-10 cd..">
+		<nav className=" bg-white shadow-md w-full z-100">
 			<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 				<div className="flex justify-between h-16 items-center">
 					{/* Logo */}
-					<div className="flex-shrink-0 text-2xl font-bold text-blue-600 cursor-pointer">
-						Siliguri Property
-					</div>
+					<img
+						src={siliguri_property_logo_noBG}
+						className="h-[100%] w-[90px] cursor-pointer"
+					></img>
 
 					{/* Desktop Menu */}
 					<div className="hidden md:flex items-center space-x-4">
@@ -57,13 +60,13 @@ const Navbar: React.FC = () => {
 				<div className="md:hidden px-4 pb-4 space-y-2 bg-white shadow">
 					<button
 						onClick={() => setIsOpen(false)}
-						className="block w-full text-left text-gray-700 hover:text-blue-600"
+						className="block w-full text-center text-gray-700 hover:text-blue-600"
 					>
 						<NavLink to="/login">Login</NavLink>
 					</button>
 					<button
 						onClick={() => setIsOpen(false)}
-						className="block w-full text-left bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition"
+						className="block w-full text-center bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition"
 					>
 						<NavLink to="/signup">Signup</NavLink>
 					</button>
