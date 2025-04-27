@@ -3,7 +3,7 @@ import { Transition } from "@headlessui/react";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import { NavLink, useNavigate } from "react-router-dom";
 import siliguri_property_logo_noBG from "../assets/siliguri_property_logo_noBG.png";
-import { useAuth } from "../contextAPI/AuthContext";
+import { useAuth } from "../contextAPI/UserAuthContext";
 
 const Navbar: React.FC = () => {
 	const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -25,11 +25,13 @@ const Navbar: React.FC = () => {
 			<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 				<div className="flex justify-between h-16 items-center">
 					{/* Logo */}
-					<img
-						src={siliguri_property_logo_noBG}
-						className="h-[100%] w-[90px] cursor-pointer"
-						alt="Logo"
-					/>
+					<NavLink to="/" className="h-18 w-24 aspect-[16/9]">
+						<img
+							src={siliguri_property_logo_noBG}
+							alt="Logo"
+							className="w-full h-full object-contain"
+						/>
+					</NavLink>
 
 					{/* Desktop Menu */}
 					<div className="hidden md:flex items-center space-x-4">
@@ -47,7 +49,7 @@ const Navbar: React.FC = () => {
 										/>
 									) : ( */}
 									<div className="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold">
-										{getInitials(user)}
+										{getInitials(user?.name ?? user)}
 									</div>
 									{/* )} */}
 								</div>

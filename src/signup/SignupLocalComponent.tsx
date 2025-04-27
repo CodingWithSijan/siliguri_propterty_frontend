@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { validateForm } from "../utils/formValidation";
-import BASE_URL from "../services";
+import BASE_URL from "../services/index";
 import { showError, showSuccess } from "../utils/toastUtils";
 import { useNavigate } from "react-router-dom";
 
@@ -19,11 +19,13 @@ interface FormErrors {
 	confirmPassword: string;
 }
 
-interface SignupEmailProps {
+interface SignupLocalComponentProps {
 	onSuccess?: () => void;
 }
 
-const SignupEmail: React.FC<SignupEmailProps> = ({ onSuccess }) => {
+const SignupLocalComponent: React.FC<SignupLocalComponentProps> = ({
+	onSuccess,
+}) => {
 	// State for form data and errors
 	const [formData, setFormData] = useState<FormData>({
 		name: "",
@@ -46,12 +48,12 @@ const SignupEmail: React.FC<SignupEmailProps> = ({ onSuccess }) => {
 		const { isValid, errors: validationErrors } = validateForm(formData);
 		if (isValid) {
 			try {
-				const response = await BASE_URL.post("/api/auth/register", {
+				await BASE_URL.post("/api/auth/register", {
 					name: formData.name,
 					email: formData.email,
 					password: formData.password,
 				});
-				console.log("Registration successful", response.data);
+				console.log("Registration successful");
 				showSuccess("User Signup Successful...\n Redirecting...");
 				if (onSuccess) {
 					onSuccess();
@@ -172,4 +174,4 @@ const SignupEmail: React.FC<SignupEmailProps> = ({ onSuccess }) => {
 	);
 };
 
-export default SignupEmail;
+export default SignupLocalComponent;
