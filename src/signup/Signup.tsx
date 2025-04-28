@@ -17,9 +17,7 @@ const Signup: React.FC = () => {
 					<h2 className="text-3xl font-bold text-center text-blue-700 mb-6">
 						Create Account
 					</h2>
-					<SignupLocalComponent
-						onSuccess={() => console.log("Signup successful!")}
-					/>
+					<SignupLocalComponent />
 					<div className="flex items-center my-4">
 						<div className="flex-grow h-px bg-gray-300"></div>
 						<span className="px-2 text-sm text-gray-500">OR</span>
