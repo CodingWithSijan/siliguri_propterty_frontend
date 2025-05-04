@@ -1,6 +1,7 @@
 import React from "react";
 import YourProfile from "./userContents/YourProfile";
 import NewPost from "./userContents/NewPost";
+import ViewYourListings from "./userContents/ViewYourListings";
 interface Props {
 	activeMenu: string;
 }
@@ -13,7 +14,7 @@ const ContentDisplay: React.FC<Props> = ({ activeMenu }) => {
 			case "New Post":
 				return <NewPost />;
 			case "View Your Listings":
-				return <div>Your listed properties will be displayed here.</div>;
+				return <ViewYourListings />;
 			case "Promote Your listings":
 				return <div>Promotional tools and options will be shown here.</div>;
 			case "Messages":
@@ -25,10 +26,7 @@ const ContentDisplay: React.FC<Props> = ({ activeMenu }) => {
 
 	return (
 		<>
-			<h1 className=" text-4xl font-extrabold text-sky-500  text-center">
-				{activeMenu}
-			</h1>
-			;<div className=" p-4 rounded-md">{renderContent()}</div>
+			;<div className=" px-4 pb-4 rounded-md">{renderContent()}</div>
 		</>
 	);
 };
