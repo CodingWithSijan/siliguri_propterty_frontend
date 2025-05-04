@@ -1,6 +1,6 @@
 import React from "react";
 
-interface ListingType {
+export interface ListingType {
 	title: string;
 	description: string;
 	location: string;
