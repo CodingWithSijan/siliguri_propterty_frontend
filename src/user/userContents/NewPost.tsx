@@ -88,7 +88,7 @@ const NewPost = () => {
 		});
 
 		try {
-			await BASE_URL.post("/api/users/new-post", postData);
+			await BASE_URL.post("/api/users/post/new-post", postData);
 			showSuccess("Post submitted successfully!");
 			setFormData(initialFormData);
 			setPreview(null);
@@ -107,18 +107,19 @@ const NewPost = () => {
 	};
 
 	return (
-		<div className="max-w-2xl mx-auto mt-8 p-6 shadow-md bg-white rounded-md">
-			<h2 className="text-2xl font-bold mb-4 text-center">
-				New Real Estate Post
+		<div className="max-w-3xl mx-auto mt-12 px-8 py-10 bg-white/90 backdrop-blur-md shadow-2xl border border-sky-200 rounded-3xl transition-all duration-500">
+			<h2 className="text-4xl font-bold text-center text-sky-700 mb-10 tracking-wide">
+				Post Your Property 🏡
 			</h2>
-			<form onSubmit={handleSubmit} className="space-y-4 text-black">
+
+			<form onSubmit={handleSubmit} className="space-y-8 text-black">
 				{/* Title */}
 				<div>
 					<label
 						htmlFor="title"
-						className="block text-sm font-medium text-sky-500"
+						className="block mb-1 text-sm font-semibold text-black"
 					>
-						Title
+						Property Title
 					</label>
 					<input
 						type="text"
@@ -127,8 +128,8 @@ const NewPost = () => {
 						value={formData.title}
 						onChange={handleInputChange}
 						required
-						className="w-full px-4 py-2 mt-1 text-sm border rounded-md border-sky-500 focus:ring-sky-500 focus:border-sky-500"
-						placeholder="Enter the title"
+						className="w-full px-4 py-3 text-sm text-black border  rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500"
+						placeholder="e.g., 3 BHK Flat in New Baneshwor"
 					/>
 				</div>
 
@@ -136,7 +137,7 @@ const NewPost = () => {
 				<div>
 					<label
 						htmlFor="description"
-						className="block text-sm font-medium text-sky-500"
+						className="block mb-1 text-sm font-semibold text-black"
 					>
 						Description
 					</label>
@@ -146,19 +147,14 @@ const NewPost = () => {
 						value={formData.description}
 						onChange={handleInputChange}
 						required
-						className="w-full px-4 py-2 mt-1 text-sm border rounded-md border-sky-500 focus:ring-sky-500 focus:border-sky-500"
-						placeholder="Enter the description"
-					></textarea>
+						className="w-full px-4 py-3 text-sm text-black border  rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500 resize-none h-28"
+						placeholder="Write something about the property..."
+					/>
 				</div>
 
 				{/* Location */}
 				<div>
-					<label
-						htmlFor="location"
-						className="block text-sm font-medium text-sky-500"
-					>
-						Location
-					</label>
+					<label className="block mb-1 text-sm font-semibold ">Location</label>
 					<AddressInput
 						value={formData.location}
 						onChange={(location) =>
@@ -167,82 +163,100 @@ const NewPost = () => {
 					/>
 				</div>
 
-				{/* Price & Type */}
+				{/* Price */}
 				<div>
-					<label
-						htmlFor="price"
-						className="block text-sm font-medium text-sky-500"
-					>
-						Price
-					</label>
-					<div className="flex items-center space-x-4">
+					<label className="block mb-1 text-sm font-semibold ">Price</label>
+					<div className="flex items-center gap-4">
 						<input
 							type="number"
-							id="price"
 							name="price"
 							value={formData.price}
 							onChange={handleInputChange}
 							required
-							className="w-[40%] px-4 py-2 mt-1 text-sm border rounded-md border-sky-500 focus:ring-sky-500 focus:border-sky-500"
-							placeholder="Enter the price"
+							className="w-1/2 px-4 py-2 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500"
+							placeholder="e.g. 3500000"
 						/>
-						<div className="flex items-center space-x-4">
-							<label className="flex items-center space-x-1">
+						<div className="flex items-center gap-3">
+							<label className="flex items-center gap-1 text-sm">
 								<input
 									type="radio"
 									name="priceType"
 									value="negotiable"
 									checked={formData.priceType === "negotiable"}
 									onChange={handleInputChange}
-									className=""
+									className="accent-sky-500"
 								/>
-								<span className="text-sky-500">Negotiable</span>
+								Negotiable
 							</label>
-							<label className="flex items-center space-x-1">
+							<label className="flex items-center gap-1  text-sm">
 								<input
 									type="radio"
 									name="priceType"
 									value="fixed"
 									checked={formData.priceType === "fixed"}
 									onChange={handleInputChange}
-									className="accent-white"
+									className="accent-sky-500"
 								/>
-								<span className="text-sky-500">Fixed</span>
+								Fixed
 							</label>
 						</div>
 					</div>
 				</div>
 
-				{/* Pictures */}
+				{/* Type */}
+				<div>
+					<label className="block mb-1 text-sm font-semibold ">
+						Listing Type
+					</label>
+					<div className="flex gap-4">
+						{["rent", "sell", "buy"].map((option) => (
+							<label key={option} className="flex items-center gap-2  text-sm">
+								<input
+									type="checkbox"
+									name={option}
+									checked={formData.type[option as keyof typeof formData.type]}
+									onChange={handleInputChange}
+									className="form-checkbox "
+								/>
+								{option.charAt(0).toUpperCase() + option.slice(1)}
+							</label>
+						))}
+					</div>
+				</div>
+
+				{/* Image Upload */}
 				<div>
 					<label
 						htmlFor="pictures"
-						className="block text-sm font-medium text-sky-500"
+						className="px-5 py-2 text-sm font-semibold text-white bg-sky-500 hover:bg-sky-600 rounded-md cursor-pointer transition"
 					>
-						Pictures
+						Upload Property Pictures
 					</label>
 					<input
 						type="file"
-						id="picture"
+						id="pictures"
 						name="pictures"
 						multiple
 						accept="image/*"
 						onChange={handlePictureChange}
-						className="block w-auto text-sm text-white bg-sky-500 border p-2 rounded-md cursor-pointer focus:outline-none"
+						className="w-full h-full opacity-0 cursor-pointer"
 					/>
 					{preview && preview.length > 0 && (
 						<div className="mt-4 grid grid-cols-2 md:grid-cols-3 gap-4">
 							{preview.map((url, index) => (
-								<div key={index} className="relative">
+								<div
+									key={index}
+									className="relative group rounded-lg overflow-hidden shadow-md border border-gray-200"
+								>
 									<img
 										src={url}
 										alt={`Preview ${index + 1}`}
-										className="w-full h-40 object-cover rounded-md"
+										className="w-full h-40 object-cover transition-transform duration-300 group-hover:scale-105"
 									/>
 									<button
 										type="button"
 										onClick={() => handlePictureDelete(index)}
-										className="absolute top-2 right-2 bg-red-500 text-white px-2 py-1 text-xs rounded-md"
+										className="absolute top-2 right-2 bg-red-500 text-white px-2 py-1 text-xs rounded-md shadow-md hover:bg-red-600"
 									>
 										Delete
 									</button>
@@ -252,38 +266,19 @@ const NewPost = () => {
 					)}
 				</div>
 
-				{/* Type */}
-				<div>
-					<label className="block text-sm font-medium text-sky-500">Type</label>
-					<div className="flex items-center space-x-4">
-						{["rent", "sell", "buy"].map((option) => (
-							<label key={option} className="flex items-center space-x-1">
-								<input
-									type="checkbox"
-									name={option}
-									checked={formData.type[option as keyof typeof formData.type]}
-									onChange={handleInputChange}
-									className="form-checkbox"
-								/>
-								<span className="text-sky-500 capitalize">{option}</span>
-							</label>
-						))}
-					</div>
-				</div>
-
 				{/* Buttons */}
-				<div className="flex justify-end space-x-4">
+				<div className="flex justify-end gap-4 pt-4">
 					<button
 						type="button"
 						onClick={handleReset}
-						className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300"
+						className="px-5 py-2 text-sm font-semibold text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300 transition"
 					>
-						Reset Post
+						Reset
 					</button>
 					<button
 						type="submit"
 						disabled={loading}
-						className="px-4 py-2 text-sm font-medium text-white bg-sky-500 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+						className="px-5 py-2 text-sm font-semibold text-white bg-gradient-to-r from-sky-500 to-blue-600 rounded-md shadow-md hover:from-sky-600 hover:to-blue-700 transition"
 					>
 						{loading ? "Submitting..." : "Submit Post"}
 					</button>

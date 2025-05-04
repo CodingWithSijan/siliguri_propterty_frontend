@@ -50,7 +50,7 @@ const AddressInput: React.FC<AddressInputProps> = ({ value, onChange }) => {
 			value={value}
 			onChange={(e) => onChange(e.target.value)}
 			placeholder="Enter your address"
-			className="w-full px-4 py-2 mt-1 border rounded-md border-sky-500 focus:ring-sky-500 focus:border-sky-500"
+			className="w-full px-4 py-2 mt-1 border rounded-md  focus:ring-sky-500 focus:border-sky-500"
 		/>
 	);
 };
