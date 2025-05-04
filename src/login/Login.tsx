@@ -12,19 +12,7 @@ interface UserFormDataTypes {
 	password: string;
 }
 
-interface GooglePopupMessage {
-	token?: string;
-	user?: {
-		id: string;
-		name: string;
-		email: string;
-		avatar?: string;
-		authProvider: "local" | "google";
-	};
-	error?: string;
-}
-
-const Login = () => {
+const Login: React.FC = () => {
 	const navigate = useNavigate();
 	const location = useLocation();
 	const { isAuthenticated, login } = useAuth();
@@ -34,31 +22,7 @@ const Login = () => {
 	});
 	const [loading, setLoading] = useState<boolean>(false);
 
-	useEffect(() => {
-		const handleMessage = (event: MessageEvent<GooglePopupMessage>) => {
-			// Secure the origin check
-			if (event.origin !== import.meta.env.VITE_BACKEND_URL) {
-				console.warn("Received message from unknown origin:", event.origin);
-				return;
-			}
-
-			if (event.data?.token && event.data?.user) {
-				login(event.data.user, event.data.token);
-				showSuccess("Google login successful! Redirecting...");
-				navigate("/");
-			}
-
-			if (event.data?.error) {
-				showError(event.data.error);
-			}
-		};
-
-		window.addEventListener("message", handleMessage);
-		return () => {
-			window.removeEventListener("message", handleMessage);
-		};
-	}, [login, navigate]);
-
+	// Handle query parameters for errors
 	useEffect(() => {
 		const params = new URLSearchParams(location.search);
 		const error = params.get("error");
@@ -67,6 +31,7 @@ const Login = () => {
 		}
 	}, [location]);
 
+	// Redirect if already authenticated
 	useEffect(() => {
 		if (isAuthenticated) {
 			navigate("/");
@@ -91,8 +56,8 @@ const Login = () => {
 			if (response.status === 200) {
 				const { user, token } = response.data;
 				login(user, token);
-				showSuccess("Login successful! Redirecting...");
-				setTimeout(() => navigate("/"), 1000);
+				showSuccess("Login successful.");
+				navigate("/");
 			} else {
 				showError(response.data.message || "Login failed.");
 			}

@@ -23,9 +23,7 @@ interface SignupLocalComponentProps {
 	onSuccess?: () => void;
 }
 
-const SignupLocalComponent: React.FC<SignupLocalComponentProps> = ({
-	onSuccess,
-}) => {
+const SignupLocalComponent: React.FC<SignupLocalComponentProps> = () => {
 	// State for form data and errors
 	const [formData, setFormData] = useState<FormData>({
 		name: "",
@@ -53,13 +51,9 @@ const SignupLocalComponent: React.FC<SignupLocalComponentProps> = ({
 					email: formData.email,
 					password: formData.password,
 				});
-				console.log("Registration successful");
-				showSuccess("User Signup Successful...\n Redirecting...");
-				if (onSuccess) {
-					onSuccess();
-				} else {
-					setTimeout(() => navigate("/"), 3000);
-				}
+
+				showSuccess("User Signup Successful.");
+				navigate("/login");
 				setErrors({ name: "", email: "", password: "", confirmPassword: "" });
 			} catch (error: any) {
 				if (error.response) {

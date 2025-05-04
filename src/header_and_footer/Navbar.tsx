@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Transition } from "@headlessui/react";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import { NavLink, useNavigate } from "react-router-dom";
-import siliguri_property_logo_noBG from "../assets/siliguri_property_logo_noBG.png";
+import siliguri_property_logo_noBG from "../assets/logo_siliguri_property.png";
 import { useAuth } from "../contextAPI/UserAuthContext";
 
 const Navbar: React.FC = () => {
@@ -25,7 +25,7 @@ const Navbar: React.FC = () => {
 			<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 				<div className="flex justify-between h-16 items-center">
 					{/* Logo */}
-					<NavLink to="/" className="h-18 w-24 aspect-[16/9]">
+					<NavLink to="/" className="h-24 w-24 aspect-[16/9]">
 						<img
 							src={siliguri_property_logo_noBG}
 							alt="Logo"
@@ -48,9 +48,17 @@ const Navbar: React.FC = () => {
 											className="w-10 h-10 rounded-full object-cover"
 										/>
 									) : ( */}
-									<div className="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold">
-										{getInitials(user?.name ?? user)}
-									</div>
+									{user.avatar ? (
+										<img
+											className="w-10 h-10 rounded-full border-2 border-sky-500"
+											src={user.avatar}
+										/>
+									) : (
+										<div className="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold">
+											{getInitials(user?.name ?? user)}
+										</div>
+									)}
+
 									{/* )} */}
 								</div>
 								{/* Dropdown Menu */}
@@ -119,6 +127,18 @@ const Navbar: React.FC = () => {
 				<div className="md:hidden px-4 pb-4 space-y-2 bg-white shadow">
 					{user ? (
 						<>
+							{user.avatar ? (
+								<div className="border-b-2 border-gray-400 py-5">
+									<img
+										className="w-10 h-10 rounded-full border-2 border-blue-600"
+										src={user.avatar}
+									/>
+								</div>
+							) : (
+								<div className="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold">
+									{getInitials(user?.name ?? user)}
+								</div>
+							)}
 							<NavLink
 								to="/dashboard"
 								className="block w-full text-center text-gray-700 hover:text-blue-600"
