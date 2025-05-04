@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
-
+import { isTokenExpired } from "../utils/IsTokenExpired";
+import { showError } from "../utils/toastUtils";
 interface User {
 	id: string;
 	name: string;
@@ -47,7 +48,12 @@ export const UserAuthProvider: React.FC<{ children: React.ReactNode }> = ({
 	useEffect(() => {
 		const storedUser = sessionStorage.getItem("user");
 		const storedToken = sessionStorage.getItem("token");
-		if (storedUser && storedToken) {
+		if (storedToken && isTokenExpired(storedToken)) {
+			sessionStorage.removeItem("token");
+			sessionStorage.removeItem("token");
+			setUser(null);
+			showError("Session expired. Please log in again.");
+		} else if (storedToken && storedUser) {
 			setUser(JSON.parse(storedUser));
 			setToken(storedToken);
 			setIsAuthenticated(true);

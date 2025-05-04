@@ -1,20 +1,36 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useAuth } from "../../contextAPI/UserAuthContext"; // Assuming you already have auth context
 import axios from "axios";
 import { showSuccess, showError } from "../../utils/toastUtils";
-import { NavLink } from "react-router-dom";
 import BASE_URL from "../../services";
+import ChangePassword from "../ChanagePassword";
+import ProtectedRoute from "../../route/ProtectedRoute";
 
 const YourProfile: React.FC = () => {
 	const { user, token, setUser } = useAuth();
 	const [selectedFile, setSelectedFile] = useState<File | null>(null);
 	const [preview, setPreview] = useState<string | null>(null);
 	const [uploading, setUploading] = useState<boolean>(false);
+	const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
 
-	useEffect(() => {
-		const response = BASE_URL.get(`/api/users/${user?.id}`);
+	// Update User context when user uploads new picture
+	const fetchLatestUserAndUpdateContext = async () => {
+		const response = await BASE_URL.get(`/api/users/${user?.id}`);
+		setUser((prev) => {
+			if (!prev) return prev;
+			return {
+				...prev,
+				avatar: response.data.avatar,
+			};
+		});
+
+		console.log(user);
 		console.log(response);
-	}, []);
+	};
+	// useEffect(() => {
+
+	// 	fetchLatestUserAndUpdateContext();
+	// }, []);
 
 	const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		if (e.target.files && e.target.files[0]) {
@@ -48,7 +64,9 @@ const YourProfile: React.FC = () => {
 			);
 
 			showSuccess("Profile Picture updated successfully!");
+			fetchLatestUserAndUpdateContext();
 
+			setSelectedFile(null);
 			// Optionally you can reload page or refetch user
 			// setTimeout(() => {
 			// 	window.location.reload();
@@ -60,8 +78,16 @@ const YourProfile: React.FC = () => {
 		}
 	};
 
+	const openChangePasswordModal = () => {
+		setIsChangePasswordOpen(true);
+	};
+
+	const closeChangePasswordModal = () => {
+		setIsChangePasswordOpen(false);
+	};
+
 	return (
-		<div className="flex flex-col items-center  min-h-screen pt-20 bg-gray-100 px-4">
+		<div className="flex flex-col items-center  min-h-screen pt-20 px-4">
 			<div className="bg-white rounded-lg shadow-lg p-8 w-full max-w-md space-y-6">
 				{/* Profile Picture */}
 				<div className="flex flex-col items-center space-y-4">
@@ -104,6 +130,7 @@ const YourProfile: React.FC = () => {
 							className="bg-gray-100 px-4 py-2 rounded-md"
 							type="text"
 							value={user?.name}
+							readOnly
 						/>
 					</div>
 					<div className="flex flex-col">
@@ -112,6 +139,7 @@ const YourProfile: React.FC = () => {
 							className="bg-gray-100 px-4 py-2 rounded-md"
 							type="text"
 							value={user?.email}
+							readOnly
 						/>
 					</div>
 					<div className="flex flex-col">
@@ -120,12 +148,17 @@ const YourProfile: React.FC = () => {
 							className="bg-gray-100 px-4 py-2 rounded-md"
 							type="password"
 							value="*********"
+							readOnly
 						/>
 					</div>
 					<div>
-						<NavLink to="/change-password" className="text-sm text-blue-600">
+						<button
+							type="button"
+							className="text-sm text-blue-600 hover:underline"
+							onClick={openChangePasswordModal}
+						>
 							Change Password
-						</NavLink>
+						</button>
 					</div>
 					<div>
 						<button className="p-4 rounded-b-md text-white bg-green-700">
@@ -134,6 +167,11 @@ const YourProfile: React.FC = () => {
 					</div>
 				</div>
 			</div>
+			{isChangePasswordOpen && (
+				<ProtectedRoute>
+					<ChangePassword onClose={closeChangePasswordModal} />
+				</ProtectedRoute>
+			)}
 		</div>
 	);
 };

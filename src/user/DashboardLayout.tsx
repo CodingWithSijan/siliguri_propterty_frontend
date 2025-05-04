@@ -33,19 +33,21 @@ const DashboardLayout: React.FC = () => {
 							sidebarOpen ? "translate-x-0" : "-translate-x-full"
 						}`}
 					>
-						<Sidebar activeMenu={activeMenu} setActiveMenu={setActiveMenu} />
+						<Sidebar
+							activeMenu={activeMenu}
+							setActiveMenu={setActiveMenu}
+							setSidebarOpen={setSidebarOpen}
+						/>
 					</div>
-
-					{/* Overlay on mobile when sidebar is open */}
+					Overlay on mobile when sidebar is open
 					{sidebarOpen && (
 						<div
 							className="fixed inset-0 bg-black opacity-30 z-30 md:hidden"
 							onClick={() => setSidebarOpen(false)}
 						></div>
 					)}
-
 					{/* Content */}
-					<main className="flex-1 p-6">
+					<main className="flex-1 p-4">
 						<ContentDisplay activeMenu={activeMenu} />
 					</main>
 				</div>

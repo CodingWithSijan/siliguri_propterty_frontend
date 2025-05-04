@@ -1,8 +1,9 @@
-import React from "react";
+import React, { SetStateAction } from "react";
 
 interface SidebarProps {
 	activeMenu: string;
 	setActiveMenu: (menu: string) => void;
+	setSidebarOpen: React.Dispatch<SetStateAction<boolean>>;
 }
 
 const menuItems = [
@@ -13,7 +14,11 @@ const menuItems = [
 	"Messages",
 ];
 
-const Sidebar: React.FC<SidebarProps> = ({ activeMenu, setActiveMenu }) => {
+const Sidebar: React.FC<SidebarProps> = ({
+	activeMenu,
+	setActiveMenu,
+	setSidebarOpen,
+}) => {
 	return (
 		<div>
 			<h2 className="text-xl font-semibold mb-6">Dashboard</h2>
@@ -24,7 +29,10 @@ const Sidebar: React.FC<SidebarProps> = ({ activeMenu, setActiveMenu }) => {
 						className={`cursor-pointer px-4 py-2 rounded-md hover:bg-blue-100 transition ${
 							activeMenu === item ? "bg-blue-500 text-white" : "text-gray-700"
 						}`}
-						onClick={() => setActiveMenu(item)}
+						onClick={() => {
+							setActiveMenu(item);
+							setSidebarOpen(false);
+						}}
 					>
 						{item}
 					</li>

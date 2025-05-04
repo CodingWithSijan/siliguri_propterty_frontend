@@ -25,6 +25,7 @@ const App: React.FC = () => {
 						/>
 						<Route path="/login" element={<Login />} />
 						<Route path="/auth/google/success" element={<GoogleSuccess />} />
+
 						<Route
 							path="/dashboard"
 							element={

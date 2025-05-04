@@ -56,7 +56,7 @@ const Login: React.FC = () => {
 			if (response.status === 200) {
 				const { user, token } = response.data;
 				login(user, token);
-				showSuccess("Login successful! Redirecting...");
+				showSuccess("Login successful.");
 				navigate("/");
 			} else {
 				showError(response.data.message || "Login failed.");
