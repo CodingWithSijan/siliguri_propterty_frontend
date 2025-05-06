@@ -15,6 +15,12 @@ const Navbar: React.FC = () => {
 		return name?.[0]?.toUpperCase() || "";
 	};
 
+	/*
+		TESTING 
+	 */
+	// useEffect(() => {
+	// 	console.log(user && user.role === "user" ? "User" : "Admin");
+	// }, []);
 	const handleLogout = () => {
 		logout();
 		navigate("/login");
@@ -41,13 +47,6 @@ const Navbar: React.FC = () => {
 									className="flex items-center space-x-2 cursor-pointer"
 									onClick={() => setDropdownOpen(!dropdownOpen)}
 								>
-									{/* {user.profilePicture ? (
-										<img
-											src={user.profilePicture}
-											alt="Profile"
-											className="w-10 h-10 rounded-full object-cover"
-										/>
-									) : ( */}
 									{user.avatar ? (
 										<img
 											className="w-10 h-10 rounded-full border-2 border-sky-500"
@@ -64,12 +63,22 @@ const Navbar: React.FC = () => {
 								{/* Dropdown Menu */}
 								{dropdownOpen && (
 									<div className="absolute right-0 mt-2 w-48 bg-white shadow-lg rounded-md py-2 z-50">
-										<NavLink
-											to="/dashboard"
-											className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
-										>
-											User Dashboard
-										</NavLink>
+										{user && user.role === "user" ? (
+											<NavLink
+												to="/dashboard"
+												className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+											>
+												User Dashboard
+											</NavLink>
+										) : (
+											<NavLink
+												to="/admin"
+												className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+											>
+												Admin Dashboard
+											</NavLink>
+										)}
+
 										<button
 											onClick={handleLogout}
 											className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"
@@ -127,24 +136,22 @@ const Navbar: React.FC = () => {
 				<div className="md:hidden px-4 pb-4 space-y-2 bg-white shadow">
 					{user ? (
 						<>
-							{user.avatar ? (
-								<div className="border-b-2 border-gray-400 py-5">
-									<img
-										className="w-10 h-10 rounded-full border-2 border-blue-600"
-										src={user.avatar}
-									/>
-								</div>
+							{" "}
+							{user && user?.role === "user" ? (
+								<NavLink
+									to="/dashboard"
+									className="block w-full text-center text-gray-700 hover:text-blue-600"
+								>
+									User Dashboard
+								</NavLink>
 							) : (
-								<div className="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold">
-									{getInitials(user?.name ?? user)}
-								</div>
+								<NavLink
+									to="/admin"
+									className="block w-full text-center text-gray-700 hover:text-blue-600"
+								>
+									Admin Dashboard
+								</NavLink>
 							)}
-							<NavLink
-								to="/dashboard"
-								className="block w-full text-center text-gray-700 hover:text-blue-600"
-							>
-								User Dashboard
-							</NavLink>
 							<button
 								onClick={handleLogout}
 								className="block w-full text-center bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition"

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useAuth } from "../../contextAPI/UserAuthContext"; // Assuming you already have auth context
+import { useAuth } from "../../contextAPI/UserAuthContext";
 import axios from "axios";
 import { showSuccess, showError } from "../../utils/toastUtils";
 import BASE_URL from "../../services";
@@ -23,9 +23,6 @@ const YourProfile: React.FC = () => {
 				avatar: response.data.avatar,
 			};
 		});
-
-		console.log(user);
-		console.log(response);
 	};
 	// useEffect(() => {
 

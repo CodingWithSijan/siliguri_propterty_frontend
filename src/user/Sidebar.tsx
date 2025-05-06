@@ -21,7 +21,7 @@ const Sidebar: React.FC<SidebarProps> = ({
 }) => {
 	return (
 		<div>
-			<h2 className="text-xl font-semibold mb-6">Dashboard</h2>
+			<h2 className="text-xl font-semibold mb-6 text-sky-500">Dashboard</h2>
 			<ul className="space-y-3">
 				{menuItems.map((item) => (
 					<li

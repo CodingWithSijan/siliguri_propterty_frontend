@@ -7,6 +7,7 @@ interface User {
 	email: string;
 	avatar?: string;
 	authProvider: "local" | "google";
+	role: "user" | "admin";
 }
 
 interface UserAuthContextType {

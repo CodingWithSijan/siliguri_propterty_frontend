@@ -15,7 +15,7 @@ interface UserFormDataTypes {
 const Login: React.FC = () => {
 	const navigate = useNavigate();
 	const location = useLocation();
-	const { isAuthenticated, login } = useAuth();
+	const { isAuthenticated, login, user } = useAuth();
 	const [formData, setFormData] = useState<UserFormDataTypes>({
 		email: "",
 		password: "",
@@ -33,8 +33,10 @@ const Login: React.FC = () => {
 
 	// Redirect if already authenticated
 	useEffect(() => {
-		if (isAuthenticated) {
+		if (isAuthenticated && user?.role == "user") {
 			navigate("/");
+		} else if (isAuthenticated && user?.role == "admin") {
+			navigate("/admin");
 		}
 	}, [isAuthenticated, navigate]);
 
@@ -52,12 +54,21 @@ const Login: React.FC = () => {
 				email: formData.email,
 				password: formData.password,
 			});
-
+			/*
+			 ***If user navigate to homepage, if admin navigate to admin dashboard***
+			 */
 			if (response.status === 200) {
-				const { user, token } = response.data;
-				login(user, token);
-				showSuccess("Login successful.");
-				navigate("/");
+				if (user?.role == "user") {
+					const { user, token } = response.data;
+					login(user, token);
+					showSuccess("Login successful.");
+					navigate("/");
+				} else {
+					const { user, token } = response.data;
+					login(user, token);
+					showSuccess("Login successful.");
+					navigate("/admin");
+				}
 			} else {
 				showError(response.data.message || "Login failed.");
 			}

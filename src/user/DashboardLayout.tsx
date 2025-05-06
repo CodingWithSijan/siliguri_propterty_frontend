@@ -3,6 +3,7 @@ import Sidebar from "./Sidebar";
 import ContentDisplay from "./ContentDisplay";
 import { ArrowDownIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import Navbar from "../header_and_footer/Navbar";
+import ProtectedRoute from "../route/ProtectedRoute";
 
 const DashboardLayout: React.FC = () => {
 	const [activeMenu, setActiveMenu] = useState("Your Profile");
@@ -48,7 +49,9 @@ const DashboardLayout: React.FC = () => {
 					)}
 					{/* Content */}
 					<main className="flex-1 p-4">
-						<ContentDisplay activeMenu={activeMenu} />
+						<ProtectedRoute allowedRoles={["user"]}>
+							<ContentDisplay activeMenu={activeMenu} />
+						</ProtectedRoute>
 					</main>
 				</div>
 			</div>

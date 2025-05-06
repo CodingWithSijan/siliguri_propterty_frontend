@@ -1,65 +1,44 @@
-import React, { useState, useEffect } from "react";
-import axios from "axios";
-import { showError } from "../../utils/toastUtils";
-import ListingCard from "../../components/ListingCard"; // Reusable card component
-import PostDetails from "../../components/PostDetails"; // Component for editing/deleting posts
+import React, { useEffect, useState } from "react";
 import BASE_URL from "../../services";
+import ListingCard from "../../components/ListingCard";
+import PostDetails from "../../components/PostDetails";
+import { showError } from "../../utils/toastUtils";
 
-const ViewYourListings: React.FC = () => {
-	const [listings, setListings] = useState([]);
-	const [selectedPost, setSelectedPost] = useState(null);
-	const [loading, setLoading] = useState(false);
+const ViewYourListings = () => {
+	const [listings, setListings] = useState<any[]>([]);
+	const [selectedPost, setSelectedPost] = useState<any | null>(null);
+	const [loading, setLoading] = useState<boolean>(false);
 
-	// Fetch user listings
 	useEffect(() => {
-		try {
-			const fetchListings = async () => {
-				// setLoading(true);
-				try {
-					const response = await BASE_URL.get(
-						"/api/users/post/view-your-listings"
-					);
-					console.log(response.data.postArray);
-
-					setListings(response.data.postArray);
-				} catch (error: any) {
-					console.log("View Your Listings Error: ", error.message);
-					showError("Failed to fetch your listings.");
-				} finally {
-					// setLoading(false);
-				}
-			};
-
-			fetchListings();
-		} catch (error: any) {
-			console.log("View Your Listings Error: ", error.message);
-			showError("Error Fetching Listings");
-		}
+		const fetchListings = async () => {
+			try {
+				setLoading(true);
+				const response = await BASE_URL.get(
+					"/api/users/post/view-your-listings"
+				);
+				setListings(response.data.postArray);
+			} catch (error: any) {
+				showError("Failed to fetch listings");
+			} finally {
+				setLoading(false);
+			}
+		};
+		fetchListings();
 	}, []);
 
-	// Handle card click to view/edit/delete post
-	const handleCardClick = (post: any) => {
-		setSelectedPost(post);
-	};
-
-	// Handle back to listings
-	const handleBack = () => {
-		setSelectedPost(null);
-	};
-
 	return (
-		<div className="max-w-7xl mx-auto p-6">
+		<div className="max-w-7xl mx-auto px-4 py-6">
 			{loading ? (
 				<p className="text-center text-gray-500">Loading your listings...</p>
 			) : selectedPost ? (
-				<PostDetails post={selectedPost} onBack={handleBack} />
+				<PostDetails post={selectedPost} onBack={() => setSelectedPost(null)} />
 			) : (
 				<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
 					{listings.map((listing) => (
 						<ListingCard
 							key={listing._id}
 							listing={listing}
-							onClick={() => handleCardClick(listing)}
+							onClick={() => setSelectedPost(listing)}
 						/>
 					))}
 				</div>

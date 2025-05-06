@@ -10,6 +10,9 @@ import Login from "./login/Login";
 import { UserAuthProvider } from "./contextAPI/UserAuthContext";
 import DashboardLayout from "./user/DashboardLayout";
 import GoogleSuccess from "./pages/GoogleSuccess";
+import AdminDashboard from "./admin/AdminDashboard";
+import NotFound404 from "./components/NotFound404";
+import AdminProtectedRoute from "./route/AdminProtectedRoute";
 
 const App: React.FC = () => {
 	return (
@@ -29,11 +32,20 @@ const App: React.FC = () => {
 						<Route
 							path="/dashboard"
 							element={
-								<ProtectedRoute>
+								<ProtectedRoute allowedRoles={["user"]}>
 									<DashboardLayout />
 								</ProtectedRoute>
 							}
 						/>
+						<Route
+							path="/admin"
+							element={
+								<ProtectedRoute allowedRoles={["admin"]}>
+									<AdminDashboard />
+								</ProtectedRoute>
+							}
+						/>
+						<Route path="/access-denied" element={<NotFound404 />} />
 					</Routes>
 					<ToastContainer />
 				</Router>
