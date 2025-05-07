@@ -12,7 +12,6 @@ import DashboardLayout from "./user/DashboardLayout";
 import GoogleSuccess from "./pages/GoogleSuccess";
 import AdminDashboard from "./admin/AdminDashboard";
 import NotFound404 from "./components/NotFound404";
-import AdminProtectedRoute from "./route/AdminProtectedRoute";
 
 const App: React.FC = () => {
 	return (
