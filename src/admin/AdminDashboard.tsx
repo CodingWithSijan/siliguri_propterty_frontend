@@ -9,7 +9,7 @@ import {
 } from "@heroicons/react/24/outline";
 
 import logo from "../../public/logo_siliguri_property.png";
-import { Divider } from "@tremor/react";
+// import { Divider } from "@tremor/react";
 const AdminDashboard: React.FC = () => {
 	const [activeMenu, setActiveMenu] = useState<string>("My Profile");
 	const { user } = useAuth();
@@ -23,7 +23,7 @@ const AdminDashboard: React.FC = () => {
 						className="rounded-full  w-[100px] h-[80px]"
 					/>
 				</div>
-				<Divider>ADMIN PANEL</Divider>
+				{/* <Divider>ADMIN PANEL</Divider> */}
 				<ul className="flex flex-col justify-between items-start font-mono">
 					<div className="flex justify-between gap-2 items-center cursor-pointer p-4 ml-2 ">
 						<HomeIcon className="text-gray-600 w-5 h-5 " />
