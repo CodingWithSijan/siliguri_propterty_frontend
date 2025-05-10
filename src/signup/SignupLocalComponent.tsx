@@ -1,170 +1,188 @@
 import React, { useState } from "react";
-import { validateForm } from "../utils/formValidation";
-import BASE_URL from "../services/index";
-import { showError, showSuccess } from "../utils/toastUtils";
 import { useNavigate } from "react-router-dom";
+import BASE_URL from "../services";
+import { showError, showSuccess } from "../utils/toastUtils";
+import { validateForm, FormData, FormErrors } from "../utils/formValidation";
+import { FaUser, FaEnvelope, FaPhoneAlt, FaLock } from "react-icons/fa";
 
-// Type Safety
-interface FormData {
-	name: string;
-	email: string;
-	password: string;
-	confirmPassword: string;
-}
-
-interface FormErrors {
-	name: string;
-	email: string;
-	password: string;
-	confirmPassword: string;
-}
-
-interface SignupLocalComponentProps {
-	onSuccess?: () => void;
-}
-
-const SignupLocalComponent: React.FC<SignupLocalComponentProps> = () => {
-	// State for form data and errors
+const SignupLocalComponent: React.FC = () => {
 	const [formData, setFormData] = useState<FormData>({
 		name: "",
 		email: "",
+		phone: "",
 		password: "",
 		confirmPassword: "",
 	});
+
 	const [errors, setErrors] = useState<FormErrors>({
 		name: "",
 		email: "",
+		phone: "",
 		password: "",
 		confirmPassword: "",
 	});
 
 	const navigate = useNavigate();
 
+	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		const { name, value } = e.target;
+		if (name === "phone" && !/^\d{0,9}$/.test(value)) return;
+		setFormData((prev) => ({ ...prev, [name]: value }));
+	};
+
 	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
-		setErrors({ name: "", email: "", password: "", confirmPassword: "" });
 		const { isValid, errors: validationErrors } = validateForm(formData);
-		if (isValid) {
-			try {
-				await BASE_URL.post("/api/auth/register", {
-					name: formData.name,
-					email: formData.email,
-					password: formData.password,
-				});
 
-				showSuccess("User Signup Successful.");
-				navigate("/login");
-				setErrors({ name: "", email: "", password: "", confirmPassword: "" });
-			} catch (error: any) {
-				if (error.response) {
-					showError(error.response.data.message);
-					console.error("Server responded with an error:", error.response.data);
-				}
-			}
-		} else {
+		if (!isValid) {
 			setErrors(validationErrors);
+			return;
+		}
+
+		try {
+			await BASE_URL.post("/api/auth/register", {
+				name: formData.name,
+				email: formData.email,
+				phone: "+91" + formData.phone,
+				password: formData.password,
+			});
+
+			showSuccess("User Signup Successful.");
+			navigate("/login");
+		} catch (error: any) {
+			if (error.response?.data?.message) {
+				showError(error.response.data.message);
+			} else {
+				showError("Something went wrong. Please try again.");
+			}
 		}
 	};
 
-	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		const { name, value } = e.target;
-		setFormData({ ...formData, [name]: value });
-	};
-
 	return (
-		<div className="w-full max-w-md p-8 space-y-6 bg-white rounded-lg shadow-md">
-			<h2 className="text-2xl font-bold text-center text-gray-800">Sign Up</h2>
-			<form className="space-y-4 text-black" onSubmit={handleSubmit}>
-				<div>
-					<label
-						htmlFor="name"
-						className="block text-sm font-medium text-gray-700"
-					>
-						Name
-					</label>
+		<form onSubmit={handleSubmit} className="space-y-5 text-black">
+			{/* Name */}
+			<div>
+				<label
+					htmlFor="name"
+					className="flex items-center gap-2 text-sm font-medium text-gray-700"
+				>
+					<FaUser /> Name
+				</label>
+				<input
+					type="text"
+					name="name"
+					id="name"
+					value={formData.name}
+					onChange={handleChange}
+					required
+					className="w-full px-4 py-2 mt-1 text-sm border rounded-md border-gray-300 focus:ring-blue-500 focus:border-blue-500"
+					placeholder="Your full name"
+				/>
+				{errors.name && <p className="text-sm text-red-500">{errors.name}</p>}
+			</div>
+
+			{/* Email */}
+			<div>
+				<label
+					htmlFor="email"
+					className="flex items-center gap-2 text-sm font-medium text-gray-700"
+				>
+					<FaEnvelope /> Email Address
+				</label>
+				<input
+					type="email"
+					name="email"
+					id="email"
+					value={formData.email}
+					onChange={handleChange}
+					required
+					className="w-full px-4 py-2 mt-1 text-sm border rounded-md border-gray-300 focus:ring-blue-500 focus:border-blue-500"
+					placeholder="you@example.com"
+				/>
+				{errors.email && <p className="text-sm text-red-500">{errors.email}</p>}
+			</div>
+
+			{/* Phone */}
+			<div>
+				<label
+					htmlFor="phone"
+					className="flex items-center gap-2 text-sm font-medium text-gray-700"
+				>
+					<FaPhoneAlt /> Phone Number
+				</label>
+				<div className="flex items-center mt-1">
+					<span className="px-3 py-2 border border-r-0 rounded-l-md bg-gray-100 text-gray-700 text-sm">
+						+91
+					</span>
 					<input
 						type="text"
-						id="name"
-						name="name"
-						value={formData.name}
+						name="phone"
+						id="phone"
+						maxLength={9}
+						value={formData.phone}
 						onChange={handleChange}
 						required
-						className="w-full px-4 py-2 mt-1 text-sm border rounded-md focus:ring-blue-500 focus:border-blue-500 border-gray-300"
-						placeholder="Enter your name"
+						className="w-full px-4 py-2 text-sm border rounded-r-md border-gray-300 focus:ring-blue-500 focus:border-blue-500"
+						placeholder="9-digit number"
 					/>
-					{errors.name && <p className="text-sm text-red-500">{errors.name}</p>}
 				</div>
-				<div>
-					<label
-						htmlFor="email"
-						className="block text-sm font-medium text-gray-700"
-					>
-						Email Address
-					</label>
-					<input
-						type="email"
-						id="email"
-						name="email"
-						value={formData.email}
-						onChange={handleChange}
-						required
-						className="w-full px-4 py-2 mt-1 text-sm border rounded-md focus:ring-blue-500 focus:border-blue-500 border-gray-300"
-						placeholder="Enter your email"
-					/>
-					{errors.email && (
-						<p className="text-sm text-red-500">{errors.email}</p>
-					)}
-				</div>
-				<div>
-					<label
-						htmlFor="password"
-						className="block text-sm font-medium text-gray-700"
-					>
-						Password
-					</label>
-					<input
-						type="password"
-						id="password"
-						name="password"
-						value={formData.password}
-						onChange={handleChange}
-						required
-						className="w-full px-4 py-2 mt-1 text-sm border rounded-md focus:ring-blue-500 focus:border-blue-500 border-gray-300"
-						placeholder="Enter your password"
-					/>
-					{errors.password && (
-						<p className="text-sm text-red-500">{errors.password}</p>
-					)}
-				</div>
-				<div>
-					<label
-						htmlFor="confirmPassword"
-						className="block text-sm font-medium text-gray-700"
-					>
-						Confirm Password
-					</label>
-					<input
-						type="password"
-						id="confirmPassword"
-						name="confirmPassword"
-						value={formData.confirmPassword}
-						onChange={handleChange}
-						required
-						className="w-full px-4 py-2 mt-1 text-sm border rounded-md focus:ring-blue-500 focus:border-blue-500 border-gray-300"
-						placeholder="Confirm your password"
-					/>
-					{errors.confirmPassword && (
-						<p className="text-sm text-red-500">{errors.confirmPassword}</p>
-					)}
-				</div>
-				<button
-					type="submit"
-					className="w-full px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+				{errors.phone && <p className="text-sm text-red-500">{errors.phone}</p>}
+			</div>
+
+			{/* Password */}
+			<div>
+				<label
+					htmlFor="password"
+					className="flex items-center gap-2 text-sm font-medium text-gray-700"
 				>
-					Sign Up
-				</button>
-			</form>
-		</div>
+					<FaLock /> Password
+				</label>
+				<input
+					type="password"
+					name="password"
+					id="password"
+					value={formData.password}
+					onChange={handleChange}
+					required
+					className="w-full px-4 py-2 mt-1 text-sm border rounded-md border-gray-300 focus:ring-blue-500 focus:border-blue-500"
+					placeholder="Minimum 6 characters"
+				/>
+				{errors.password && (
+					<p className="text-sm text-red-500">{errors.password}</p>
+				)}
+			</div>
+
+			{/* Confirm Password */}
+			<div>
+				<label
+					htmlFor="confirmPassword"
+					className="flex items-center gap-2 text-sm font-medium text-gray-700"
+				>
+					<FaLock /> Confirm Password
+				</label>
+				<input
+					type="password"
+					name="confirmPassword"
+					id="confirmPassword"
+					value={formData.confirmPassword}
+					onChange={handleChange}
+					required
+					className="w-full px-4 py-2 mt-1 text-sm border rounded-md border-gray-300 focus:ring-blue-500 focus:border-blue-500"
+					placeholder="Re-enter password"
+				/>
+				{errors.confirmPassword && (
+					<p className="text-sm text-red-500">{errors.confirmPassword}</p>
+				)}
+			</div>
+
+			{/* Submit */}
+			<button
+				type="submit"
+				className="w-full px-4 py-2 text-white bg-blue-600 hover:bg-blue-700 rounded-md text-sm font-medium transition duration-200"
+			>
+				Create Account
+			</button>
+		</form>
 	);
 };
 

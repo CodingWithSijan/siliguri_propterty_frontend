@@ -2,10 +2,11 @@ import React, { useEffect, useState } from "react";
 import Navbar from "../header_and_footer/Navbar";
 import { showSuccess, showError } from "../utils/toastUtils";
 import BASE_URL from "../services";
-import { SiGoogle } from "react-icons/si";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../contextAPI/UserAuthContext";
 import { AxiosError } from "axios";
+import { FaEnvelope, FaLock } from "react-icons/fa";
+import { BiLoaderAlt } from "react-icons/bi";
 
 interface UserFormDataTypes {
 	email: string;
@@ -16,28 +17,24 @@ const Login: React.FC = () => {
 	const navigate = useNavigate();
 	const location = useLocation();
 	const { isAuthenticated, login, user } = useAuth();
+
 	const [formData, setFormData] = useState<UserFormDataTypes>({
 		email: "",
 		password: "",
 	});
 	const [loading, setLoading] = useState<boolean>(false);
 
-	// Handle query parameters for errors
+	// Show error from URL
 	useEffect(() => {
 		const params = new URLSearchParams(location.search);
 		const error = params.get("error");
-		if (error) {
-			showError(decodeURIComponent(error));
-		}
+		if (error) showError(decodeURIComponent(error));
 	}, [location]);
 
-	// Redirect if already authenticated
+	// Auto-redirect if already logged in
 	useEffect(() => {
-		if (isAuthenticated && user?.role == "user") {
-			navigate("/");
-		} else if (isAuthenticated && user?.role == "admin") {
-			navigate("/admin");
-		}
+		if (isAuthenticated && user?.role === "user") navigate("/");
+		else if (isAuthenticated && user?.role === "admin") navigate("/admin");
 	}, [isAuthenticated, navigate]);
 
 	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -50,118 +47,74 @@ const Login: React.FC = () => {
 		setLoading(true);
 
 		try {
-			const response = await BASE_URL.post("/api/auth/login", {
-				email: formData.email,
-				password: formData.password,
-			});
-			/*
-			 ***If user navigate to homepage, if admin navigate to admin dashboard***
-			 */
-			if (response.status === 200) {
-				if (user?.role == "user") {
-					const { user, token } = response.data;
-					login(user, token);
-					showSuccess("Login successful.");
-					navigate("/");
-				} else {
-					const { user, token } = response.data;
-					login(user, token);
-					showSuccess("Login successful.");
-					navigate("/admin");
-				}
-			} else {
-				showError(response.data.message || "Login failed.");
-			}
+			const response = await BASE_URL.post("/api/auth/login", formData);
+			const { user, token } = response.data;
+			login(user, token);
+			showSuccess("Login successful.");
+			navigate(user?.role === "admin" ? "/admin" : "/");
 		} catch (error) {
 			const err = error as AxiosError<{ message: string }>;
-			if (err.response?.data?.message) {
-				showError(err.response.data.message);
-			} else {
-				showError("An error occurred during login.");
-			}
+			showError(err.response?.data?.message || "Login failed.");
 		} finally {
 			setLoading(false);
 		}
 	};
 
-	const handleGoogleLogin = () => {
-		window.location.href = `${
-			import.meta.env.VITE_BACKEND_URL
-		}/api/auth/google`;
-	};
-
 	return (
 		<>
-			<Navbar />
-			<div className="flex items-center justify-center min-h-screen bg-gray-100 pt-16">
-				<div className="w-full max-w-md p-8 space-y-6 bg-white rounded-lg shadow-md">
-					<h2 className="text-2xl font-bold text-center text-gray-800">
-						Login
+			<div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-100 via-white to-blue-200 px-4">
+				<div className="w-full max-w-md bg-white shadow-2xl rounded-3xl p-8">
+					<h2 className="text-2xl sm:text-3xl font-bold text-center text-blue-700 mb-6">
+						Welcome Back
 					</h2>
-
-					<form className="space-y-4" onSubmit={handleSubmit}>
-						<div>
-							<label
-								htmlFor="email"
-								className="block text-sm font-medium text-gray-700"
-							>
-								Email Address
-							</label>
+					<form className="space-y-5 text-black" onSubmit={handleSubmit}>
+						{/* Email */}
+						<div className="relative">
+							<FaEnvelope className="absolute top-3 left-3 text-gray-400" />
 							<input
 								type="email"
-								id="email"
 								name="email"
+								id="email"
+								required
 								value={formData.email}
 								onChange={handleChange}
-								required
-								className="w-full px-4 py-2 mt-1 text-sm text-black border rounded-md border-gray-300 focus:ring-blue-500 focus:border-blue-500"
-								placeholder="Enter your email"
+								placeholder="Email address"
+								className="w-full pl-10 pr-4 py-2 text-sm border rounded-md border-gray-300 focus:ring-blue-500 focus:border-blue-500"
 							/>
 						</div>
 
-						<div>
-							<label
-								htmlFor="password"
-								className="block text-sm font-medium text-gray-700"
-							>
-								Password
-							</label>
+						{/* Password */}
+						<div className="relative">
+							<FaLock className="absolute top-3 left-3 text-gray-400" />
 							<input
 								type="password"
-								id="password"
 								name="password"
+								id="password"
+								required
 								value={formData.password}
 								onChange={handleChange}
-								required
-								className="w-full px-4 py-2 mt-1 text-sm border text-black rounded-md border-gray-300 focus:ring-blue-500 focus:border-blue-500"
-								placeholder="Enter your password"
+								placeholder="Password"
+								className="w-full pl-10 pr-4 py-2 text-sm border rounded-md border-gray-300 focus:ring-blue-500 focus:border-blue-500"
 							/>
 						</div>
 
+						{/* Submit */}
 						<button
 							type="submit"
 							disabled={loading}
-							className="w-full px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+							className="w-full flex items-center justify-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-md transition duration-200"
 						>
+							{loading && <BiLoaderAlt className="animate-spin" />}
 							{loading ? "Logging in..." : "Login"}
 						</button>
 					</form>
 
-					<div className="text-center">
-						<p className="text-sm text-gray-600">Or login using</p>
-						<button
-							onClick={handleGoogleLogin}
-							disabled={loading}
-							className="mt-2 w-full px-4 py-2 text-sm font-medium text-white bg-red-400 rounded-md hover:bg-red-500 flex items-center justify-center"
-						>
-							<SiGoogle className="w-5 h-5 mr-2" />
-							Login with Google
-						</button>
-					</div>
-
-					<p className="text-sm text-center text-gray-600">
+					<p className="text-sm text-center text-gray-600 mt-4">
 						Don’t have an account?{" "}
-						<a href="/signup" className="text-blue-600 hover:underline">
+						<a
+							href="/signup"
+							className="text-blue-600 hover:underline font-medium"
+						>
 							Sign up
 						</a>
 					</p>
