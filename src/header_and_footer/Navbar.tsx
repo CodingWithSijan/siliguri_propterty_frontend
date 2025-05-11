@@ -4,16 +4,13 @@ import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import { NavLink, useNavigate } from "react-router-dom";
 import siliguri_property_logo_noBG from "../assets/logo_siliguri_property.png";
 import { useAuth } from "../contextAPI/UserAuthContext";
+import { getInitials } from "../utils/getInitial";
 
 const Navbar: React.FC = () => {
 	const [isOpen, setIsOpen] = useState<boolean>(false);
 	const [dropdownOpen, setDropdownOpen] = useState<boolean>(false);
 	const { user, logout } = useAuth();
 	const navigate = useNavigate();
-
-	const getInitials = (name: string): string => {
-		return name?.[0]?.toUpperCase() || "";
-	};
 
 	/*
 		TESTING 
@@ -31,7 +28,7 @@ const Navbar: React.FC = () => {
 			<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 				<div className="flex justify-between h-16 items-center">
 					{/* Logo */}
-					<NavLink to="/" className="h-24 w-24 aspect-[16/9]">
+					<NavLink to="/" className="h-24 w-24">
 						<img
 							src={siliguri_property_logo_noBG}
 							alt="Logo"

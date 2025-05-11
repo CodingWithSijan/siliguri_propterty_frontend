@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import Navbar from "../header_and_footer/Navbar";
 import { showSuccess, showError } from "../utils/toastUtils";
 import BASE_URL from "../services";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation, NavLink } from "react-router-dom";
 import { useAuth } from "../contextAPI/UserAuthContext";
 import { AxiosError } from "axios";
 import { FaEnvelope, FaLock } from "react-icons/fa";
@@ -111,12 +111,12 @@ const Login: React.FC = () => {
 
 					<p className="text-sm text-center text-gray-600 mt-4">
 						Don’t have an account?{" "}
-						<a
-							href="/signup"
+						<NavLink
+							to="/signup"
 							className="text-blue-600 hover:underline font-medium"
 						>
 							Sign up
-						</a>
+						</NavLink>
 					</p>
 				</div>
 			</div>
