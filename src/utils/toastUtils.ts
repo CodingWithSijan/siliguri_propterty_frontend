@@ -27,5 +27,17 @@ const showSuccess = (msg: string): void => {
 		transition: Bounce,
 	});
 };
-
-export { showSuccess, showError };
+const showInfo = (msg: string): void => {
+	toast.info(msg, {
+		position: "top-center",
+		autoClose: 1000,
+		hideProgressBar: false,
+		closeOnClick: false,
+		pauseOnHover: false,
+		draggable: false,
+		progress: undefined,
+		theme: "colored",
+		transition: Bounce,
+	});
+};
+export { showSuccess, showError, showInfo };

@@ -12,6 +12,7 @@ import DashboardLayout from "./user/DashboardLayout";
 import GoogleSuccess from "./pages/GoogleSuccess";
 import AdminDashboard from "./admin/AdminDashboard";
 import NotFound404 from "./components/NotFound404";
+import VerifyEmail from "./components/VerifyEmail";
 
 const App: React.FC = () => {
 	return (
@@ -45,6 +46,7 @@ const App: React.FC = () => {
 							}
 						/>
 						<Route path="/access-denied" element={<NotFound404 />} />
+						<Route path="/verify-email" element={<VerifyEmail />} />
 					</Routes>
 					<ToastContainer />
 				</Router>

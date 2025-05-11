@@ -1,13 +1,15 @@
-interface FormData {
+export interface FormData {
 	email: string;
 	password: string;
+	phone: string;
 	confirmPassword: string;
 	name: string;
 }
 
-interface FormErrors {
+export interface FormErrors {
 	email: string;
 	password: string;
+	phone: string;
 	confirmPassword: string;
 	name: string;
 }
@@ -18,20 +20,20 @@ export const validateForm = (
 	const errors: FormErrors = {
 		email: "",
 		password: "",
+		phone: "",
 		confirmPassword: "",
 		name: "",
 	};
+
 	let isValid = true;
 
-	console.log(
-		`password: ${formData.password} confirm ${formData.confirmPassword}`
-	);
-
+	// Email validation
 	if (!formData.email.includes("@")) {
 		errors.email = "Invalid email address.";
 		isValid = false;
 	}
 
+	// Password validation
 	if (formData.password.length < 6) {
 		errors.password = "Password must be at least 6 characters long.";
 		isValid = false;
@@ -42,11 +44,19 @@ export const validateForm = (
 		isValid = false;
 	}
 
+	// Name validation
 	if (formData.name.trim() === "") {
 		errors.name = "Name is required.";
 		isValid = false;
 	} else if (formData.name.length < 3) {
 		errors.name = "Name must be at least 3 characters long.";
+		isValid = false;
+	}
+
+	// Phone validation (expects only 9 digits as input, without +91)
+	if (!/^\d{9}$/.test(formData.phone)) {
+		errors.phone = "Phone number must be 9 digits.";
+		isValid = false;
 	}
 
 	return { isValid, errors };

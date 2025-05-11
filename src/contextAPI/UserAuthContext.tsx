@@ -8,6 +8,8 @@ interface User {
 	avatar?: string;
 	authProvider: "local" | "google";
 	role: "user" | "admin";
+	phone: string;
+	isVerified: boolean;
 }
 
 interface UserAuthContextType {
