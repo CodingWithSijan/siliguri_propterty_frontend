@@ -5,7 +5,14 @@ import { showSuccess, showError, showInfo } from "../../utils/toastUtils";
 import BASE_URL from "../../services";
 import ChangePassword from "../ChanagePassword";
 import ProtectedRoute from "../../route/ProtectedRoute";
-import { FiUser, FiMail, FiLock, FiCamera, FiSave } from "react-icons/fi";
+import {
+	FiUser,
+	FiMail,
+	FiLock,
+	FiCamera,
+	FiSave,
+	FiPhone,
+} from "react-icons/fi";
 import { getInitials } from "../../utils/getInitial";
 
 const YourProfile: React.FC = () => {
@@ -175,7 +182,7 @@ const YourProfile: React.FC = () => {
 						</div>
 					</div>
 					<div className="relative">
-						<FiLock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+						<FiPhone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
 						<input
 							className="pl-10 w-full bg-gray-100 px-4 py-2 rounded-md border border-gray-300"
 							type="text"
