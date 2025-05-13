@@ -1,4 +1,5 @@
-import { FormDataTypes } from "../../../../../types/postTypes";
+import { useForm } from "react-hook-form";
+import { RentFormData } from "../../../../../types/postTypes";
 import { Button } from "../../../../ui/button";
 import { Input } from "../../../../ui/input";
 import { Label } from "../../../../ui/label";
@@ -9,6 +10,29 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "../../../../ui/select";
+import { Textarea } from "../../../../ui/textarea";
+import {
+	LuDollarSign,
+	LuBuilding,
+	LuText,
+	LuTextQuote,
+	LuMapPin,
+	LuClock,
+} from "react-icons/lu";
+import { MdCurrencyRupee } from "react-icons/md";
+import AddressInput from "../../../../../services/AddressInput";
+import { useEffect } from "react";
+
+interface Props {
+	step: number;
+	formData: RentFormData;
+	updateField: <K extends keyof RentFormData>(
+		key: K,
+		value: RentFormData[K]
+	) => void;
+	onNext: () => void;
+	onBack: () => void;
+}
 
 export default function RentSteps({
 	step,
@@ -16,45 +40,84 @@ export default function RentSteps({
 	updateField,
 	onNext,
 	onBack,
-}: {
-	step: number;
-	formData: FormDataTypes;
-	updateField: <K extends keyof FormDataTypes>(
-		key: K,
-		value: FormDataTypes[K]
-	) => void;
-	onNext: () => void;
-	onBack: () => void;
-}) {
+}: Props) {
+	const {
+		register,
+		handleSubmit,
+		setValue,
+		trigger,
+		formState: { errors },
+	} = useForm<RentFormData>({
+		defaultValues: formData,
+	});
+
+	const onSubmit = (data: RentFormData) => {
+		Object.entries(data).forEach(([key, value]) => {
+			updateField(
+				key as keyof RentFormData,
+				value as RentFormData[keyof RentFormData]
+			);
+		});
+		onNext();
+	};
+
 	return (
-		<div className="space-y-4">
+		<form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+			{/* Title */}
 			<div>
-				<Label>Title</Label>
-				<Input
-					value={formData.title}
-					onChange={(e) => updateField("title", e.target.value)}
-				/>
-			</div>
-			<div>
-				<Label>Description</Label>
-				<Input
-					value={formData.description}
-					onChange={(e) => updateField("description", e.target.value)}
-				/>
-			</div>
-			<div>
-				<Label>Location</Label>
-				<Input
-					value={formData.location}
-					onChange={(e) => updateField("location", e.target.value)}
-				/>
+				<Label>
+					<div className="flex items-center gap-2">
+						<LuText /> Title
+					</div>
+				</Label>
+				<Input {...register("title", { required: "Title is required" })} />
+				{errors.title && (
+					<p className="text-red-500 text-sm">{errors.title.message}</p>
+				)}
 			</div>
 
+			{/* Description */}
 			<div>
-				<Label>Rent Role</Label>
+				<Label>
+					<div className="flex items-center gap-2">
+						<LuTextQuote /> Description
+					</div>
+				</Label>
+				<Textarea
+					{...register("description", { required: "Description is required" })}
+					rows={4}
+				/>
+				{errors.description && (
+					<p className="text-red-500 text-sm">{errors.description.message}</p>
+				)}
+			</div>
+
+			{/* Location */}
+			<div>
+				<Label>
+					<div className="flex items-center gap-2">
+						<LuMapPin /> Location
+					</div>
+				</Label>
+				<AddressInput />
+				{errors.location && (
+					<p className="text-red-500 text-sm">{errors.location.message}</p>
+				)}
+			</div>
+
+			{/* Rent Role */}
+			<div>
+				<Label>
+					<div className="flex items-center gap-2">
+						<LuBuilding /> Rent Role
+					</div>
+				</Label>
 				<Select
-					value={(formData as any).rentRole}
-					onValueChange={(val) => updateField("rentRole", val)}
+					{...register("rentRole", { required: "Rent role is required" })}
+					onValueChange={(value) => {
+						setValue("rentRole", value);
+						trigger("rentRole");
+					}}
 				>
 					<SelectTrigger>
 						<SelectValue placeholder="Select role" />
@@ -64,40 +127,88 @@ export default function RentSteps({
 						<SelectItem value="owner">Owner</SelectItem>
 					</SelectContent>
 				</Select>
+				{errors.rentRole && (
+					<p className="text-red-500 text-sm">{errors.rentRole.message}</p>
+				)}
 			</div>
 
-			<div>
-				<Label>Budget</Label>
-				<Input
-					value={(formData as any).budget}
-					onChange={(e) => updateField("budget", e.target.value)}
-				/>
+			{/* Budget or Price */}
+			<div className="flex items-end gap-3">
+				<div className="flex-1">
+					<Label>
+						<div className="flex items-center gap-2">
+							<MdCurrencyRupee />
+							{formData.rentRole === "owner" ? "Price" : "Budget"}
+						</div>
+					</Label>
+					<Input
+						type="number"
+						{...register("budget", { required: "This field is required" })}
+					/>
+					{errors.budget && (
+						<p className="text-red-500 text-sm">{errors.budget.message}</p>
+					)}
+				</div>
+				<div>
+					<Label>Frequency</Label>
+					<Select
+						{...register("duration", { required: "Duration is required" })}
+						onValueChange={(value) => {
+							setValue("duration", value);
+							trigger("duration");
+						}}
+					>
+						<SelectTrigger>
+							<SelectValue placeholder="Select duration" />
+						</SelectTrigger>
+						<SelectContent>
+							<SelectItem value="day">Per Day</SelectItem>
+							<SelectItem value="week">Per Week</SelectItem>
+							<SelectItem value="month">Per Month</SelectItem>
+							<SelectItem value="year">Per Year</SelectItem>
+						</SelectContent>
+					</Select>
+					{errors.duration && (
+						<p className="text-red-500 text-sm">{errors.duration.message}</p>
+					)}
+				</div>
 			</div>
 
-			<div>
-				<Label>Duration</Label>
-				<Select
-					value={(formData as any).duration}
-					onValueChange={(val) => updateField("duration", val)}
-				>
-					<SelectTrigger>
-						<SelectValue placeholder="Select duration" />
-					</SelectTrigger>
-					<SelectContent>
-						<SelectItem value="day">Day</SelectItem>
-						<SelectItem value="week">Week</SelectItem>
-						<SelectItem value="month">Month</SelectItem>
-						<SelectItem value="year">Year</SelectItem>
-					</SelectContent>
-				</Select>
-			</div>
+			{/* Price Type (only for owner) */}
+			{formData.rentRole === "owner" && (
+				<div>
+					<Label>
+						<div className="flex items-center gap-2">
+							<MdCurrencyRupee /> Price Type
+						</div>
+					</Label>
+					<Select
+						{...register("priceType", { required: "Price type is required" })}
+						onValueChange={(value) => {
+							setValue("priceType", value);
+							trigger("priceType");
+						}}
+					>
+						<SelectTrigger>
+							<SelectValue placeholder="Select price type" />
+						</SelectTrigger>
+						<SelectContent>
+							<SelectItem value="fixed">Fixed</SelectItem>
+							<SelectItem value="negotiable">Negotiable</SelectItem>
+						</SelectContent>
+					</Select>
+					{errors.priceType && (
+						<p className="text-red-500 text-sm">{errors.priceType.message}</p>
+					)}
+				</div>
+			)}
 
-			<div className="flex justify-between">
-				<Button variant="outline" onClick={onBack}>
+			<div className="flex justify-between pt-4">
+				<Button variant="outline" type="button" onClick={onBack}>
 					Back
 				</Button>
-				<Button onClick={onNext}>Next</Button>
+				<Button type="submit">Next</Button>
 			</div>
-		</div>
+		</form>
 	);
 }

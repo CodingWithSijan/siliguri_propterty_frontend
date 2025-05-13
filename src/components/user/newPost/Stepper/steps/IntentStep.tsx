@@ -3,18 +3,16 @@ import { Button } from "../../../../ui/button";
 import { Label } from "../../../../ui/label";
 import { RadioGroup, RadioGroupItem } from "../../../../ui/radio-group";
 
-export default function IntentStep({
-	formData,
-	updateField,
-	onNext,
-}: {
+interface Props {
 	formData: FormDataTypes;
 	updateField: <K extends keyof FormDataTypes>(
 		key: K,
 		value: FormDataTypes[K]
 	) => void;
 	onNext: () => void;
-}) {
+}
+
+export default function IntentStep({ formData, updateField, onNext }: Props) {
 	return (
 		<div>
 			<h2 className="text-xl font-bold mb-4">Select your intent</h2>

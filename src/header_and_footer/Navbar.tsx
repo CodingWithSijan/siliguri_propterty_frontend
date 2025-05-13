@@ -5,6 +5,7 @@ import { NavLink, useNavigate } from "react-router-dom";
 import siliguri_property_logo_noBG from "../assets/logo_siliguri_property.png";
 import { useAuth } from "../contextAPI/UserAuthContext";
 import { getInitials } from "../utils/getInitial";
+import { motion } from "framer-motion";
 
 const Navbar: React.FC = () => {
 	const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -12,23 +13,20 @@ const Navbar: React.FC = () => {
 	const { user, logout } = useAuth();
 	const navigate = useNavigate();
 
-	/*
-		TESTING 
-	 */
-	// useEffect(() => {
-	// 	console.log(user && user.role === "user" ? "User" : "Admin");
-	// }, []);
 	const handleLogout = () => {
 		logout();
 		navigate("/login");
 	};
 
 	return (
-		<nav className="bg-white shadow-md w-full z-50">
+		<nav className="bg-white shadow-sm sticky top-0 z-50">
 			<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 				<div className="flex justify-between h-16 items-center">
 					{/* Logo */}
-					<NavLink to="/" className="h-24 w-24">
+					<NavLink
+						to="/"
+						className="relative h-14 w-14 sm:h-16 sm:w-16 transition-transform hover:scale-105"
+					>
 						<img
 							src={siliguri_property_logo_noBG}
 							alt="Logo"
@@ -40,75 +38,78 @@ const Navbar: React.FC = () => {
 					<div className="hidden md:flex items-center space-x-4">
 						{user ? (
 							<div className="relative">
-								<div
-									className="flex items-center space-x-2 cursor-pointer"
+								<motion.div
+									whileHover={{ scale: 1.05 }}
+									whileTap={{ scale: 0.95 }}
+									className="flex items-center space-x-3 cursor-pointer"
 									onClick={() => setDropdownOpen(!dropdownOpen)}
 								>
 									{user.avatar ? (
 										<img
-											className="w-10 h-10 rounded-full border-2 border-sky-500"
+											className="w-10 h-10 rounded-full border-2 border-blue-500 p-0.5"
 											src={user.avatar}
+											alt={user.name}
 										/>
 									) : (
-										<div className="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold">
-											{getInitials(user?.name ?? user)}
+										<div className="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold ring-2 ring-blue-500 ring-offset-2">
+											{getInitials(user?.name ?? "")}
 										</div>
 									)}
+									<span className="text-gray-700 font-medium">{user.name}</span>
+								</motion.div>
 
-									{/* )} */}
-								</div>
 								{/* Dropdown Menu */}
-								{dropdownOpen && (
-									<div className="absolute right-0 mt-2 w-48 bg-white shadow-lg rounded-md py-2 z-50">
-										{user && user.role === "user" ? (
-											<NavLink
-												to="/dashboard"
-												className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
-											>
-												User Dashboard
-											</NavLink>
-										) : (
-											<NavLink
-												to="/admin"
-												className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
-											>
-												Admin Dashboard
-											</NavLink>
-										)}
-
+								<Transition
+									show={dropdownOpen}
+									enter="transition ease-out duration-100"
+									enterFrom="transform opacity-0 scale-95"
+									enterTo="transform opacity-100 scale-100"
+									leave="transition ease-in duration-75"
+									leaveFrom="transform opacity-100 scale-100"
+									leaveTo="transform opacity-0 scale-95"
+								>
+									<div className="absolute right-0 mt-3 w-48 bg-white rounded-xl shadow-lg py-2 z-50 ring-1 ring-black ring-opacity-5">
+										<NavLink
+											to={user.role === "user" ? "/dashboard" : "/admin"}
+											className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+										>
+											{user.role === "user"
+												? "User Dashboard"
+												: "Admin Dashboard"}
+										</NavLink>
 										<button
 											onClick={handleLogout}
-											className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"
+											className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50"
 										>
 											Logout
 										</button>
 									</div>
-								)}
+								</Transition>
 							</div>
 						) : (
 							<>
 								<NavLink
 									to="/login"
-									className="text-gray-700 hover:text-blue-600 transition"
+									className="text-gray-700 hover:text-blue-600 font-medium transition-colors"
 								>
 									Login
 								</NavLink>
 								<NavLink
 									to="/signup"
-									className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition"
+									className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors font-medium"
 								>
-									Signup
+									Sign Up
 								</NavLink>
 							</>
 						)}
 					</div>
 
-					{/* Mobile Hamburger */}
+					{/* Mobile Menu Button */}
 					<div className="md:hidden">
 						<button
 							onClick={() => setIsOpen(!isOpen)}
 							type="button"
-							className="text-gray-700 hover:text-blue-600 focus:outline-none"
+							className="text-gray-700 hover:text-blue-600 focus:outline-none p-2"
 						>
 							{isOpen ? (
 								<XMarkIcon className="h-6 w-6" />
@@ -123,54 +124,58 @@ const Navbar: React.FC = () => {
 			{/* Mobile Dropdown */}
 			<Transition
 				show={isOpen}
-				enter="transition ease-out duration-200 transform"
-				enterFrom="-translate-y-4 opacity-0"
-				enterTo="translate-y-0 opacity-100"
-				leave="transition ease-in duration-150 transform"
-				leaveFrom="translate-y-0 opacity-100"
-				leaveTo="-translate-y-4 opacity-0"
+				enter="transition ease-out duration-200"
+				enterFrom="opacity-0 -translate-y-1"
+				enterTo="opacity-100 translate-y-0"
+				leave="transition ease-in duration-150"
+				leaveFrom="opacity-100 translate-y-0"
+				leaveTo="opacity-0 -translate-y-1"
 			>
-				<div className="md:hidden px-4 pb-4 space-y-2 bg-white shadow">
+				<div className="md:hidden px-4 pt-2 pb-4 bg-white shadow-lg">
 					{user ? (
-						<>
-							{" "}
-							{user && user?.role === "user" ? (
-								<NavLink
-									to="/dashboard"
-									className="block w-full text-center text-gray-700 hover:text-blue-600"
-								>
-									User Dashboard
-								</NavLink>
-							) : (
-								<NavLink
-									to="/admin"
-									className="block w-full text-center text-gray-700 hover:text-blue-600"
-								>
-									Admin Dashboard
-								</NavLink>
-							)}
+						<div className="space-y-3">
+							<div className="flex items-center space-x-3 px-4 py-2">
+								{user.avatar ? (
+									<img
+										className="w-10 h-10 rounded-full border-2 border-blue-500"
+										src={user.avatar}
+										alt={user.name}
+									/>
+								) : (
+									<div className="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold">
+										{getInitials(user?.name ?? "")}
+									</div>
+								)}
+								<span className="text-gray-700 font-medium">{user.name}</span>
+							</div>
+							<NavLink
+								to={user.role === "user" ? "/dashboard" : "/admin"}
+								className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-50 rounded-lg"
+							>
+								{user.role === "user" ? "User Dashboard" : "Admin Dashboard"}
+							</NavLink>
 							<button
 								onClick={handleLogout}
-								className="block w-full text-center bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition"
+								className="block w-full text-left px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg"
 							>
 								Logout
 							</button>
-						</>
+						</div>
 					) : (
-						<>
+						<div className="space-y-3">
 							<NavLink
 								to="/login"
-								className="block w-full text-center text-gray-700 hover:text-blue-600"
+								className="block w-full text-center px-4 py-2 text-gray-700 hover:bg-gray-50 rounded-lg"
 							>
 								Login
 							</NavLink>
 							<NavLink
 								to="/signup"
-								className="block w-full text-center bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition"
+								className="block w-full text-center px-4 py-2 bg-blue-600 text-white hover:bg-blue-700 rounded-lg"
 							>
-								Signup
+								Sign Up
 							</NavLink>
-						</>
+						</div>
 					)}
 				</div>
 			</Transition>

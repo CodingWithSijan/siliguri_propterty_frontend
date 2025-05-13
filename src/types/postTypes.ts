@@ -35,19 +35,21 @@ export interface SellFormData extends BaseFormData {
 	intent: "sell";
 	price: string;
 	priceType: PriceType;
-	unit?: UnitType;
+	propertyCategory: "land" | "apartment" | "house" | "room" | "shop";
+	unit?: string; // Required only when propertyCategory === 'land'
 }
 
 export interface BuyFormData extends BaseFormData {
 	intent: "buy";
 	budget?: string;
+	priceType: PriceType;
 }
 
 export interface RentFormData extends BaseFormData {
 	intent: "rent";
 	rentRole: "tenant" | "owner";
-	budget?: string;
-	duration?: RentDuration;
+	budget: string; // Make budget required
+	duration: RentDuration; // Make duration required
 }
 
 export type FormDataTypes = SellFormData | BuyFormData | RentFormData;

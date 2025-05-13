@@ -1,4 +1,5 @@
 import React from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import YourProfile from "./userContents/YourProfile";
 import NewPost from "./userContents/NewPost";
 import ViewYourListings from "./userContents/ViewYourListings";
@@ -11,33 +12,90 @@ const ContentDisplay: React.FC<Props> = ({ activeMenu }) => {
 	const renderContent = () => {
 		switch (activeMenu) {
 			case "Your Profile":
-				return <YourProfile />;
+				return (
+					<motion.div
+						initial={{ opacity: 0, y: 20 }}
+						animate={{ opacity: 1, y: 0 }}
+						exit={{ opacity: 0 }}
+						className="h-full overflow-y-auto px-6 py-4"
+					>
+						<YourProfile />
+					</motion.div>
+				);
 			case "New Post":
-				return <NewPost />;
+				return (
+					<motion.div
+						initial={{ opacity: 0, y: 20 }}
+						animate={{ opacity: 1, y: 0 }}
+						exit={{ opacity: 0 }}
+						className="h-full overflow-y-auto px-6 py-4"
+					>
+						<NewPost />
+					</motion.div>
+				);
 			case "View Your Listings":
-				return <ViewYourListings />;
+				return (
+					<motion.div
+						initial={{ opacity: 0, y: 20 }}
+						animate={{ opacity: 1, y: 0 }}
+						exit={{ opacity: 0 }}
+						className="h-full overflow-y-auto px-6 py-4"
+					>
+						<ViewYourListings />
+					</motion.div>
+				);
 			case "Promote Your listings":
 				return (
-					<div className="text-gray-600">
-						Promotional tools and options will be shown here.
-					</div>
+					<motion.div
+						initial={{ opacity: 0, y: 20 }}
+						animate={{ opacity: 1, y: 0 }}
+						exit={{ opacity: 0 }}
+						className="flex items-center justify-center h-full"
+					>
+						<div className="text-gray-600 bg-gray-50 rounded-xl p-8 shadow-sm">
+							<h3 className="text-xl font-semibold mb-3">Coming Soon</h3>
+							<p className="text-gray-500">
+								Promotional tools and options will be available here.
+							</p>
+						</div>
+					</motion.div>
 				);
 			case "Messages":
 				return (
-					<div className="text-gray-600">
-						User messages and inquiries will show here.
-					</div>
+					<motion.div
+						initial={{ opacity: 0, y: 20 }}
+						animate={{ opacity: 1, y: 0 }}
+						exit={{ opacity: 0 }}
+						className="flex items-center justify-center h-full"
+					>
+						<div className="text-gray-600 bg-gray-50 rounded-xl p-8 shadow-sm">
+							<h3 className="text-xl font-semibold mb-3">Coming Soon</h3>
+							<p className="text-gray-500">
+								Your messages and inquiries will appear here.
+							</p>
+						</div>
+					</motion.div>
 				);
 			default:
 				return (
-					<div className="text-gray-500 italic">
-						Select a menu item to begin.
-					</div>
+					<motion.div
+						initial={{ opacity: 0 }}
+						animate={{ opacity: 1 }}
+						className="flex items-center justify-center h-full"
+					>
+						<div className="text-gray-500 italic">
+							Select a menu item to begin
+						</div>
+					</motion.div>
 				);
 		}
 	};
 
-	return <div className="w-full">{renderContent()}</div>;
+	return (
+		<div className="w-full h-[calc(100vh-4rem)]">
+			<AnimatePresence mode="wait">{renderContent()}</AnimatePresence>
+		</div>
+	);
 };
 
 export default ContentDisplay;

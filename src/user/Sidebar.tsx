@@ -12,7 +12,7 @@ import { motion } from "framer-motion";
 interface SidebarProps {
 	activeMenu: string;
 	setActiveMenu: (menu: string) => void;
-	setSidebarOpen: React.Dispatch<React.SetStateAction<boolean>>;
+	setSidebarOpen: (open: boolean) => void;
 }
 
 const menuItems = [
@@ -33,37 +33,60 @@ const Sidebar: React.FC<SidebarProps> = ({
 			initial={{ x: -300 }}
 			animate={{ x: 0 }}
 			exit={{ x: -300 }}
-			transition={{ duration: 0.3 }}
-			className="h-full flex flex-col justify-between"
+			transition={{ type: "spring", stiffness: 100, damping: 20 }}
+			className="h-full w-full flex flex-col bg-white border-r border-gray-200 shadow-sm"
 		>
-			<div>
-				<ul className="space-y-3">
-					{menuItems.map((item) => (
-						<li
-							key={item.label}
-							className={`flex items-center gap-3 cursor-pointer px-4 py-2 rounded-md transition ${
-								activeMenu === item.label
-									? "bg-blue-600 text-white font-semibold"
-									: "text-gray-700 hover:bg-gray-100"
-							}`}
-							onClick={() => {
-								setActiveMenu(item.label);
-								setSidebarOpen(false);
-							}}
-						>
-							{item.icon}
-							<span>{item.label}</span>
-						</li>
-					))}
-				</ul>
+			<div className="flex flex-col flex-1">
+				<div className="p-6 border-b border-gray-100">
+					<h2 className="text-xl font-semibold text-gray-800">Dashboard</h2>
+				</div>
+
+				<nav className="flex-1 p-4">
+					<ul className="space-y-1">
+						{menuItems.map((item) => (
+							<motion.li
+								key={item.label}
+								whileHover={{ scale: 1.02 }}
+								whileTap={{ scale: 0.98 }}
+								className={`
+									flex items-center gap-3 px-4 py-3 rounded-lg cursor-pointer
+									transition-all duration-200 ease-in-out
+									${
+										activeMenu === item.label
+											? "bg-primary text-primary-foreground shadow-sm"
+											: "text-gray-700 hover:bg-gray-50"
+									}
+								`}
+								onClick={() => {
+									setActiveMenu(item.label);
+									setSidebarOpen(false);
+								}}
+							>
+								<span
+									className={`text-lg ${
+										activeMenu === item.label
+											? "text-primary-foreground"
+											: "text-gray-500"
+									}`}
+								>
+									{item.icon}
+								</span>
+								<span className="font-medium">{item.label}</span>
+							</motion.li>
+						))}
+					</ul>
+				</nav>
 			</div>
 
-			{/* Logout at Bottom (optional if you reintegrate it later) */}
-			<div className="mt-auto pt-6">
-				<button className="w-full flex items-center gap-2 text-sm px-4 py-2 text-red-600 hover:bg-red-50 rounded-md">
+			<div className="p-4 border-t border-gray-100">
+				<motion.button
+					whileHover={{ scale: 1.02 }}
+					whileTap={{ scale: 0.98 }}
+					className="w-full flex items-center gap-3 px-4 py-3 text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-200"
+				>
 					<FiLogOut className="text-lg" />
-					Logout
-				</button>
+					<span className="font-medium">Logout</span>
+				</motion.button>
 			</div>
 		</motion.div>
 	);

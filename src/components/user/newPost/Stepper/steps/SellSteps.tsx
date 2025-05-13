@@ -1,8 +1,9 @@
-import { SellFormData, UnitType } from "../../../../../types/postTypes";
+import { SellFormData } from "../../../../../types/postTypes";
 import { useForm } from "react-hook-form";
 import { Button } from "../../../../ui/button";
 import { Input } from "../../../../ui/input";
 import { Label } from "../../../../ui/label";
+import { Textarea } from "../../../../ui/textarea";
 import {
 	Select,
 	SelectTrigger,
@@ -11,17 +12,11 @@ import {
 	SelectItem,
 } from "../../../../ui/select";
 import AddressInput from "../../../../../services/AddressInput";
-import {
-	FaTag,
-	FaFileAlt,
-	FaMapMarkerAlt,
-	FaRupeeSign,
-	FaMoneyBillWave,
-	FaBuilding,
-} from "react-icons/fa";
+import { LuText, LuTextQuote, LuMapPin, LuBuilding } from "react-icons/lu";
+import { MdCurrencyRupee } from "react-icons/md";
+import { useEffect } from "react";
 
 interface Props {
-	step: number;
 	formData: SellFormData;
 	updateField: <K extends keyof SellFormData>(
 		key: K,
@@ -32,7 +27,6 @@ interface Props {
 }
 
 export default function SellSteps({
-	step,
 	formData,
 	updateField,
 	onNext,
@@ -43,6 +37,7 @@ export default function SellSteps({
 		handleSubmit,
 		setValue,
 		watch,
+		trigger,
 		formState: { errors },
 	} = useForm<SellFormData>({
 		defaultValues: formData,
@@ -66,7 +61,7 @@ export default function SellSteps({
 			<div>
 				<Label>
 					<div className="flex items-center gap-2">
-						<FaTag /> Title
+						<LuText /> Title
 					</div>
 				</Label>
 				<Input {...register("title", { required: "Title is required" })} />
@@ -79,11 +74,12 @@ export default function SellSteps({
 			<div>
 				<Label>
 					<div className="flex items-center gap-2">
-						<FaFileAlt /> Description
+						<LuTextQuote /> Description
 					</div>
 				</Label>
-				<Input
+				<Textarea
 					{...register("description", { required: "Description is required" })}
+					rows={4}
 				/>
 				{errors.description && (
 					<p className="text-red-500 text-sm">{errors.description.message}</p>
@@ -94,11 +90,11 @@ export default function SellSteps({
 			<div>
 				<Label>
 					<div className="flex items-center gap-2">
-						<FaMapMarkerAlt /> Location
+						<LuMapPin /> Location
 					</div>
 				</Label>
 				<AddressInput
-					defaultValue={formData.location}
+					value={formData.location}
 					onSelect={(val: string) => {
 						setValue("location", val);
 						updateField("location", val);
@@ -110,18 +106,23 @@ export default function SellSteps({
 			</div>
 
 			{/* Price */}
-			<div>
+			<div className="flex flex-col max-w-sm">
 				<Label>
 					<div className="flex items-center gap-2">
-						<FaRupeeSign /> Price (in NPR)
+						<MdCurrencyRupee /> Price (in INR)
 					</div>
 				</Label>
 				<Input
 					type="number"
-					{...register("price", { required: "Price is required" })}
+					{...register("price", {
+						required: "Price is required",
+						valueAsNumber: true,
+						validate: (value) =>
+							parseFloat(value) > 0 || "Price must be a positive number",
+					})}
 				/>
 				{errors.price && (
-					<p className="text-red-500 text-sm">{errors.price.message}</p>
+					<p className="text-red-500 text-sm mt-1">{errors.price.message}</p>
 				)}
 			</div>
 
@@ -129,14 +130,14 @@ export default function SellSteps({
 			<div>
 				<Label>
 					<div className="flex items-center gap-2">
-						<FaMoneyBillWave /> Price Type
+						<MdCurrencyRupee /> Price Type
 					</div>
 				</Label>
 				<Select
-					defaultValue={formData.priceType}
-					onValueChange={(val) => {
-						setValue("priceType", val as SellFormData["priceType"]);
-						updateField("priceType", val as SellFormData["priceType"]);
+					{...register("priceType", { required: "Price type is required" })}
+					onValueChange={(value) => {
+						setValue("priceType", value);
+						trigger("priceType");
 					}}
 				>
 					<SelectTrigger>
@@ -147,26 +148,30 @@ export default function SellSteps({
 						<SelectItem value="negotiable">Negotiable</SelectItem>
 					</SelectContent>
 				</Select>
+				{errors.priceType && (
+					<p className="text-red-500 text-sm mt-1">
+						{errors.priceType.message}
+					</p>
+				)}
 			</div>
 
 			{/* Property Type */}
 			<div>
 				<Label>
 					<div className="flex items-center gap-2">
-						<FaBuilding /> Property Type
+						<LuBuilding /> Property Type
 					</div>
 				</Label>
 				<Select
-					defaultValue={formData.propertyCategory}
-					onValueChange={(val) => {
+					{...register("propertyCategory", {
+						required: "Property type is required",
+					})}
+					onValueChange={(value) => {
 						setValue(
 							"propertyCategory",
-							val as SellFormData["propertyCategory"]
+							value as SellFormData["propertyCategory"]
 						);
-						updateField(
-							"propertyCategory",
-							val as SellFormData["propertyCategory"]
-						);
+						trigger("propertyCategory");
 					}}
 				>
 					<SelectTrigger>
@@ -180,18 +185,28 @@ export default function SellSteps({
 						))}
 					</SelectContent>
 				</Select>
+				{errors.propertyCategory && (
+					<p className="text-red-500 text-sm mt-1">
+						{errors.propertyCategory.message}
+					</p>
+				)}
 			</div>
 
 			{/* Unit (only when property type is land) */}
 			{propertyType === "land" && (
 				<div>
-					<Label>Unit</Label>
+					<Label>
+						<div className="flex items-center gap-2">
+							<LuBuilding /> Unit
+						</div>
+					</Label>
 					<Select
-						defaultValue={formData.unit}
-						onValueChange={(val) => {
-							setValue("unit", val as UnitType);
-							updateField("unit", val as UnitType);
-						}}
+						{...register("unit", {
+							required:
+								formData.propertyCategory === "land"
+									? "Unit is required for land"
+									: false,
+						})}
 					>
 						<SelectTrigger>
 							<SelectValue placeholder="Select unit" />
@@ -210,6 +225,35 @@ export default function SellSteps({
 							))}
 						</SelectContent>
 					</Select>
+					{errors.unit && (
+						<p className="text-red-500 text-sm mt-1">{errors.unit.message}</p>
+					)}
+				</div>
+			)}
+
+			{/* Unit (only when property type is not land) */}
+			{formData.propertyCategory !== "land" && (
+				<div>
+					<Label>Unit</Label>
+					<Select
+						{...register("unit", { required: "Unit is required" })}
+						onValueChange={(value) => {
+							setValue("unit", value);
+							trigger("unit");
+						}}
+					>
+						<SelectTrigger>
+							<SelectValue placeholder="Select unit" />
+						</SelectTrigger>
+						<SelectContent>
+							<SelectItem value="sqft">Square Feet</SelectItem>
+							<SelectItem value="sqm">Square Meter</SelectItem>
+							<SelectItem value="acre">Acre</SelectItem>
+						</SelectContent>
+					</Select>
+					{errors.unit && (
+						<p className="text-red-500 text-sm">{errors.unit.message}</p>
+					)}
 				</div>
 			)}
 
