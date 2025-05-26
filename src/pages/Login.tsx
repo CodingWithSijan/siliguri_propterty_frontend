@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import Navbar from "../header_and_footer/Navbar";
 import { showSuccess, showError } from "../utils/toastUtils";
 import BASE_URL from "../services";
 import { useNavigate, useLocation, NavLink } from "react-router-dom";

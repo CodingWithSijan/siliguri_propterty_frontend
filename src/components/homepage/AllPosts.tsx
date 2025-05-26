@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import ListingCard from "./ListingCard";
-import BASE_URL from "../services";
+import ListingCard from "../card/ListingCard";
+import BASE_URL from "../../services";
 import PostDetails from "./PostDetails";
 import { motion } from "framer-motion";
 

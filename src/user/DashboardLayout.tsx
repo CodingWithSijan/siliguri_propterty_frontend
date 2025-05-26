@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import Sidebar from "./Sidebar";
 import ContentDisplay from "./ContentDisplay";
 import { Bars3Icon } from "@heroicons/react/24/outline";
-import Navbar from "../header_and_footer/Navbar";
+import Navbar from "../components/header_and_footer/Navbar";
 import ProtectedRoute from "../route/ProtectedRoute";
 import { AnimatePresence } from "framer-motion";
 import { useAuth } from "../contextAPI/UserAuthContext";

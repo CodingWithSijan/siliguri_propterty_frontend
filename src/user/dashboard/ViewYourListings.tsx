@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import BASE_URL from "../../services";
-import ListingCard from "../../components/ListingCard";
-import PostDetails from "../../components/PostDetails";
+import ListingCard from "../../components/card/ListingCard";
+import PostDetails from "../../components/homepage/PostDetails";
 import { showError } from "../../utils/toastUtils";
 
 const ViewYourListings = () => {
@@ -25,7 +25,7 @@ const ViewYourListings = () => {
 		};
 		fetchListings();
 	}, []);
-
+	d;
 	return (
 		<div className="max-w-7xl mx-auto px-4 py-6">
 			{loading ? (

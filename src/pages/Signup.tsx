@@ -1,5 +1,5 @@
 import React from "react";
-import SignupLocalComponent from "./SignupLocalComponent";
+import SignupLocalComponent from "../components/signup/SignupLocalComponent";
 import { NavLink } from "react-router-dom";
 
 const Signup: React.FC = () => {

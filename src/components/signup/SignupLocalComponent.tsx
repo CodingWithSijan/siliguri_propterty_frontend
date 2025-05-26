@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import BASE_URL from "../services";
-import { showError, showSuccess } from "../utils/toastUtils";
-import { validateForm, FormData, FormErrors } from "../utils/formValidation";
+import BASE_URL from "../../services";
+import { showError, showSuccess } from "../../utils/toastUtils";
+import { validateForm, FormData, FormErrors } from "../../utils/formValidation";
 import { FaUser, FaEnvelope, FaPhoneAlt, FaLock } from "react-icons/fa";
 
 const SignupLocalComponent: React.FC = () => {

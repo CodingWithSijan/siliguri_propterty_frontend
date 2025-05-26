@@ -27,29 +27,31 @@ export interface BaseFormData {
 	title: string;
 	description: string;
 	location: string;
-	propertyCategory: PropertyCategory;
-	pictures: File[];
-}
-
-export interface SellFormData extends BaseFormData {
-	intent: "sell";
 	price: string;
-	priceType: PriceType;
-	propertyCategory: "land" | "apartment" | "house" | "room" | "shop";
-	unit?: string; // Required only when propertyCategory === 'land'
+	propertyCategory: PropertyCategory;
 }
 
-export interface BuyFormData extends BaseFormData {
-	intent: "buy";
-	budget?: string;
-	priceType: PriceType;
+// export interface SellFormData extends BaseFormData {
+// 	intent: "sell";
+// 	price: string;
+// 	priceType: PriceType;
+// 	propertyCategory: "land" | "apartment" | "house" | "room" | "shop";
+// 	unit?: string; // Required only when propertyCategory === 'land'
+// 	pictures: File[];
 }
+
+// export interface BuyFormData extends BaseFormData {
+// 	intent: "buy";
+// 	budget?: string;
+// 	priceType: PriceType;
+// }
 
 export interface RentFormData extends BaseFormData {
 	intent: "rent";
-	rentRole: "tenant" | "owner";
-	budget: string; // Make budget required
-	duration: RentDuration; // Make duration required
+	rentRole: "tenant" | "owner" | string;
+	duration?: RentDuration;
+	pictures?: string[];
 }
 
-export type FormDataTypes = SellFormData | BuyFormData | RentFormData;
+// export type FormDataTypes = SellFormData | BuyFormData | RentFormData;
+export type FormDataTypes =  RentFormData;

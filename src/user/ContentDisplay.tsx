@@ -1,8 +1,8 @@
 import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import YourProfile from "./userContents/YourProfile";
-import NewPost from "./userContents/NewPost";
-import ViewYourListings from "./userContents/ViewYourListings";
+import YourProfile from "./dashboard/YourProfile";
+import NewPost from "./dashboard/NewPost";
+import ViewYourListings from "./dashboard/ViewYourListings";
 
 interface Props {
 	activeMenu: string;

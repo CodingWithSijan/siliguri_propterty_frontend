@@ -2,10 +2,11 @@ import React, { useState } from "react";
 import { Transition } from "@headlessui/react";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import { NavLink, useNavigate } from "react-router-dom";
-import siliguri_property_logo_noBG from "../assets/logo_siliguri_property.png";
-import { useAuth } from "../contextAPI/UserAuthContext";
-import { getInitials } from "../utils/getInitial";
+import siliguri_property_logo_noBG from "../../assets/logo_siliguri_property.png";
+import { useAuth } from "../../contextAPI/UserAuthContext";
+import { getInitials } from "../../utils/getInitial";
 import { motion } from "framer-motion";
+import { PostYourPropertyButton } from "../common/PostYourPropertyButton";
 
 const Navbar: React.FC = () => {
 	const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -33,7 +34,7 @@ const Navbar: React.FC = () => {
 							className="w-full h-full object-contain"
 						/>
 					</NavLink>
-
+					<PostYourPropertyButton />
 					{/* Desktop Menu */}
 					<div className="hidden md:flex items-center space-x-4">
 						{user ? (

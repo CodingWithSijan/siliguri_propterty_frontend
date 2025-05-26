@@ -1,18 +1,17 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import ProtectedRoute from "./route/ProtectedRoute";
-import Signup from "./signup/Signup";
-import Homepage from "./Homepage";
-import SignupLocalComponent from "./signup/SignupLocalComponent";
+import Signup from "./pages/Signup";
+import Homepage from "./pages/Homepage";
+import SignupLocalComponent from "./components/signup/SignupLocalComponent";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import Login from "./login/Login";
+import Login from "./pages/Login";
 import { UserAuthProvider } from "./contextAPI/UserAuthContext";
 import DashboardLayout from "./user/DashboardLayout";
-import GoogleSuccess from "./pages/GoogleSuccess";
 import AdminDashboard from "./admin/AdminDashboard";
-import NotFound404 from "./components/NotFound404";
-import VerifyEmail from "./components/VerifyEmail";
+import NotFound404 from "./components/homepage/NotFound404";
+import VerifyEmail from "./components/homepage/VerifyEmail";
 
 const App: React.FC = () => {
 	return (
@@ -27,7 +26,6 @@ const App: React.FC = () => {
 							element={<SignupLocalComponent />}
 						/>
 						<Route path="/login" element={<Login />} />
-						<Route path="/auth/google/success" element={<GoogleSuccess />} />
 
 						<Route
 							path="/dashboard"
