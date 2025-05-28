@@ -10,65 +10,87 @@ import { Textarea } from "../ui/textarea";
 import { Button } from "../ui/button";
 import BASE_URL from "../../services";
 import { Trash2 } from "lucide-react";
+import { Props } from "../../types/user_dashboard_types";
 
+// Property categories for the dropdown
 const propertyCategories = ["apartment", "house", "room", "shop"];
+// Price types for frequency/duration
 const priceTypes = [
-	{ value: "per month", label: "Per Month" },
-	{ value: "per week", label: "Per Week" },
-	{ value: "per day", label: "Per Day" },
+	{ value: "month", label: "Per Month" },
+	{ value: "week", label: "Per Week" },
+	{ value: "day", label: "Per Day" },
 ];
+// Rent roles for the dropdown
 const rentRoles = [
 	{ value: "tenant", label: "Tenant" },
 	{ value: "owner", label: "Owner" },
 ];
 
+// Type definition for form inputs
+// pictures is optional and only for 'owner' role
+// duration is required in the form, but optional in type for flexibility
+// price is optional for flexibility
 type RentPostFormInputs = {
-	title: string;
-	description: string;
-	location: string;
-	propertyCategory: string;
-	price?: number;
-	rentRole: string;
-	duration?: string;
-	priceType: string;
-	pictures?: FileList;
+	title: string; // Title of the property
+	description: string; // Description of the property
+	location: string; // Address/location
+	propertyCategory: string; // Category (apartment, house, etc.)
+	price?: number; // Price or budget
+	rentRole: string; // Owner or tenant
+	duration?: string; // Frequency/duration (per month, week, etc.)
+	pictures?: FileList; // Images (only for owner)
 };
 
-const RentPostForm: React.FC = () => {
+// Main RentPostForm component
+const RentPostForm: React.FC<Props> = ({ registerReset }) => {
+	// Initialize React Hook Form
 	const {
-		register,
-		handleSubmit,
-		reset,
-		watch,
-		control,
-		setValue,
-		formState: { errors, isSubmitting },
+		register, // For registering input fields
+		handleSubmit, // Handles form submission
+		reset, // Resets the form
+		watch, // Watches form values
+		control, // For controlled components (e.g., AddressInput)
+		setValue, // Programmatically set field values
+		formState: { errors, isSubmitting }, // Form state (errors, loading)
 	} = useForm<RentPostFormInputs>();
+
+	// Register the reset function with parent (if needed)
+	useEffect(() => {
+		registerReset(reset);
+	}, [reset, registerReset]);
+
+	// State for image previews
 	const [previews, setPreviews] = useState<string[]>([]);
+	// Watchers for pictures and rentRole fields
 	const pictures = watch("pictures");
 	const rentRoleWatch = watch("rentRole");
+	const priceWatch = watch("price");
 
+	// Update image previews when pictures change
 	useEffect(() => {
 		if (pictures && pictures.length > 0) {
 			const files = Array.from(pictures);
 			const urls = files.map((file) => URL.createObjectURL(file));
 			setPreviews(urls);
+			// Cleanup: revoke object URLs to avoid memory leaks
 			return () => urls.forEach((url) => URL.revokeObjectURL(url));
 		} else {
 			setPreviews([]);
 		}
 	}, [pictures]);
 
+	// If rentRole is 'tenant', clear pictures field and previews
 	useEffect(() => {
 		if (rentRoleWatch === "tenant") {
-			// Clear pictures field and preview
 			setValue("pictures", undefined);
 			setPreviews([]);
 		}
-	}, [rentRoleWatch, setValue]);
+	}, [rentRoleWatch, priceWatch, setValue]);
 
+	// Form submission handler
 	const onSubmit = async (data: RentPostFormInputs) => {
 		const formData = new FormData();
+		// Append all form fields to FormData for API
 		formData.append("title", data.title);
 		formData.append("description", data.description);
 		formData.append("location", data.location);
@@ -76,6 +98,7 @@ const RentPostForm: React.FC = () => {
 		formData.append("price", String(data.price));
 		formData.append("rentRole", data.rentRole);
 		if (data.duration) formData.append("duration", data.duration);
+		// Append images if present
 		if (data.pictures && data.pictures.length > 0) {
 			Array.from(data.pictures).forEach((file) => {
 				formData.append("pictures", file);
@@ -84,7 +107,7 @@ const RentPostForm: React.FC = () => {
 		try {
 			await BASE_URL.post("/api/user/post/new-rent-post", formData);
 			showSuccess("Rent post created successfully!");
-			reset();
+			reset(); // Reset form
 			window.scrollTo({ top: 0, behavior: "smooth" });
 		} catch (err: any) {
 			showError(err?.response?.data?.message || "Failed to create rent post.");
@@ -97,6 +120,7 @@ const RentPostForm: React.FC = () => {
 			className="space-y-6 bg-white p-6 rounded-xl shadow max-w-2xl mx-auto"
 		>
 			<h2 className="text-xl font-bold mb-4">Create Rent Post</h2>
+			{/* Title input */}
 			<div>
 				<label className="block mb-1 font-medium">Title *</label>
 				<Input
@@ -107,6 +131,7 @@ const RentPostForm: React.FC = () => {
 					<p className="text-red-500 text-sm">{errors.title.message}</p>
 				)}
 			</div>
+			{/* Description input */}
 			<div>
 				<label className="block mb-1 font-medium">Description *</label>
 				<Textarea
@@ -118,6 +143,7 @@ const RentPostForm: React.FC = () => {
 					<p className="text-red-500 text-sm">{errors.description.message}</p>
 				)}
 			</div>
+			{/* Location input using AddressInput component */}
 			<div>
 				<label className="block mb-1 font-medium">Location *</label>
 				<Controller
@@ -136,6 +162,7 @@ const RentPostForm: React.FC = () => {
 					)}
 				/>
 			</div>
+			{/* Rent Role dropdown */}
 			<div className="flex-1">
 				<label className="block mb-1 font-medium">Rent Role *</label>
 				<select
@@ -153,6 +180,7 @@ const RentPostForm: React.FC = () => {
 					<p className="text-red-500 text-sm">{errors.rentRole.message}</p>
 				)}
 			</div>
+			{/* Property Category dropdown */}
 			<div>
 				<label className="block mb-1 font-medium">Property Category *</label>
 				<select
@@ -172,9 +200,11 @@ const RentPostForm: React.FC = () => {
 					</p>
 				)}
 			</div>
+			{/* Price/Budget and Frequency/Duration fields */}
 			<div className="flex flex-col sm:flex-row gap-4">
 				<div className="flex-1">
 					<label className="block mb-1 font-medium">
+						{/* Label changes based on rentRole */}
 						{rentRoleWatch === "tenant" ? "Budget" : "Price"}
 					</label>
 					<Input
@@ -185,14 +215,17 @@ const RentPostForm: React.FC = () => {
 					/>
 				</div>
 				<div className="flex-1">
-					<label className="block mb-1 font-medium">Frequency/duration *</label>
+					<label className="block mb-1 font-medium">
+						Frequency/duration
+						{!priceWatch || priceWatch >= 0 ? <span></span> : <span>*</span>}
+					</label>
 					<select
-						{...register("duration", { required: "Select Frequency" })}
+						{...register("duration", {
+							validate: () => (!priceWatch || priceWatch >= 0 ? true : false),
+						})}
 						className="w-full border rounded px-3 py-2"
 					>
-						<option value="" disabled>
-							eg. per week
-						</option>
+						<option value="">Select Frequency</option>
 						{priceTypes.map((pt) => (
 							<option key={pt.value} value={pt.value}>
 								{pt.label}
@@ -204,6 +237,7 @@ const RentPostForm: React.FC = () => {
 					)}
 				</div>
 			</div>
+			{/* Pictures upload (only for owner) */}
 			{rentRoleWatch === "owner" && (
 				<div>
 					<label className="block mb-1 font-medium">Pictures</label>
@@ -213,6 +247,7 @@ const RentPostForm: React.FC = () => {
 						accept="image/*"
 						{...register("pictures")}
 					/>
+					{/* Image previews with remove button */}
 					{previews.length > 0 && (
 						<div className="flex flex-wrap gap-2 mt-2">
 							{previews.map((src, idx) => (
@@ -226,10 +261,13 @@ const RentPostForm: React.FC = () => {
 										type="button"
 										className="absolute top-0 right-0 bg-white bg-opacity-80 rounded-full p-1 hover:bg-red-500 hover:text-white transition"
 										onClick={() => {
+											// Remove selected image from FileList
 											const dt = new DataTransfer();
-											Array.from(pictures).forEach((file, fileIdx) => {
-												if (fileIdx !== idx) dt.items.add(file);
-											});
+											if (pictures) {
+												Array.from(pictures).forEach((file, fileIdx) => {
+													if (fileIdx !== idx) dt.items.add(file);
+												});
+											}
 											setValue("pictures", dt.files, { shouldValidate: true });
 										}}
 										tabIndex={-1}
@@ -246,6 +284,7 @@ const RentPostForm: React.FC = () => {
 				</div>
 			)}
 
+			{/* Submit button */}
 			<Button type="submit" disabled={isSubmitting} className="w-full">
 				{isSubmitting ? "Submitting..." : "Create Rent Post"}
 			</Button>

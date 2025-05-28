@@ -1,7 +1,7 @@
 // BuyPostForm.tsx
 // Form for creating a new 'Buy' real estate post. Uses React Hook Form and AddressInput for location.
 
-import React from "react";
+import React, { useEffect } from "react";
 import { useForm, Controller } from "react-hook-form";
 import AddressInput from "../../services/AddressInput";
 import { showSuccess, showError } from "../../utils/toastUtils";
@@ -9,6 +9,7 @@ import { Input } from "../ui/input";
 import { Textarea } from "../ui/textarea";
 import { Button } from "../ui/button";
 import BASE_URL from "../../services";
+import { Props } from "../../types/user_dashboard_types";
 
 const propertyCategories = ["apartment", "house", "room", "shop", "land"];
 
@@ -20,7 +21,7 @@ type BuyPostFormInputs = {
 	price?: number;
 };
 
-const BuyPostForm: React.FC = () => {
+const BuyPostForm: React.FC<Props> = ({ registerReset }) => {
 	const {
 		register,
 		handleSubmit,
@@ -28,6 +29,9 @@ const BuyPostForm: React.FC = () => {
 		control,
 		formState: { errors, isSubmitting },
 	} = useForm<BuyPostFormInputs>();
+	useEffect(() => {
+		registerReset(reset);
+	}, [reset, registerReset]);
 
 	const onSubmit = async (data: BuyPostFormInputs) => {
 		try {

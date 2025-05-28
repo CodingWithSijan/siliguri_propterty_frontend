@@ -6,6 +6,15 @@ import { useAuth } from "../contextAPI/UserAuthContext";
 import { AxiosError } from "axios";
 import { FaEnvelope, FaLock } from "react-icons/fa";
 import { BiLoaderAlt } from "react-icons/bi";
+import {
+	Dialog,
+	DialogContent,
+	DialogHeader,
+	DialogTitle,
+	DialogDescription,
+} from "../components/ui/dialog";
+import { Input } from "../components/ui/input";
+import { Button } from "../components/ui/button";
 
 interface UserFormDataTypes {
 	email: string;
@@ -23,6 +32,12 @@ const Login: React.FC = () => {
 	});
 	const [loading, setLoading] = useState<boolean>(false);
 
+	// Forgot password states
+	const [forgotOpen, setForgotOpen] = useState(false); // Modal open state
+	const [forgotEmail, setForgotEmail] = useState(""); // Email for reset
+	const [forgotLoading, setForgotLoading] = useState(false); // Loading state for reset
+	const [forgotMsg, setForgotMsg] = useState<string | null>(null); // Success/failure message
+
 	// Show error from URL
 	useEffect(() => {
 		const params = new URLSearchParams(location.search);
@@ -34,7 +49,7 @@ const Login: React.FC = () => {
 	useEffect(() => {
 		if (isAuthenticated && user?.role === "user") navigate("/");
 		else if (isAuthenticated && user?.role === "admin") navigate("/admin");
-	}, [isAuthenticated, navigate]);
+	}, [isAuthenticated, navigate, user?.role]);
 
 	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const { name, value } = e.target;
@@ -57,6 +72,21 @@ const Login: React.FC = () => {
 		} finally {
 			setLoading(false);
 		}
+	};
+
+	// Handler for forgot password submit
+	const handleForgotSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+		e.preventDefault();
+		setForgotLoading(true);
+		setForgotMsg(null);
+		try {
+			await BASE_URL.post("/api/auth/forgot-password", { email: forgotEmail });
+			setForgotMsg("Reset link sent! Check your email.");
+			setForgotEmail("");
+		} catch (err) {
+			setForgotMsg("Failed to send reset link");
+		}
+		setForgotLoading(false);
 	};
 
 	return (
@@ -97,6 +127,17 @@ const Login: React.FC = () => {
 							/>
 						</div>
 
+						{/* Forgot password link */}
+						<div className="flex justify-end mb-2">
+							<button
+								type="button"
+								className="text-xs text-blue-600 hover:underline focus:outline-none"
+								onClick={() => setForgotOpen(true)}
+							>
+								Forgot password?
+							</button>
+						</div>
+
 						{/* Submit */}
 						<button
 							type="submit"
@@ -119,6 +160,41 @@ const Login: React.FC = () => {
 					</p>
 				</div>
 			</div>
+
+			{/* Forgot Password Modal (shadcn dialog) */}
+			<Dialog open={forgotOpen} onOpenChange={setForgotOpen}>
+				<DialogContent>
+					<DialogHeader>
+						<DialogTitle>Forgot Password</DialogTitle>
+						<DialogDescription>
+							Enter your email to receive a password reset link.
+						</DialogDescription>
+					</DialogHeader>
+					<form onSubmit={handleForgotSubmit} className="space-y-4">
+						<Input
+							type="email"
+							placeholder="Email address"
+							value={forgotEmail}
+							onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+								setForgotEmail(e.target.value)
+							}
+							required
+						/>
+						<Button type="submit" disabled={forgotLoading} className="w-full">
+							{forgotLoading ? "Sending..." : "Send Reset Link"}
+						</Button>
+						{forgotMsg && (
+							<p
+								className={`text-sm ${
+									forgotMsg.includes("sent") ? "text-green-600" : "text-red-600"
+								}`}
+							>
+								{forgotMsg}
+							</p>
+						)}
+					</form>
+				</DialogContent>
+			</Dialog>
 		</>
 	);
 };

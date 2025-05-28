@@ -11,6 +11,7 @@ import { Textarea } from "../ui/textarea";
 import { Button } from "../ui/button";
 import BASE_URL from "../../services";
 import { Trash2 } from "lucide-react";
+import { Props } from "../../types/user_dashboard_types";
 // Property category options for the select dropdown
 const propertyCategories = ["land", "apartment", "house", "room", "shop"];
 
@@ -41,7 +42,7 @@ type SellPostFormInputs = {
 };
 
 // Main functional component for the Sell Post Form
-const SellPostForm: React.FC = () => {
+const SellPostForm: React.FC<Props> = ({ registerReset }) => {
 	// Initialize react-hook-form with TypeScript generics
 	const {
 		register, // for registering input fields
@@ -52,6 +53,9 @@ const SellPostForm: React.FC = () => {
 		setValue, // to programmatically set form values
 		formState: { errors, isSubmitting }, // form state and validation errors
 	} = useForm<SellPostFormInputs>();
+	useEffect(() => {
+		registerReset(reset);
+	}, [reset, registerReset]);
 
 	// State to hold preview URLs for uploaded images
 	const [previews, setPreviews] = useState<string[]>([]);
@@ -161,7 +165,7 @@ const SellPostForm: React.FC = () => {
 			</div>
 
 			{/* Property Category Select Field */}
-			<div className="flex flex-col  sm:flex-row sm:justify-start  gap-3">
+			<div className=" ">
 				<div>
 					<label className="block mb-1 font-medium">Property Category *</label>
 					<select
@@ -174,7 +178,7 @@ const SellPostForm: React.FC = () => {
 								}
 							},
 						})}
-						className="w-full border rounded px-3 py-2"
+						className="border rounded px-3 py-2"
 					>
 						<option value="">Select category</option>
 						{propertyCategories.map((cat) => (
@@ -189,25 +193,6 @@ const SellPostForm: React.FC = () => {
 						</p>
 					)}
 				</div>
-				{/* Watch after setting only display unit if land is selected */}
-				{watch("propertyCategory") === "land" && (
-					<div>
-						<label className="block mb-1 font-medium">Unit</label>
-						<select
-							{...register("unit")}
-							className="w-full border rounded px-3 py-2"
-						>
-							<option value="" disabled>
-								Select unit
-							</option>
-							{unitOptions.map((unit) => (
-								<option key={unit} value={unit}>
-									{"per " + unit}
-								</option>
-							))}
-						</select>
-					</div>
-				)}
 			</div>
 
 			{/* Unit Select Field (optional) */}
@@ -217,6 +202,7 @@ const SellPostForm: React.FC = () => {
 				<div>
 					<label className=" mb-1 font-medium ">Price *</label>
 					<Input
+						className="px-3 py-2"
 						type="number"
 						step="100"
 						{...register("price", {
@@ -230,25 +216,22 @@ const SellPostForm: React.FC = () => {
 						<p className="text-red-500 text-sm">{errors.price.message}</p>
 					)}
 				</div>
-				<div>
-					<label className="block mb-1 font-medium">Price Type *</label>
-					<select
-						{...register("priceType", { required: "Select price type" })}
-						className=" border rounded px-3 py-1"
-					>
-						<option value="" disabled>
-							Select price type
-						</option>
-						{priceTypes.map((pt) => (
-							<option key={pt.value} value={pt.value}>
-								{pt.label}
+				{/* Watch after setting only display unit if land is selected */}
+				{watch("propertyCategory") === "land" && (
+					<div>
+						<label className="block mb-1 font-medium">Unit</label>
+						<select {...register("unit")} className="border rounded px-3 py-1">
+							<option value="" disabled>
+								Select unit
 							</option>
-						))}
-					</select>
-					{errors.priceType && (
-						<p className="text-red-500 text-sm">{errors.priceType.message}</p>
-					)}
-				</div>
+							{unitOptions.map((unit) => (
+								<option key={unit} value={unit}>
+									{"per " + unit}
+								</option>
+							))}
+						</select>
+					</div>
+				)}
 			</div>
 
 			{/* Price Type Select Field */}

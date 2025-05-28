@@ -95,7 +95,7 @@ const YourProfile: React.FC = () => {
 		}
 	};
 	return (
-		<div className="flex flex-col items-center min-h-screen pt-20 px-4 bg-gradient-to-br from-blue-50 to-white">
+		<div className="flex flex-col items-center min-h-screen pt-20 px-4">
 			<div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-md space-y-6 text-gray-600">
 				<div className="flex flex-col items-center space-y-4">
 					{user?.avatar || preview ? (
