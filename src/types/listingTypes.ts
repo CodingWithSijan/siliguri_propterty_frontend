@@ -1,4 +1,4 @@
-export interface IBasePostType {
+export interface IBaseListingType {
 	_id: string;
 	intent: "sell";
 	title: string;
@@ -9,15 +9,22 @@ export interface IBasePostType {
 	user?: string;
 	approvalStatus: "approved" | "pending" | "rejected";
 }
-export interface ISellListingType extends IBasePostType {
+export interface ISellListingType extends IBaseListingType {
 	pictures?: string[];
 	unit?: "decimal" | "sq foot" | "katha" | "bigha" | "acre";
+	availableLandSpace?: number;
+	availableLandSpaceUnit?: "decimal" | "sq foot" | "katha" | "bigha" | "acre";
 }
 
-export interface IRentListingType extends IBasePostType {
+export interface IRentListingType extends IBaseListingType {
 	rentRole: "tenant" | "owner";
 	duration?: "day" | "week" | "month" | "year";
 	pictures?: string[];
 }
 
-export type IBuyPostType = IBasePostType;
+export type IBuyListingType = IBaseListingType;
+
+export type IUniversalListingType =
+	| ISellListingType
+	| IBuyListingType
+	| IRentListingType;

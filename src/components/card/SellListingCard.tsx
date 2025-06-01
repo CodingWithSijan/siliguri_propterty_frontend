@@ -1,18 +1,19 @@
 import React from "react";
 import { FaMapMarkerAlt } from "react-icons/fa";
 import { MdSell } from "react-icons/md";
-import { LuBuilding2 } from "react-icons/lu";
+import PropertyIconHelper from "../common/propertyIconHelper";
 import { motion } from "framer-motion";
 import { formatIndianCurrency } from "../../utils/priceFormatHelper";
 import { ISellListingType } from "../../types/listingTypes";
-
+import propertyImagePlaceholder from "../../assets/looking_to_sell.png";
 const capitalize = (str: string | undefined) =>
 	str ? str.charAt(0).toUpperCase() + str.slice(1) : "";
 
 const SellListingCard: React.FC<{
 	listing: ISellListingType;
 	onClick: () => void;
-}> = ({ listing, onClick }) => {
+	userOrGlobal?: string;
+}> = ({ listing, onClick, userOrGlobal }) => {
 	const priceNum = Number(listing.price);
 	const formattedPrice = isNaN(priceNum)
 		? listing.price
@@ -31,7 +32,7 @@ const SellListingCard: React.FC<{
 				</span>
 			</div>
 			<div className="absolute top-2 right-2 bg-white/90 text-gray-800 text-[10px] px-2 py-1 rounded shadow font-semibold z-20 border border-gray-200">
-				{listing.approvalStatus && (
+				{listing.approvalStatus && userOrGlobal === "user" && (
 					<span
 						className={`mr-2 font-bold ${
 							listing.approvalStatus === "approved"
@@ -51,21 +52,23 @@ const SellListingCard: React.FC<{
 					  ).toLocaleDateString()
 					: "-"}
 			</div>
-			<div className="relative w-full h-32 overflow-hidden rounded-t-xl">
+			<div className="relative w-full h-50 overflow-hidden rounded-t-xl">
 				<img
 					src={
 						listing.pictures && listing.pictures.length > 0
 							? listing.pictures[0]
-							: "https://via.placeholder.com/300"
+							: propertyImagePlaceholder
 					}
 					alt={listing.title}
-					className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+					className="w-full h-full object-full group-hover:scale-110 transition-transform duration-700"
 				/>
-				<div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
 			</div>
 			<div className="flex items-center justify-between mt-1 px-2">
 				<span className="flex items-center gap-1 bg-white/90 text-red-700 text-xs px-2 py-1 rounded-full shadow-lg border border-red-200 w-fit">
-					<LuBuilding2 className="inline-block text-xs mr-1" />
+					<PropertyIconHelper
+						propertyCategory={listing.propertyCategory}
+						className="inline-block text-xs mr-1 w-4 h-4"
+					/>
 					{capitalize(listing.propertyCategory)}
 				</span>
 				{/* User info placeholder, as user is string in type */}
@@ -87,15 +90,28 @@ const SellListingCard: React.FC<{
 					{listing.price && (
 						<span className="bg-gray-100 text-gray-700 px-2 py-1 rounded text-xs font-medium">
 							Price:{" "}
-							<span className="text-green-700 font-bold">{formattedPrice}</span>
-						</span>
-					)}
-					{listing.unit && (
-						<span className="bg-gray-100 text-gray-700 px-2 py-1 rounded text-xs font-medium">
-							Unit: {capitalize(listing.unit)}
+							<span className="text-green-700 font-bold">
+								{listing.unit
+									? `${formattedPrice}  /  ${capitalize(listing.unit)}`
+									: `${formattedPrice}`}
+							</span>
 						</span>
 					)}
 				</div>
+				{listing.propertyCategory === "land" && listing.availableLandSpace && (
+					<div className="flex flex-wrap gap-1 mb-1">
+						{listing.price && (
+							<span className="bg-gray-100 text-gray-700 px-2 py-1 rounded text-xs font-medium">
+								Total Land space:{" "}
+								<span className="text-green-700 font-bold">
+									{listing.availableLandSpace +
+										" " +
+										capitalize(listing.availableLandSpaceUnit)}
+								</span>
+							</span>
+						)}
+					</div>
+				)}
 			</div>
 		</motion.div>
 	);

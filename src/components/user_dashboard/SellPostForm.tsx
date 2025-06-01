@@ -11,38 +11,15 @@ import { Textarea } from "../ui/textarea";
 import { Button } from "../ui/button";
 import BASE_URL from "../../services";
 import { Trash2 } from "lucide-react";
-import { Props } from "../../types/user_dashboard_types";
+import { SellPostFormInputs } from "../../types/postFormTypes";
 // Property category options for the select dropdown
 const propertyCategories = ["land", "apartment", "house", "room", "shop"];
 
 // Unit options for the select dropdown
 const unitOptions = ["decimal", "katha", "bigha", "acre", "sq foot"];
 
-// Price type options for the select dropdown
-const priceTypes = [
-	{ value: "fixed", label: "Fixed" },
-	{ value: "negotiable", label: "Negotiable" },
-];
-
-// TypeScript type for the form inputs
-// 'pictures' is a FileList for multi-file upload
-// 'unit' is optional
-// All other fields are required
-// Used for type safety with react-hook-form
-//
-type SellPostFormInputs = {
-	title: string;
-	description: string;
-	location: string;
-	propertyCategory: string;
-	unit?: string;
-	price: number;
-	priceType: string;
-	pictures: FileList;
-};
-
 // Main functional component for the Sell Post Form
-const SellPostForm: React.FC<Props> = ({ registerReset }) => {
+const SellPostForm: React.FC = () => {
 	// Initialize react-hook-form with TypeScript generics
 	const {
 		register, // for registering input fields
@@ -53,16 +30,14 @@ const SellPostForm: React.FC<Props> = ({ registerReset }) => {
 		setValue, // to programmatically set form values
 		formState: { errors, isSubmitting }, // form state and validation errors
 	} = useForm<SellPostFormInputs>();
-	useEffect(() => {
-		registerReset(reset);
-	}, [reset, registerReset]);
 
 	// State to hold preview URLs for uploaded images
 	const [previews, setPreviews] = useState<string[]>([]);
 
 	// Watch the 'pictures' field for changes
 	const pictures = watch("pictures");
-
+	// Watch the propertyCategory field for changes
+	const watchPropertyCategories = watch("propertyCategory");
 	// Effect to generate image previews when files are selected
 	useEffect(() => {
 		if (pictures && pictures.length > 0) {
@@ -75,6 +50,13 @@ const SellPostForm: React.FC<Props> = ({ registerReset }) => {
 			setPreviews([]);
 		}
 	}, [pictures]);
+	useEffect(() => {
+		if (watchPropertyCategories !== "land") {
+			setValue("unit", "");
+			setValue("availableLandSpace", "");
+			setValue("availableLandSpaceUnit", "");
+		}
+	}, [watchPropertyCategories, setValue]);
 
 	// Form submission handler
 	// Wraps data in FormData for file upload and posts to backend
@@ -85,8 +67,10 @@ const SellPostForm: React.FC<Props> = ({ registerReset }) => {
 		formData.append("location", data.location);
 		formData.append("propertyCategory", data.propertyCategory);
 		if (data.unit) formData.append("unit", data.unit);
+		if (data.availableLandSpaceUnit)
+			formData.append("availableLandSpaceUnit", data.availableLandSpaceUnit);
 		formData.append("price", String(data.price));
-		formData.append("priceType", data.priceType);
+		formData.append("availableLandSpace", String(data.availableLandSpace));
 		// Append each selected picture file to FormData
 		if (data.pictures && data.pictures.length > 0) {
 			Array.from(data.pictures).forEach((file) => {
@@ -178,7 +162,7 @@ const SellPostForm: React.FC<Props> = ({ registerReset }) => {
 								}
 							},
 						})}
-						className="border rounded px-3 py-2"
+						className="w-full border rounded px-3 py-2"
 					>
 						<option value="">Select category</option>
 						{propertyCategories.map((cat) => (
@@ -198,15 +182,19 @@ const SellPostForm: React.FC<Props> = ({ registerReset }) => {
 			{/* Unit Select Field (optional) */}
 
 			{/* Price Field */}
-			<div className="flex flex-col sm:flex-row sm:justify-start gap-4">
+			<div
+				className={`flex flex-col sm:flex-row sm:justify-start gap-4 ${
+					watch("propertyCategory") === "land" ? "border-1 p-4 " : ""
+				} `}
+			>
 				<div>
-					<label className=" mb-1 font-medium ">Price *</label>
+					<label className=" mb-1 font-medium ">
+						Price {watchPropertyCategories === "land" ? "per unit" : ""}
+					</label>
 					<Input
 						className="px-3 py-2"
 						type="number"
-						step="100"
 						{...register("price", {
-							required: "Price is required",
 							valueAsNumber: true,
 							min: { value: 0, message: "Price must be positive" },
 						})}
@@ -233,6 +221,56 @@ const SellPostForm: React.FC<Props> = ({ registerReset }) => {
 					</div>
 				)}
 			</div>
+			{/* Total Available Land space */}
+			{watch("propertyCategory") === "land" && (
+				<div
+					className={`flex flex-col sm:flex-row sm:justify-start gap-4 ${
+						watch("propertyCategory") === "land" ? "border-1 p-4 " : ""
+					} `}
+				>
+					<div>
+						<label className=" mb-1 font-medium ">Total land space</label>
+						<Input
+							className="px-3 py-2"
+							type="number"
+							step="1"
+							{...register("availableLandSpace", {
+								required: "Total available land space is required",
+								valueAsNumber: true,
+								min: {
+									value: 0,
+									message: "Total available land space must be positive",
+								},
+							})}
+							placeholder="Enter total space in numbers"
+						/>
+						{errors.availableLandSpace && (
+							<p className="text-red-500 text-sm">
+								{errors.availableLandSpace.message}
+							</p>
+						)}
+					</div>
+					{/* Watch after setting only display unit if land is selected */}
+					{watch("propertyCategory") === "land" && (
+						<div>
+							<label className="block mb-1 font-medium">Unit</label>
+							<select
+								{...register("availableLandSpaceUnit")}
+								className="border rounded px-3 py-1"
+							>
+								<option value="" disabled>
+									Select unit
+								</option>
+								{unitOptions.map((unit) => (
+									<option key={unit} value={unit}>
+										{unit}
+									</option>
+								))}
+							</select>
+						</div>
+					)}
+				</div>
+			)}
 
 			{/* Price Type Select Field */}
 

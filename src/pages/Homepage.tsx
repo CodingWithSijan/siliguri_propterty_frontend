@@ -1,4 +1,5 @@
 import Navbar from "../components/header_and_footer/Navbar";
+import AllPostsHomepage from "../components/homepage/AllPostsHomepage";
 import HeroSection from "../components/homepage/HeroSection";
 
 const Homepage = () => {
@@ -6,6 +7,7 @@ const Homepage = () => {
 		<div>
 			<Navbar />
 			<HeroSection />
+			<AllPostsHomepage />
 		</div>
 	);
 };

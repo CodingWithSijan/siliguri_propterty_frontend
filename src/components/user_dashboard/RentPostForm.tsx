@@ -11,6 +11,7 @@ import { Button } from "../ui/button";
 import BASE_URL from "../../services";
 import { Trash2 } from "lucide-react";
 import { Props } from "../../types/user_dashboard_types";
+import { RentPostFormInputs } from "../../types/postFormTypes";
 
 // Property categories for the dropdown
 const propertyCategories = ["apartment", "house", "room", "shop"];
@@ -25,21 +26,6 @@ const rentRoles = [
 	{ value: "tenant", label: "Tenant" },
 	{ value: "owner", label: "Owner" },
 ];
-
-// Type definition for form inputs
-// pictures is optional and only for 'owner' role
-// duration is required in the form, but optional in type for flexibility
-// price is optional for flexibility
-type RentPostFormInputs = {
-	title: string; // Title of the property
-	description: string; // Description of the property
-	location: string; // Address/location
-	propertyCategory: string; // Category (apartment, house, etc.)
-	price?: number; // Price or budget
-	rentRole: string; // Owner or tenant
-	duration?: string; // Frequency/duration (per month, week, etc.)
-	pictures?: FileList; // Images (only for owner)
-};
 
 // Main RentPostForm component
 const RentPostForm: React.FC<Props> = ({ registerReset }) => {
@@ -92,6 +78,7 @@ const RentPostForm: React.FC<Props> = ({ registerReset }) => {
 		const formData = new FormData();
 		// Append all form fields to FormData for API
 		formData.append("title", data.title);
+
 		formData.append("description", data.description);
 		formData.append("location", data.location);
 		formData.append("propertyCategory", data.propertyCategory);

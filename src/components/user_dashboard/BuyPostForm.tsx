@@ -10,16 +10,9 @@ import { Textarea } from "../ui/textarea";
 import { Button } from "../ui/button";
 import BASE_URL from "../../services";
 import { Props } from "../../types/user_dashboard_types";
+import { BuyPostFormInputs } from "../../types/postFormTypes";
 
 const propertyCategories = ["apartment", "house", "room", "shop", "land"];
-
-type BuyPostFormInputs = {
-	title: string;
-	description: string;
-	location: string;
-	propertyCategory: string;
-	price?: number;
-};
 
 const BuyPostForm: React.FC<Props> = ({ registerReset }) => {
 	const {
