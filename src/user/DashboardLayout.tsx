@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import Sidebar from "./Sidebar";
 import ContentDisplay from "./ContentDisplay";
 import { Bars3Icon } from "@heroicons/react/24/outline";
-import Navbar from "../header_and_footer/Navbar";
+import Navbar from "../components/header_and_footer/Navbar";
 import ProtectedRoute from "../route/ProtectedRoute";
 import { AnimatePresence } from "framer-motion";
 import { useAuth } from "../contextAPI/UserAuthContext";
@@ -27,19 +27,18 @@ const DashboardLayout: React.FC = () => {
 		};
 
 		fetchLatestUser();
-	}, []);
+	}, [user?.id, token, setUser]);
 
 	return (
-		<>
+		<div className="flex flex-col h-screen bg-gray-50">
 			<Navbar />
-
-			{/* Main Layout Below Navbar */}
-			<div className="h-[calc(100vh-4rem)] bg-gray-50 relative overflow-hidden">
+			<div className="flex flex-1 overflow-hidden">
 				{/* Mobile Menu Button */}
-				<div className="md:hidden fixed top-2 left-2 z-50">
+				<div className="md:hidden fixed top-20 left-4 z-50">
 					<button
 						onClick={() => setSidebarOpen(!sidebarOpen)}
-						className="p-2 bg-blue-600 text-white rounded-full shadow-lg"
+						className="p-2 bg-primary text-primary-foreground rounded-lg shadow-lg hover:bg-primary/90 transition-colors"
+						aria-label="Toggle menu"
 					>
 						<Bars3Icon className="h-6 w-6" />
 					</button>
@@ -48,45 +47,38 @@ const DashboardLayout: React.FC = () => {
 				{/* Overlay */}
 				{sidebarOpen && (
 					<div
-						className="fixed inset-0 bg-black bg-opacity-40 z-30 md:hidden"
+						className="fixed inset-0 bg-black/40 backdrop-blur-sm z-30 md:hidden transition-opacity"
 						onClick={() => setSidebarOpen(false)}
 					></div>
 				)}
 
-				{/* Content Wrapper */}
-				<div className="flex w-full h-full md:flex-row flex-col overflow-hidden">
-					{/* Sidebar */}
-					<div
-						className={`
-							bg-white w-64 shadow-lg pt-10 p-4 transition-transform duration-300
-							${
-								sidebarOpen
-									? "fixed z-40 inset-y-0 left-0 translate-x-0"
-									: "absolute -translate-x-full"
-							}
-							md:relative md:translate-x-0 md:z-auto
-						`}
-					>
-						<AnimatePresence>
-							<Sidebar
-								activeMenu={activeMenu}
-								setActiveMenu={setActiveMenu}
-								setSidebarOpen={setSidebarOpen}
-							/>
-						</AnimatePresence>
-					</div>
-
-					{/* Main Dashboard Content */}
-					<main className="flex-1 p-4 overflow-y-auto">
-						<ProtectedRoute allowedRoles={["user"]}>
-							<div className="bg-white rounded-2xl shadow-md h-full">
-								<ContentDisplay activeMenu={activeMenu} />
-							</div>
-						</ProtectedRoute>
-					</main>
+				{/* Sidebar */}
+				<div
+					className={`
+						fixed md:relative md:flex flex-shrink-0 w-64 h-full z-40
+						transition-transform duration-300 ease-in-out
+						${sidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}
+					`}
+				>
+					<AnimatePresence>
+						<Sidebar
+							activeMenu={activeMenu}
+							setActiveMenu={setActiveMenu}
+							setSidebarOpen={setSidebarOpen}
+						/>
+					</AnimatePresence>
 				</div>
+
+				{/* Main Content Area */}
+				<main className="flex-1 overflow-hidden">
+					<ProtectedRoute allowedRoles={["user"]}>
+						<div className="h-full bg-white">
+							<ContentDisplay activeMenu={activeMenu} />
+						</div>
+					</ProtectedRoute>
+				</main>
 			</div>
-		</>
+		</div>
 	);
 };
 
