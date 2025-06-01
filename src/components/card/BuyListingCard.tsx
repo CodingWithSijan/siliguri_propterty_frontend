@@ -4,7 +4,7 @@ import { MdSell } from "react-icons/md";
 import { motion } from "framer-motion";
 import { formatIndianCurrency } from "../../utils/priceFormatHelper";
 import { IBuyListingType } from "../../types/listingTypes";
-import PropertyIconHelper from "../common/propertyIconHelper";
+import PropertyIconHelper from "../common/PropertyIconHelper";
 import propertyImagePlaceHolder from "../../assets/looking_for_property.png";
 
 const capitalize = (str: string | undefined) =>
