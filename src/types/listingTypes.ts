@@ -1,6 +1,6 @@
 export interface IBaseListingType {
 	_id: string;
-	intent: "sell";
+	intent: "sell" | "rent" | "buy";
 	title: string;
 	description: string;
 	location: string;

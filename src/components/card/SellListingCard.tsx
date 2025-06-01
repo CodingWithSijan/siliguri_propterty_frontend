@@ -1,11 +1,11 @@
 import React from "react";
 import { FaMapMarkerAlt } from "react-icons/fa";
 import { MdSell } from "react-icons/md";
-import PropertyIconHelper from "../common/propertyIconHelper";
 import { motion } from "framer-motion";
 import { formatIndianCurrency } from "../../utils/priceFormatHelper";
 import { ISellListingType } from "../../types/listingTypes";
 import propertyImagePlaceholder from "../../assets/looking_to_sell.png";
+import PropertyIconHelper from "../common/PropertyIconHelper";
 const capitalize = (str: string | undefined) =>
 	str ? str.charAt(0).toUpperCase() + str.slice(1) : "";
 
