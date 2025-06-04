@@ -3,19 +3,22 @@ import { Transition } from "@headlessui/react";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import { NavLink, useNavigate } from "react-router-dom";
 import siliguri_property_logo_noBG from "../../assets/logo_siliguri_property.png";
-import { useAuth } from "../../contextAPI/UserAuthContext";
 import { getInitials } from "../../utils/getInitial";
 import { motion } from "framer-motion";
 import { PostYourPropertyButton } from "../common/PostYourPropertyButton";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "../../app/store";
+import { logout } from "../../app/slices/authSlice";
 
 const Navbar: React.FC = () => {
 	const [isOpen, setIsOpen] = useState<boolean>(false);
 	const [dropdownOpen, setDropdownOpen] = useState<boolean>(false);
-	const { user, logout } = useAuth();
+	const { user } = useSelector((state: RootState) => state.auth);
+	const dispatch = useDispatch<AppDispatch>();
 	const navigate = useNavigate();
 
 	const handleLogout = () => {
-		logout();
+		dispatch(logout());
 		navigate("/login");
 	};
 

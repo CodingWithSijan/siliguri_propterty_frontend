@@ -1,6 +1,5 @@
 import React, { useState } from "react";
-import { useAuth } from "../../contextAPI/UserAuthContext";
-import axios, { AxiosError } from "axios";
+import axios from "axios";
 import { showSuccess, showError, showInfo } from "../../utils/toastUtils";
 import BASE_URL from "../../services";
 import ChangePassword from "../ChanagePassword";
@@ -14,9 +13,13 @@ import {
 	FiPhone,
 } from "react-icons/fi";
 import { getInitials } from "../../utils/getInitial";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "../../app/store";
+import { login } from "../../app/slices/authSlice";
 
 const YourProfile: React.FC = () => {
-	const { user, token, setUser } = useAuth();
+	const { user } = useSelector((state: RootState) => state.auth);
+	const dispatch = useDispatch<AppDispatch>();
 	const [selectedFile, setSelectedFile] = useState<File | null>(null);
 	const [preview, setPreview] = useState<string | null>(null);
 	const [uploading, setUploading] = useState<boolean>(false);
@@ -26,13 +29,13 @@ const YourProfile: React.FC = () => {
 	 *** Function to fetch Latest user after image upload (Profile picture upload)
 	 *** Updates auth context
 	 */
-	const fetchLatestUserAndUpdateContext = async () => {
-		const response = await BASE_URL.get(`/api/users/${user?.id}`);
-		setUser((prev) => {
-			if (!prev) return prev;
-			return { ...prev, avatar: response.data.avatar };
-		});
-	};
+	// const fetchLatestUserAndUpdateContext = async () => {
+	// 	const response = await BASE_URL.get(`/api/users/${user?.id}`);
+	// 	setUser((prev) => {
+	// 		if (!prev) return prev;
+	// 		return { ...prev, avatar: response.data.avatar };
+	// 	});
+	// };
 
 	/*
 	 ** Handle File Change (Profile Picture Preview)
@@ -57,18 +60,15 @@ const YourProfile: React.FC = () => {
 
 		try {
 			setUploading(true);
-			await axios.post(
+			const response = await BASE_URL.post(
 				`${import.meta.env.VITE_BACKEND_URL}/api/users/upload-profile-picture`,
-				formData,
-				{
-					headers: {
-						"Content-Type": "multipart/form-data",
-						Authorization: `Bearer ${token}`,
-					},
-				}
+				formData
 			);
+			const updatedUser = response.data.user;
 			showSuccess("Profile Picture updated successfully!");
-			fetchLatestUserAndUpdateContext();
+			dispatch(
+				login({ user: updatedUser, token: sessionStorage.getItem("token")! })
+			);
 			setSelectedFile(null);
 		} catch (error: any) {
 			showError(error.response?.data?.message || "Upload failed.");

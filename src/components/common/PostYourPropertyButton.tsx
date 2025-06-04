@@ -1,10 +1,11 @@
 import { MdHouse } from "react-icons/md";
+import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../../contextAPI/UserAuthContext";
+import { RootState } from "../../app/store";
 
 export const PostYourPropertyButton: React.FC = (): React.ReactNode => {
 	const navigate = useNavigate();
-	const { isAuthenticated } = useAuth();
+	const { isAuthenticated } = useSelector((state: RootState) => state.auth);
 	const redirectUser = () => {
 		const navigatePath = isAuthenticated ? "/dashboard" : "/login";
 		navigate(navigatePath);

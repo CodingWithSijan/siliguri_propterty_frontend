@@ -30,6 +30,7 @@ const ContentDisplay: React.FC<Props> = ({ activeMenu }) => {
 						exit={{ opacity: 0 }}
 						className="h-full overflow-y-auto px-6 py-4"
 					>
+						{/* <NewPost /> */}
 						<NewPost />
 					</motion.div>
 				);

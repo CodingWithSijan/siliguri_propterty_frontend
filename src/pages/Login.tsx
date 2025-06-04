@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { showSuccess, showError } from "../utils/toastUtils";
 import BASE_URL from "../services";
 import { useNavigate, useLocation, NavLink } from "react-router-dom";
-import { useAuth } from "../contextAPI/UserAuthContext";
 import { AxiosError } from "axios";
 import { FaEnvelope, FaLock } from "react-icons/fa";
 import { BiLoaderAlt } from "react-icons/bi";
@@ -15,6 +14,9 @@ import {
 } from "../components/ui/dialog";
 import { Input } from "../components/ui/input";
 import { Button } from "../components/ui/button";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "../app/store";
+import { login } from "../app/slices/authSlice";
 
 interface UserFormDataTypes {
 	email: string;
@@ -24,7 +26,11 @@ interface UserFormDataTypes {
 const Login: React.FC = () => {
 	const navigate = useNavigate();
 	const location = useLocation();
-	const { isAuthenticated, login, user } = useAuth();
+	const dispatch = useDispatch<AppDispatch>();
+
+	const { isAuthenticated, user } = useSelector(
+		(state: RootState) => state.auth
+	);
 
 	const [formData, setFormData] = useState<UserFormDataTypes>({
 		email: "",
@@ -63,7 +69,9 @@ const Login: React.FC = () => {
 		try {
 			const response = await BASE_URL.post("/api/auth/login", formData);
 			const { user, token } = response.data;
-			login(user, token);
+
+			dispatch(login({ user, token }));
+
 			showSuccess("Login successful.");
 			navigate(user?.role === "admin" ? "/admin" : "/");
 		} catch (error) {

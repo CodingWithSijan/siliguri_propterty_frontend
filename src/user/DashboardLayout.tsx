@@ -1,33 +1,14 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import Sidebar from "./Sidebar";
 import ContentDisplay from "./ContentDisplay";
 import { Bars3Icon } from "@heroicons/react/24/outline";
 import Navbar from "../components/header_and_footer/Navbar";
 import ProtectedRoute from "../route/ProtectedRoute";
 import { AnimatePresence } from "framer-motion";
-import { useAuth } from "../contextAPI/UserAuthContext";
-import BASE_URL from "../services";
 
 const DashboardLayout: React.FC = () => {
 	const [activeMenu, setActiveMenu] = useState("Your Profile");
 	const [sidebarOpen, setSidebarOpen] = useState(false);
-	const { user, setUser, token } = useAuth();
-
-	useEffect(() => {
-		const fetchLatestUser = async () => {
-			if (!user?.id || !token) return;
-			try {
-				const res = await BASE_URL.get(
-					`${import.meta.env.VITE_BACKEND_URL}/api/users/${user.id}`
-				);
-				setUser((prev) => ({ ...prev, ...res.data }));
-			} catch (err) {
-				console.error("Failed to refresh user context", err);
-			}
-		};
-
-		fetchLatestUser();
-	}, [user?.id, token, setUser]);
 
 	return (
 		<div className="flex flex-col h-screen bg-gray-50">

@@ -8,6 +8,7 @@ import {
 	FiLogOut,
 } from "react-icons/fi";
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 
 interface SidebarProps {
 	activeMenu: string;
@@ -17,7 +18,7 @@ interface SidebarProps {
 
 const menuItems = [
 	{ label: "Your Profile", icon: <FiUser /> },
-	{ label: "New Post", icon: <FiPlusCircle /> },
+	{ label: "New Post", icon: <FiPlusCircle />, link: "add-post" },
 	{ label: "View Your Listings", icon: <FiList /> },
 	{ label: "Promote Your listings", icon: <FiTrendingUp /> },
 	{ label: "Messages", icon: <FiMessageCircle /> },
@@ -28,6 +29,8 @@ const Sidebar: React.FC<SidebarProps> = ({
 	setActiveMenu,
 	setSidebarOpen,
 }) => {
+	const navigate = useNavigate();
+
 	return (
 		<motion.div
 			initial={{ x: -300 }}
@@ -60,6 +63,9 @@ const Sidebar: React.FC<SidebarProps> = ({
 								onClick={() => {
 									setActiveMenu(item.label);
 									setSidebarOpen(false);
+									if (item.label === "New Post") {
+										navigate("/add-post"); // or whatever your route path is
+									}
 								}}
 							>
 								<span

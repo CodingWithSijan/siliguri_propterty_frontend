@@ -1,5 +1,5 @@
 // 1. Redux Toolkit functions to create slices and async actions
-import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import BASE_URL from "../../services"; // Your Axios base instance (e.g., axios.create)
 import { IUniversalListingType } from "../../types/listingTypes"; // Type for post
 
@@ -42,7 +42,7 @@ const initialState: PostsState = {
 
 // 5. 🚀 Slice creation (reducers + extra async logic)
 const postsSlice = createSlice({
-	name: "posts",
+	name: "addPost",
 	initialState,
 	reducers: {
 		// Optional synchronous reducers (e.g., clearPosts, removePost)

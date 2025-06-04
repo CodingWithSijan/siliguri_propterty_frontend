@@ -1,6 +1,4 @@
 // SellPostForm.tsx
-// This component provides a form for users to create a new 'Sell' real estate post.
-// It uses React Hook Form for form state management and validation, and supports image uploads with preview.
 
 import React, { useState, useEffect } from "react";
 import { useForm, Controller } from "react-hook-form";
@@ -13,6 +11,9 @@ import BASE_URL from "../../services";
 import { Trash2 } from "lucide-react";
 import { Props } from "../../types/user_dashboard_types";
 import { SellPostFormInputs } from "../../types/postFormTypes";
+import { useDispatch, useSelector } from "react-redux";
+import type { AppDispatch, RootState } from "../../app/store";
+import { addNewPost } from "../../app/slices/postSlice";
 // Property category options for the select dropdown
 const propertyCategories = ["land", "apartment", "house", "room", "shop"];
 
@@ -23,17 +24,18 @@ const unitOptions = ["decimal", "katha", "bigha", "acre", "sq foot"];
 const SellPostForm: React.FC<Props> = ({ registerReset }) => {
 	// Initialize react-hook-form with TypeScript generics
 	const {
-		register, // for registering input fields
-		handleSubmit, // to handle form submission
-		reset, // to reset the form after successful submit
-		watch, // to watch form values (used for file preview)
-		control, // for controlled components (used for AddressInput)
-		setValue, // to programmatically set form values
-		formState: { errors, isSubmitting }, // form state and validation errors
+		register,
+		handleSubmit,
+		reset,
+		watch,
+		control,
+		setValue,
+		formState: { errors, isSubmitting },
 	} = useForm<SellPostFormInputs>();
 
 	// State to hold preview URLs for uploaded images
 	const [previews, setPreviews] = useState<string[]>([]);
+	const dispatch = useDispatch<AppDispatch>();
 
 	// Watch the 'pictures' field for changes
 	const pictures = watch("pictures");
@@ -58,9 +60,9 @@ const SellPostForm: React.FC<Props> = ({ registerReset }) => {
 	}, [pictures]);
 	useEffect(() => {
 		if (watchPropertyCategories !== "land") {
-			setValue("unit", "");
+			setValue("unit", undefined);
 			setValue("availableLandSpace", undefined);
-			setValue("availableLandSpaceUnit", "");
+			setValue("availableLandSpaceUnit", undefined);
 		}
 	}, [watchPropertyCategories, setValue]);
 
@@ -86,8 +88,9 @@ const SellPostForm: React.FC<Props> = ({ registerReset }) => {
 		}
 
 		try {
+			dispatch(addNewPost(formData));
 			// Send POST request to backend API
-			await BASE_URL.post("/api/user/post/add-new-post", formData);
+
 			showSuccess("Sell post created successfully!");
 			reset(); // Reset form fields
 			window.scrollTo({ top: 0, behavior: "smooth" }); // Scroll to top on success
