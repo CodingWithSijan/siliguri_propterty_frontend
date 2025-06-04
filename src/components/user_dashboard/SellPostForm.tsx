@@ -11,6 +11,7 @@ import { Textarea } from "../ui/textarea";
 import { Button } from "../ui/button";
 import BASE_URL from "../../services";
 import { Trash2 } from "lucide-react";
+import { Props } from "../../types/user_dashboard_types";
 import { SellPostFormInputs } from "../../types/postFormTypes";
 // Property category options for the select dropdown
 const propertyCategories = ["land", "apartment", "house", "room", "shop"];
@@ -19,7 +20,7 @@ const propertyCategories = ["land", "apartment", "house", "room", "shop"];
 const unitOptions = ["decimal", "katha", "bigha", "acre", "sq foot"];
 
 // Main functional component for the Sell Post Form
-const SellPostForm: React.FC = () => {
+const SellPostForm: React.FC<Props> = ({ registerReset }) => {
 	// Initialize react-hook-form with TypeScript generics
 	const {
 		register, // for registering input fields
@@ -39,6 +40,11 @@ const SellPostForm: React.FC = () => {
 	// Watch the propertyCategory field for changes
 	const watchPropertyCategories = watch("propertyCategory");
 	// Effect to generate image previews when files are selected
+
+	useEffect(() => {
+		registerReset(reset);
+	}, [reset, registerReset]);
+
 	useEffect(() => {
 		if (pictures && pictures.length > 0) {
 			const files = Array.from(pictures);
@@ -53,7 +59,7 @@ const SellPostForm: React.FC = () => {
 	useEffect(() => {
 		if (watchPropertyCategories !== "land") {
 			setValue("unit", "");
-			setValue("availableLandSpace", "");
+			setValue("availableLandSpace", undefined);
 			setValue("availableLandSpaceUnit", "");
 		}
 	}, [watchPropertyCategories, setValue]);
@@ -62,6 +68,7 @@ const SellPostForm: React.FC = () => {
 	// Wraps data in FormData for file upload and posts to backend
 	const onSubmit = async (data: SellPostFormInputs) => {
 		const formData = new FormData();
+		formData.append("intent", "sell");
 		formData.append("title", data.title);
 		formData.append("description", data.description);
 		formData.append("location", data.location);
@@ -80,7 +87,7 @@ const SellPostForm: React.FC = () => {
 
 		try {
 			// Send POST request to backend API
-			await BASE_URL.post("/api/user/post/new-sell-post", formData);
+			await BASE_URL.post("/api/user/post/add-new-post", formData);
 			showSuccess("Sell post created successfully!");
 			reset(); // Reset form fields
 			window.scrollTo({ top: 0, behavior: "smooth" }); // Scroll to top on success

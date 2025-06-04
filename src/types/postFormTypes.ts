@@ -30,3 +30,8 @@ export interface SellPostFormInputs extends BasePostFormInputs {
 	availableLandSpace?: string;
 	availableLandSpaceUnit?: "decimal" | "sq foot" | "katha" | "bigha" | "acre";
 }
+
+export type UniversalPostFormInputs =
+	| BuyPostFormInputs
+	| RentPostFormInputs
+	| SellPostFormInputs;

@@ -17,9 +17,7 @@ import {
 import ListingsAccordingToIntentType from "../../components/viewYourListingsComponent/ListingsAccordingToIntentType";
 
 const ViewYourListings = () => {
-	const [listings, setListings] = useState<
-		Partial<IUniversalListingType>[] | null
-	>([]);
+	const [listings, setListings] = useState<IUniversalListingType[] | null>([]);
 
 	const [activeListings, setActiveListings] = useState<
 		IUniversalListingType[] | null
@@ -42,7 +40,6 @@ const ViewYourListings = () => {
 				);
 				const allPostsOrListings = response.data.postArray;
 				setListings(allPostsOrListings);
-				console.log(allPostsOrListings);
 				setActiveListings(
 					allPostsOrListings.filter(
 						(item: IUniversalListingType | null) =>
@@ -50,7 +47,6 @@ const ViewYourListings = () => {
 					)
 				);
 
-				console.log(activeListings);
 				setPendingListings(
 					allPostsOrListings.filter(
 						(item: IUniversalListingType | null) =>
