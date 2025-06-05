@@ -9,6 +9,7 @@ import { PostYourPropertyButton } from "../common/PostYourPropertyButton";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../app/store";
 import { logout } from "../../app/slices/authSlice";
+import { formatFullName } from "../../utils/capitalizeName";
 
 const Navbar: React.FC = () => {
 	const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -23,7 +24,7 @@ const Navbar: React.FC = () => {
 	};
 
 	return (
-		<nav className="bg-white shadow-sm sticky top-0 z-50">
+		<nav className="bg-white shadow-sm sticky top-0 z-50 ">
 			<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 				<div className="flex justify-between h-16 items-center">
 					{/* Logo */}
@@ -59,7 +60,9 @@ const Navbar: React.FC = () => {
 											{getInitials(user?.name ?? "")}
 										</div>
 									)}
-									<span className="text-gray-700 font-medium">{user.name}</span>
+									<span className="text-gray-700 font-medium">
+										{formatFullName(user?.name)}
+									</span>
 								</motion.div>
 
 								{/* Dropdown Menu */}
@@ -150,7 +153,9 @@ const Navbar: React.FC = () => {
 										{getInitials(user?.name ?? "")}
 									</div>
 								)}
-								<span className="text-gray-700 font-medium">{user.name}</span>
+								<span className="text-gray-700 font-medium">
+									{formatFullName(user?.name)}
+								</span>
 							</div>
 							<NavLink
 								to={user.role === "user" ? "/dashboard" : "/admin"}

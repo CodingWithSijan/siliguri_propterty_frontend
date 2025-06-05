@@ -16,12 +16,23 @@ import { Home, Key, ShoppingBag } from "lucide-react";
 export default function NewPost() {
 	const [intent, setIntent] = useState("");
 	const [dialogOpen, setDialogOpen] = useState(true); // open dialog by default
+	const [shake, setShake] = useState(false); // for shake animation
 	const formResetRef = useRef<(() => void) | null>(null);
 
 	const handleGoBack = () => {
 		setIntent("");
 		setDialogOpen(true);
 		if (formResetRef.current) formResetRef.current();
+	};
+
+	const handleDialogOpenChange = (open: boolean) => {
+		if (!open && !intent) {
+			// User tried to close without selecting
+			setShake(true);
+			setTimeout(() => setShake(false), 500);
+			return;
+		}
+		setDialogOpen(open);
 	};
 
 	const renderForm = () => {
@@ -43,8 +54,13 @@ export default function NewPost() {
 
 	return (
 		<main className="sm:p-6 max-w-4xl mx-auto">
-			<Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-				<DialogContent className="max-w-md w-full rounded-2xl shadow-xl p-8 bg-gradient-to-br from-white via-slate-50 to-slate-100 border border-gray-200">
+			<Dialog open={dialogOpen} onOpenChange={handleDialogOpenChange}>
+				<DialogContent
+					showClose={false}
+					className={`max-w-md w-full rounded-2xl shadow-xl p-8 bg-gradient-to-br from-white via-slate-50 to-slate-100 border border-gray-200 ${
+						shake ? "animate-shake" : ""
+					}`}
+				>
 					<DialogHeader>
 						<DialogTitle className="text-2xl font-bold text-gray-800 mb-2 flex items-center gap-2">
 							Post Your Property
@@ -156,3 +172,16 @@ export default function NewPost() {
 		</main>
 	);
 }
+
+// Add this to your global CSS (e.g., index.css or App.css):
+// .animate-shake {
+//   animation: shake 0.5s;
+// }
+// @keyframes shake {
+//   0% { transform: translateX(0); }
+//   20% { transform: translateX(-8px); }
+//   40% { transform: translateX(8px); }
+//   60% { transform: translateX(-8px); }
+//   80% { transform: translateX(8px); }
+//   100% { transform: translateX(0); }
+// }

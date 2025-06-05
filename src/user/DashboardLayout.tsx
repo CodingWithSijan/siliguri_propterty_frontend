@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import Sidebar from "./Sidebar";
 import ContentDisplay from "./ContentDisplay";
 import { Bars3Icon } from "@heroicons/react/24/outline";
-import Navbar from "../components/header_and_footer/Navbar";
 import ProtectedRoute from "../route/ProtectedRoute";
 import { AnimatePresence } from "framer-motion";
 
@@ -12,10 +11,9 @@ const DashboardLayout: React.FC = () => {
 
 	return (
 		<div className="flex flex-col h-screen bg-gray-50">
-			<Navbar />
-			<div className="flex flex-1 overflow-hidden">
+			<div className="flex flex-1 ">
 				{/* Mobile Menu Button */}
-				<div className="md:hidden fixed top-20 left-4 z-50">
+				<div className="md:hidden fixed top-2 right-2 z-50">
 					<button
 						onClick={() => setSidebarOpen(!sidebarOpen)}
 						className="p-2 bg-primary text-primary-foreground rounded-lg shadow-lg hover:bg-primary/90 transition-colors"

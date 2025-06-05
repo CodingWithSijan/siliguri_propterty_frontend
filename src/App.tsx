@@ -12,43 +12,52 @@ import AdminDashboard from "./admin/AdminDashboard";
 import NotFound404 from "./components/homepage/NotFound404";
 import VerifyEmail from "./components/homepage/VerifyEmail";
 import NewPost from "./user/dashboard/NewPost";
+import ViewYourListings from "./user/dashboard/ViewYourListings";
+import ScrollToTopButton from "./components/common/scrollToTopButton";
 
 const App: React.FC = () => {
 	return (
-		<>
-			<Router>
-				<Routes>
-					<Route path="/" element={<Homepage />} />
-					<Route path="/signup" element={<Signup />} />
-					<Route
-						path="/SignupLocalComponent"
-						element={<SignupLocalComponent />}
-					/>
-					<Route path="/login" element={<Login />} />
+		<Router>
+			<ScrollToTopButton />
 
+			<Routes>
+				<Route path="/" element={<Homepage />} />
+				<Route path="/signup" element={<Signup />} />
+				<Route
+					path="/SignupLocalComponent"
+					element={<SignupLocalComponent />}
+				/>
+				<Route path="/login" element={<Login />} />
+
+				<Route
+					path="/dashboard"
+					element={
+						<ProtectedRoute allowedRoles={["user"]}>
+							<DashboardLayout />
+						</ProtectedRoute>
+					}
+				>
+					<Route path="/dashboard/new-post" element={<NewPost />} />
 					<Route
-						path="/dashboard"
-						element={
-							<ProtectedRoute allowedRoles={["user"]}>
-								<DashboardLayout />
-							</ProtectedRoute>
-						}
+						path="/dashboard/view-your-listings"
+						element={<ViewYourListings />}
 					/>
-					<Route
-						path="/admin"
-						element={
-							<ProtectedRoute allowedRoles={["admin"]}>
-								<AdminDashboard />
-							</ProtectedRoute>
-						}
-					/>
-					<Route path="/access-denied" element={<NotFound404 />} />
-					<Route path="/verify-email" element={<VerifyEmail />} />
-					<Route path="/new-post" element={<NewPost />} />
-				</Routes>
-				<ToastContainer />
-			</Router>
-		</>
+				</Route>
+				<Route
+					path="/admin"
+					element={
+						<ProtectedRoute allowedRoles={["admin"]}>
+							<AdminDashboard />
+						</ProtectedRoute>
+					}
+				/>
+
+				<Route path="/access-denied" element={<NotFound404 />} />
+				<Route path="/verify-email" element={<VerifyEmail />} />
+			</Routes>
+
+			<ToastContainer />
+		</Router>
 	);
 };
 

@@ -103,7 +103,7 @@ const SellPostForm: React.FC<Props> = ({ registerReset }) => {
 	return (
 		<form
 			onSubmit={handleSubmit(onSubmit)}
-			className="space-y-6 bg-white p-6 rounded-xl shadow max-w-2xl mx-auto"
+			className="space-y-6 bg-white p-6 shadow-lg border-2 rounded-xl  max-w-2xl mx-auto"
 		>
 			{/* Form Title */}
 			<h2 className="text-xl font-bold mb-4">Create Post</h2>

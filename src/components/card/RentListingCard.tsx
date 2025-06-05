@@ -23,7 +23,7 @@ const RentListingCard: React.FC<{
 		<motion.div
 			whileHover={{ y: -5 }}
 			transition={{ type: "spring", stiffness: 300 }}
-			className="relative bg-white rounded-xl overflow-hidden shadow-md border-2  hover:border-blue-400 transition-all duration-300 group w-full max-w-xs mx-auto cursor-pointer"
+			className="relative bg-white  overflow-hidden  border-2 shadow-md  hover:border-blue-400 transition-all duration-300 group w-full max-w-xs mx-auto cursor-pointer"
 			onClick={onClick}
 		>
 			<div className="absolute top-3 left-3 flex items-center gap-2 z-20">
@@ -52,7 +52,7 @@ const RentListingCard: React.FC<{
 					  ).toLocaleDateString()
 					: "-"}
 			</div>
-			<div className="relative w-full h-50 overflow-hidden rounded-t-xl">
+			<div className="relative w-full h-50 overflow-hidden">
 				<img
 					src={
 						listing.pictures && listing.pictures.length > 0

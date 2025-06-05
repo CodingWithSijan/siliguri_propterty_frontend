@@ -24,7 +24,7 @@ const BuyListingCard: React.FC<{
 		<motion.div
 			whileHover={{ y: -5 }}
 			transition={{ type: "spring", stiffness: 300 }}
-			className="relative bg-white rounded-xl overflow-hidden shadow-md border-2 border-green-200 hover:border-green-400 transition-all duration-300 group w-full max-w-xs mx-auto cursor-pointer"
+			className="relative bg-white  overflow-hidden shadow-md border-2  hover:border-green-400 transition-all duration-300 group w-full max-w-xs mx-auto cursor-pointer"
 			onClick={onClick}
 		>
 			<div className="absolute top-3 left-3 flex items-center gap-2 z-20">
@@ -53,7 +53,7 @@ const BuyListingCard: React.FC<{
 					  ).toLocaleDateString()
 					: "-"}
 			</div>
-			<div className="relative w-full h-50 overflow-hidden rounded-t-xl">
+			<div className="relative w-full h-50 overflow-hidden ">
 				{/* No pictures for buy type in type, so just show placeholder */}
 				<img
 					src={propertyImagePlaceHolder}

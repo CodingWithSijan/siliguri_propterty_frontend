@@ -72,7 +72,6 @@ const Login: React.FC = () => {
 
 			dispatch(login({ user, token }));
 
-			showSuccess("Login successful.");
 			navigate(user?.role === "admin" ? "/admin" : "/");
 		} catch (error) {
 			const err = error as AxiosError<{ message: string }>;

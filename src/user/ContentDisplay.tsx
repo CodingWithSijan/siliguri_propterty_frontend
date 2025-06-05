@@ -93,7 +93,7 @@ const ContentDisplay: React.FC<Props> = ({ activeMenu }) => {
 	};
 
 	return (
-		<div className="w-full h-[calc(100vh-4rem)]">
+		<div className="w-full h-full ">
 			<AnimatePresence mode="wait">{renderContent()}</AnimatePresence>
 		</div>
 	);
