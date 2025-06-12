@@ -7,7 +7,7 @@ export const PostYourPropertyButton: React.FC = (): React.ReactNode => {
 	const navigate = useNavigate();
 	const { isAuthenticated } = useSelector((state: RootState) => state.auth);
 	const redirectUser = () => {
-		const navigatePath = isAuthenticated ? "/dashboard" : "/login";
+		const navigatePath = isAuthenticated ? "/dashboard/new-post" : "/login";
 		navigate(navigatePath);
 	};
 	return (

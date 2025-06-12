@@ -2,14 +2,9 @@ import React, { useEffect, useState } from "react";
 import BASE_URL from "../../services";
 import SellListingCard from "../card/SellListingCard";
 import RentListingCard from "../card/RentListingCard";
-import BuyListingCard from "../card/BuyListingCard";
 import { IUniversalListingType } from "../../types/listingTypes";
 import { motion } from "framer-motion";
-import {
-	ISellListingType,
-	IRentListingType,
-	IBuyListingType,
-} from "../../types/listingTypes";
+import { ISellListingType, IRentListingType } from "../../types/listingTypes";
 
 const AllPostsHomepage: React.FC = () => {
 	const [posts, setPosts] = useState<IUniversalListingType[]>([]);
@@ -73,15 +68,7 @@ const AllPostsHomepage: React.FC = () => {
 								userOrGlobal="global"
 							/>
 						);
-					case "buy":
-						return (
-							<BuyListingCard
-								key={post._id}
-								listing={post as IBuyListingType}
-								onClick={() => {}}
-								userOrGlobal="global"
-							/>
-						);
+
 					default:
 						return null;
 				}

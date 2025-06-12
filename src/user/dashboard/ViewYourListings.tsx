@@ -39,6 +39,7 @@ const ViewYourListings = () => {
 					"/api/user/post/view-your-listings"
 				);
 				const allPostsOrListings = response.data.postArray;
+				console.log(allPostsOrListings);
 				setListings(allPostsOrListings);
 				setActiveListings(
 					allPostsOrListings.filter(

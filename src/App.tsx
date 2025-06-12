@@ -1,5 +1,10 @@
 import React from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import {
+	BrowserRouter as Router,
+	Routes,
+	Route,
+	Navigate,
+} from "react-router-dom";
 import ProtectedRoute from "./route/ProtectedRoute";
 import Signup from "./pages/Signup";
 import Homepage from "./pages/Homepage";
@@ -14,6 +19,8 @@ import VerifyEmail from "./components/homepage/VerifyEmail";
 import NewPost from "./user/dashboard/NewPost";
 import ViewYourListings from "./user/dashboard/ViewYourListings";
 import ScrollToTopButton from "./components/common/scrollToTopButton";
+import PostStepperForm from "./components/post_form/PostStepperForm";
+import YourProfile from "./user/dashboard/YourProfile";
 
 const App: React.FC = () => {
 	return (
@@ -37,12 +44,20 @@ const App: React.FC = () => {
 						</ProtectedRoute>
 					}
 				>
-					<Route path="/dashboard/new-post" element={<NewPost />} />
+					<Route index element={<Navigate to="your-profile" replace />} />
+					<Route path="your-profile" element={<YourProfile />} />
+					<Route path="new-post" element={<NewPost />} />
 					<Route
-						path="/dashboard/view-your-listings"
-						element={<ViewYourListings />}
+						path="new-post/sell"
+						element={<PostStepperForm intent="sell" />}
 					/>
+					<Route
+						path="new-post/rent"
+						element={<PostStepperForm intent="rent" />}
+					/>
+					<Route path="view-your-listings" element={<ViewYourListings />} />
 				</Route>
+
 				<Route
 					path="/admin"
 					element={

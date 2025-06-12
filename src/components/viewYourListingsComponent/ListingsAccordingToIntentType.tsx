@@ -1,13 +1,11 @@
 import React, { useState } from "react";
 import SellListingCard from "../card/SellListingCard";
 import {
-	IBuyListingType,
 	IRentListingType,
 	ISellListingType,
 	IUniversalListingType,
 } from "../../types/listingTypes";
 import RentListingCard from "../card/RentListingCard";
-import BuyListingCard from "../card/BuyListingCard";
 import PostDetailsDrawer from "./PostDetailsDrawer";
 
 const ListingsAccordingToIntentType: React.FC<{
@@ -45,15 +43,7 @@ const ListingsAccordingToIntentType: React.FC<{
 										userOrGlobal="user"
 									/>
 								);
-							case "buy":
-								return (
-									<BuyListingCard
-										key={listing._id}
-										listing={listing as IBuyListingType}
-										onClick={() => handleCardClick(listing as IBuyListingType)}
-										userOrGlobal="user"
-									/>
-								);
+
 							default:
 						}
 					})}
@@ -64,12 +54,6 @@ const ListingsAccordingToIntentType: React.FC<{
 				open={drawerOpen}
 				onClose={() => setDrawerOpen(false)}
 				post={selectedPost}
-				onEdit={() => {
-					/* handle edit */
-				}}
-				onDelete={() => {
-					/* handle delete */
-				}}
 			/>
 		</>
 	);

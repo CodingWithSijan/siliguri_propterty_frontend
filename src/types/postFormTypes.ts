@@ -1,37 +1,68 @@
+// File: types/postFormTypes.ts
+
+export type PropertyCategory = "land" | "house" | "flat" | "shop";
+export type UnitOfMeasurement =
+	| "decimal"
+	| "sq foot"
+	| "katha"
+	| "bigha"
+	| "acre";
+
+export type FurnishingType =
+	| "unfurnished"
+	| "semi-furnished"
+	| "fully-furnished";
 export interface BasePostFormInputs {
 	title: string;
 	description: string;
 	location: string;
-	propertyCategory: string;
-	price?: number;
-}
-
-export type BuyPostFormInputs = BasePostFormInputs;
-
-// Type definition for form inputs
-// pictures is optional and only for 'owner' role
-// duration is required in the form, but optional in type for flexibility
-// price is optional for flexibility
-export interface RentPostFormInputs extends BasePostFormInputs {
-	rentRole: string; // Owner or tenant
-	duration?: "day" | "week" | "month" | "year"; // Frequency/duration (per month, week, etc.)
-	pictures?: FileList; // Images (only for owner)
-}
-
-// TypeScript type for the form inputs
-// 'pictures' is a FileList for multi-file upload
-// 'unit' is optional
-// All other fields are required
-// Used for type safety with react-hook-form
-//
-export interface SellPostFormInputs extends BasePostFormInputs {
-	unit?: "decimal" | "sq foot" | "katha" | "bigha" | "acre";
+	propertyCategory: PropertyCategory;
 	pictures?: FileList;
-	availableLandSpace?: string;
-	availableLandSpaceUnit?: "decimal" | "sq foot" | "katha" | "bigha" | "acre";
+	availableFrom?: string; // ISO date string
 }
 
-export type UniversalPostFormInputs =
-	| BuyPostFormInputs
-	| RentPostFormInputs
-	| SellPostFormInputs;
+export interface RentPostFormInputs extends BasePostFormInputs {
+	// Common fields
+	frequency?: "day" | "week" | "month" | "year";
+	pricePerFrequency?: number;
+	furnishing?: FurnishingType;
+	availableForDuration?: number;
+	availableForDurationUnit?: "day" | "week" | "month" | "year";
+
+	// house/flat
+	bedrooms?: number;
+	bathrooms?: number;
+	floor?: number;
+	builtUpArea?: number;
+	attachedBathroom?: boolean;
+	parking?: boolean;
+
+	// shop specific
+	shopArea?: number;
+	hasShutter?: boolean;
+}
+
+export interface SellPostFormInputs extends BasePostFormInputs {
+	furnishing?: FurnishingType;
+	unit?: UnitOfMeasurement;
+	price?: string;
+	// Common residential fields (house/flat)
+	bedrooms?: number;
+	bathrooms?: number;
+	floor?: number;
+	builtUpArea?: number;
+	attachedBathroom?: boolean;
+	parking?: boolean;
+
+	// Land Specific
+	pricePerUnit?: number;
+	availableLandSpace?: string;
+	availableLandSpaceUnit?: UnitOfMeasurement;
+	totalPrice?: number;
+
+	// shop specific
+	shopArea?: number;
+	hasShutter?: boolean;
+}
+
+export type UniversalPostFormInputs = RentPostFormInputs | SellPostFormInputs;

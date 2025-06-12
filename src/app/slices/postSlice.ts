@@ -5,9 +5,9 @@ import { IUniversalListingType } from "../../types/listingTypes"; // Type for po
 
 // 2. 🔄 Async thunk action: called when you submit the form
 export const addNewPost = createAsyncThunk<
-	IUniversalListingType, // ✅ What this thunk returns on success
-	FormData, // ✅ What argument it receives (formData)
-	{ rejectValue: string } // ✅ What it returns on failure
+	IUniversalListingType,
+	FormData,
+	{ rejectValue: string }
 >(
 	"posts/addNewPost", // ✅ Action type prefix
 	async (formData, { rejectWithValue }) => {
@@ -28,14 +28,12 @@ export const addNewPost = createAsyncThunk<
 
 // 3. 🔐 Posts slice state structure
 interface PostsState {
-	posts: IUniversalListingType[]; // List of all posts
 	loading: boolean; // For loading spinner
 	error: string | null; // If any error happens
 }
 
 // 4. 🌱 Initial state
 const initialState: PostsState = {
-	posts: [],
 	loading: false,
 	error: null,
 };
@@ -53,9 +51,10 @@ const postsSlice = createSlice({
 				state.loading = true; // Start loading
 				state.error = null; // Clear previous error
 			})
-			.addCase(addNewPost.fulfilled, (state, action) => {
+			.addCase(addNewPost.fulfilled, (state) => {
 				state.loading = false;
-				state.posts.unshift(action.payload); // Add new post at the top
+				state.error = null;
+				// Add new post at the top
 			})
 			.addCase(addNewPost.rejected, (state, action) => {
 				state.loading = false;

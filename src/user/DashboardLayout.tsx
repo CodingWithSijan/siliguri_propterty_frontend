@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import Sidebar from "./Sidebar";
-import ContentDisplay from "./ContentDisplay";
 import { Bars3Icon } from "@heroicons/react/24/outline";
 import ProtectedRoute from "../route/ProtectedRoute";
 import { AnimatePresence } from "framer-motion";
+import { Outlet } from "react-router-dom";
 
 const DashboardLayout: React.FC = () => {
 	const [activeMenu, setActiveMenu] = useState("Your Profile");
@@ -52,7 +52,7 @@ const DashboardLayout: React.FC = () => {
 				<main className="flex-1 overflow-hidden">
 					<ProtectedRoute allowedRoles={["user"]}>
 						<div className="h-full bg-white">
-							<ContentDisplay activeMenu={activeMenu} />
+							<Outlet />
 						</div>
 					</ProtectedRoute>
 				</main>
