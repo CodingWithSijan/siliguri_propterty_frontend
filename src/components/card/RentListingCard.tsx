@@ -27,7 +27,7 @@ const RentListingCard: React.FC<{
 		<motion.div
 			whileHover={{ y: -5 }}
 			transition={{ type: "spring", stiffness: 300 }}
-			className="relative bg-white rounded-2xl shadow-lg border border-gray-200 hover:shadow-xl hover:border-blue-400 transition-all duration-300 group w-full max-w-sm mx-auto cursor-pointer"
+			className="relative bg-white rounded-md shadow-md border border-gray-200  group w-full max-w-sm mx-auto cursor-pointer"
 			onClick={onClick}
 		>
 			{/* Rent Tag */}
@@ -59,9 +59,18 @@ const RentListingCard: React.FC<{
 						: "-"}
 				</div>
 			)}
-
+			{listing.approvalStatus && userOrGlobal === "global" && (
+				<div className="absolute top-3 right-3 bg-white/90 text-orange-700 text-[10px] px-2 py-1 rounded shadow font-bold z-20 border border-gray-200">
+					<span>Posted on </span>
+					{listing._id
+						? new Date(
+								parseInt(listing._id.substring(0, 8), 16) * 1000
+						  ).toLocaleDateString()
+						: "-"}
+				</div>
+			)}
 			{/* Image */}
-			<div className="relative w-full h-52 overflow-hidden rounded-t-2xl">
+			<div className="relative w-full h-62 overflow-hidden rounded-t-md">
 				<img
 					src={
 						listing.pictures && listing.pictures.length > 0
@@ -86,13 +95,9 @@ const RentListingCard: React.FC<{
 
 			{/* Main Content */}
 			<div className="p-3">
-				<h3 className="text-base font-semibold text-gray-800">
-					{listing.title}
-				</h3>
-
-				<div className="flex items-center gap-2 text-xs text-gray-500 mt-1 mb-2">
+				<div className="flex items-center gap-2 text-sm text-gray-500 mt-1 mb-2">
 					<FaMapMarkerAlt className="text-blue-500" />
-					<span className="line-clamp-1">{listing.location}</span>
+					<span>{listing.location}</span>
 				</div>
 
 				{/* Price */}

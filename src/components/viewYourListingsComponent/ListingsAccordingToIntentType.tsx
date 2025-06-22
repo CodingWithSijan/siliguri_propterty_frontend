@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import SellListingCard from "../card/SellListingCard";
 import {
 	IRentListingType,
@@ -6,18 +6,15 @@ import {
 	IUniversalListingType,
 } from "../../types/listingTypes";
 import RentListingCard from "../card/RentListingCard";
-import PostDetailsDrawer from "./PostDetailsDrawer";
+import { useNavigate } from "react-router-dom";
 
 const ListingsAccordingToIntentType: React.FC<{
 	listings: IUniversalListingType[] | null;
 }> = ({ listings }) => {
-	const [selectedPost, setSelectedPost] =
-		useState<IUniversalListingType | null>(null);
-	const [drawerOpen, setDrawerOpen] = useState(false);
+	const navigate = useNavigate();
 
 	const handleCardClick = (listing: IUniversalListingType) => {
-		setSelectedPost(listing);
-		setDrawerOpen(true);
+		navigate(`/dashboard/view-your-listings/edit-post/${listing._id}`);
 	};
 	return (
 		<>
@@ -48,13 +45,6 @@ const ListingsAccordingToIntentType: React.FC<{
 						}
 					})}
 			</div>
-			<PostDetailsDrawer
-				isUser={true}
-				title="View/Edit Post"
-				open={drawerOpen}
-				onClose={() => setDrawerOpen(false)}
-				post={selectedPost}
-			/>
 		</>
 	);
 };

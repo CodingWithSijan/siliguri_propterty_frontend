@@ -27,7 +27,7 @@ const SellListingCard: React.FC<{
 		<motion.div
 			whileHover={{ y: -5 }}
 			transition={{ type: "spring", stiffness: 300 }}
-			className="relative bg-white rounded-2xl shadow-lg border border-gray-200 hover:shadow-xl hover:border-red-400 transition-all duration-300 group w-full max-w-sm mx-auto cursor-pointer"
+			className="relative bg-white rounded-md shadow-md border border-gray-200  group w-full max-w-sm mx-auto cursor-pointer"
 			onClick={onClick}
 		>
 			{/* Sell Tag */}
@@ -61,7 +61,7 @@ const SellListingCard: React.FC<{
 			)}
 
 			{/* Image */}
-			<div className="relative w-full h-52 overflow-hidden rounded-t-2xl">
+			<div className="relative w-full h-62 overflow-hidden rounded-t-md">
 				<img
 					src={
 						listing.pictures && listing.pictures.length > 0
@@ -90,9 +90,9 @@ const SellListingCard: React.FC<{
 					{listing.title}
 				</h3>
 
-				<div className="flex items-center gap-2 text-xs text-gray-500 mt-1 mb-2">
+				<div className="flex items-center gap-2 text-sm text-gray-500 mt-1 mb-2">
 					<FaMapMarkerAlt className="text-red-500" />
-					<span className="line-clamp-1">{listing.location}</span>
+					<span className="">{listing.location}</span>
 				</div>
 
 				{/* Price */}

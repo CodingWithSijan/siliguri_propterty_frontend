@@ -21,6 +21,7 @@ import ViewYourListings from "./user/dashboard/ViewYourListings";
 import ScrollToTopButton from "./components/common/scrollToTopButton";
 import PostStepperForm from "./components/post_form/PostStepperForm";
 import YourProfile from "./user/dashboard/YourProfile";
+import EditPostPage from "./pages/EditPostPage";
 
 const App: React.FC = () => {
 	return (
@@ -56,6 +57,10 @@ const App: React.FC = () => {
 						element={<PostStepperForm intent="rent" />}
 					/>
 					<Route path="view-your-listings" element={<ViewYourListings />} />
+					<Route
+						path="view-your-listings/edit-post/:id"
+						element={<EditPostPage />}
+					/>
 				</Route>
 
 				<Route
@@ -70,8 +75,7 @@ const App: React.FC = () => {
 				<Route path="/access-denied" element={<NotFound404 />} />
 				<Route path="/verify-email" element={<VerifyEmail />} />
 			</Routes>
-
-			<ToastContainer />
+			<ToastContainer position="top-center" autoClose={2000} newestOnTop />
 		</Router>
 	);
 };

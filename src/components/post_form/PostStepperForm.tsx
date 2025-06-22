@@ -79,7 +79,7 @@ const PostStepperForm: React.FC<PostStepperFormProps> = ({ intent }) => {
 
 	const navigate = useNavigate();
 
-	const { loading, error } = useSelector((state: RootState) => state.addPost);
+	const { loading } = useSelector((state: RootState) => state.addPost);
 	const dispatch = useDispatch<AppDispatch>();
 
 	const [step, setStep] = useState(0);
