@@ -98,38 +98,39 @@ const NewListings: React.FC = () => {
 						renderArrowNext={(onClick) => customArrow(onClick, "right")}
 						className="rounded-2xl bg-white py-6"
 					>
-						{posts.map((post) => {
-							switch (post.intent) {
-								case "sell":
-									return (
-										<div
-											key={post._id}
-											className="px-2 md:px-4 h-full flex items-stretch"
-										>
-											<SellListingCard
-												listing={post as ISellListingType}
-												onClick={() => {}}
-												userOrGlobal="global"
-											/>
-										</div>
-									);
-								case "rent":
-									return (
-										<div
-											key={post._id}
-											className="px-2 md:px-4 h-full flex items-stretch"
-										>
-											<RentListingCard
-												listing={post as IRentListingType}
-												onClick={() => {}}
-												userOrGlobal="global"
-											/>
-										</div>
-									);
-								default:
-									return null;
-							}
-						})}
+						{posts &&
+							posts.map((post) => {
+								switch (post.intent) {
+									case "sell":
+										return (
+											<div
+												key={post._id}
+												className="px-2 md:px-4 h-full flex items-stretch"
+											>
+												<SellListingCard
+													listing={post as ISellListingType}
+													onClick={() => {}}
+													userOrGlobal="global"
+												/>
+											</div>
+										);
+									case "rent":
+										return (
+											<div
+												key={post._id}
+												className="px-2 md:px-4 h-full flex items-stretch"
+											>
+												<RentListingCard
+													listing={post as IRentListingType}
+													onClick={() => {}}
+													userOrGlobal="global"
+												/>
+											</div>
+										);
+									default:
+										return null;
+								}
+							})}
 					</Carousel>
 				</div>
 			</motion.div>
