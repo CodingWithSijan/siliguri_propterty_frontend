@@ -85,21 +85,22 @@ const NewListings: React.FC = () => {
 				animate={{ opacity: 1, y: 0 }}
 				transition={{ duration: 0.5 }}
 			>
-				<div className="relative w-full max-w-[1600px]">
-					<Carousel
-						showArrows={true}
-						autoPlay
-						infiniteLoop
-						transitionTime={2000}
-						swipeable
-						centerMode
-						centerSlidePercentage={slidePercentage}
-						renderArrowPrev={(onClick) => customArrow(onClick, "left")}
-						renderArrowNext={(onClick) => customArrow(onClick, "right")}
-						className="rounded-2xl bg-white py-6"
-					>
-						{posts &&
-							posts.map((post) => {
+				{" "}
+				{posts && posts.length !== 0 && (
+					<div className="relative w-full max-w-[1600px]">
+						<Carousel
+							showArrows={true}
+							autoPlay
+							infiniteLoop
+							transitionTime={2000}
+							swipeable
+							centerMode
+							centerSlidePercentage={slidePercentage}
+							renderArrowPrev={(onClick) => customArrow(onClick, "left")}
+							renderArrowNext={(onClick) => customArrow(onClick, "right")}
+							className="rounded-2xl bg-white py-6"
+						>
+							{posts?.map((post) => {
 								switch (post.intent) {
 									case "sell":
 										return (
@@ -131,8 +132,9 @@ const NewListings: React.FC = () => {
 										return null;
 								}
 							})}
-					</Carousel>
-				</div>
+						</Carousel>
+					</div>
+				)}
 			</motion.div>
 		</section>
 	);
