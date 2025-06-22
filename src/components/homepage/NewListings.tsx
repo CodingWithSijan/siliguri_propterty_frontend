@@ -98,7 +98,7 @@ const NewListings: React.FC = () => {
 						renderArrowNext={(onClick) => customArrow(onClick, "right")}
 						className="rounded-2xl bg-white py-6"
 					>
-						{posts.map((post) => {
+						{posts && posts.map((post) => {
 							switch (post.intent) {
 								case "sell":
 									return (
