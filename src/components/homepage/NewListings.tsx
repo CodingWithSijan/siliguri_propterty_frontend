@@ -85,8 +85,7 @@ const NewListings: React.FC = () => {
 				animate={{ opacity: 1, y: 0 }}
 				transition={{ duration: 0.5 }}
 			>
-				{" "}
-				{posts && posts.length !== 0 && (
+				{posts && posts.length > 0 ? (
 					<div className="relative w-full max-w-[1600px]">
 						<Carousel
 							showArrows={true}
@@ -100,7 +99,7 @@ const NewListings: React.FC = () => {
 							renderArrowNext={(onClick) => customArrow(onClick, "right")}
 							className="rounded-2xl bg-white py-6"
 						>
-							{posts?.map((post) => {
+							{posts.map((post) => {
 								switch (post.intent) {
 									case "sell":
 										return (
@@ -133,6 +132,19 @@ const NewListings: React.FC = () => {
 								}
 							})}
 						</Carousel>
+					</div>
+				) : (
+					<div className="w-full flex flex-col items-center justify-center py-16">
+						<div className="text-2xl font-semibold text-gray-500 mb-2">
+							No new posts available
+						</div>
+						<div className="text-gray-600 mb-4">Check out other listings!</div>
+						<a
+							href="/"
+							className="inline-block bg-blue-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-blue-700 transition"
+						>
+							Go to Homepage
+						</a>
 					</div>
 				)}
 			</motion.div>
