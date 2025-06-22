@@ -85,6 +85,7 @@ const NewListings: React.FC = () => {
 				animate={{ opacity: 1, y: 0 }}
 				transition={{ duration: 0.5 }}
 			>
+
 				{" "}
 				{posts && posts.length !== 0 && (
 					<div className="relative w-full max-w-[1600px]">
@@ -135,6 +136,9 @@ const NewListings: React.FC = () => {
 						</Carousel>
 					</div>
 				)}
+
+				
+
 			</motion.div>
 		</section>
 	);
