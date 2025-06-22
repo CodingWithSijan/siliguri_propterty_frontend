@@ -32,7 +32,7 @@ const HeroSection: React.FC = () => {
 	}, [slides.length]);
 
 	return (
-		<div className="relative h-[600px] w-full overflow-hidden bg-gray-900">
+		<div className="relative h-screen w-full overflow-hidden bg-gray-900">
 			{/* Carousel */}
 			<div className="absolute inset-0">
 				<AnimatePresence initial={false}>
@@ -77,17 +77,12 @@ const HeroSection: React.FC = () => {
 					transition={{ duration: 0.5, delay: 0.4 }}
 					className="w-full max-w-3xl"
 				>
-					<div className="flex items-center bg-white/95 backdrop-blur-sm rounded-lg shadow-lg p-2">
-						<div className="flex-1 flex items-center gap-3 px-4">
-							<FaSearch className="text-gray-400 text-xl" />
-							<input
-								type="text"
-								placeholder="Search for properties..."
-								className="w-full py-3 text-gray-700 bg-transparent border-none focus:outline-none text-lg"
-							/>
-						</div>
-						<button className="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition-colors duration-300 text-lg font-medium">
-							Search
+					<div className="flex w-full gap-4 justify-center items-center">
+						<button className="p-4 bg-blue-600 text-white font-bold rounded-lg">
+							Browse Properties
+						</button>
+						<button className="p-4 bg-white text-blue-600 border-2 border-blue-600 font-bold rounded-lg">
+							List Your Property
 						</button>
 					</div>
 				</motion.div>

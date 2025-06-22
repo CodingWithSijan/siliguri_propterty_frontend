@@ -1,91 +1,89 @@
-"use client"; // if using Next.js App Router
-
-import React, { useRef, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import SellPostForm from "../../components/user_dashboard/SellPostForm";
-import RentPostForm from "../../components/user_dashboard/RentPostForm";
-import BuyPostForm from "../../components/user_dashboard/BuyPostForm";
-import { ArrowLeft } from "lucide-react";
-
+import { useState } from "react";
+import { Home, Key } from "lucide-react";
+import {
+	Dialog,
+	DialogContent,
+	DialogDescription,
+	DialogHeader,
+	DialogTitle,
+} from "../../components/ui/dialog";
+import { useNavigate } from "react-router-dom";
 export default function NewPost() {
-	const [intent, setIntent] = useState("");
-	// Ref to trigger form reset from parent
-	const formResetRef = useRef<(() => void) | null>(null);
+	const navigate = useNavigate();
 
-	// Handler to reset intent and form
-	const handleGoBack = () => {
-		setIntent("");
-		// Call the reset function in the form
-		if (formResetRef.current) formResetRef.current();
-	};
+	const [dialogOpen, setDialogOpen] = useState(true);
+	const [shake, setShake] = useState(false);
 
-	const renderForm = () => {
-		const commonProps = {
-			onGoBack: handleGoBack,
-			registerReset: (fn: () => void) => (formResetRef.current = fn),
-		};
-		switch (intent) {
-			case "sell":
-				return <SellPostForm {...commonProps} />;
-			case "rent":
-				return <RentPostForm {...commonProps} />;
-			case "buy":
-				return <BuyPostForm {...commonProps} />;
-			default:
-				return null;
+	const handleDialogOpenChange = (open: boolean) => {
+		if (!open) {
+			setShake(true);
+			setTimeout(() => setShake(false), 500);
+			return;
 		}
+		setDialogOpen(open);
 	};
 
 	return (
-		<main className=" sm:p-6 max-w-4xl mx-auto">
-			<AnimatePresence>
-				{!intent && (
-					<motion.div
-						initial={{ opacity: 0, y: -20 }}
-						animate={{ opacity: 1, y: 0 }}
-						exit={{ opacity: 0, y: -20 }}
-						transition={{ duration: 0.4 }}
-						className="mb-6"
-					>
-						<label className="block text-lg font-medium mb-2">
-							What do you want to do?
-						</label>
-						<select
-							value={intent}
-							onChange={(e) => setIntent(e.target.value)}
-							className="border sm:w-full border-gray-300 rounded-md p-2"
-						>
-							<option value="">-- Select Intent --</option>
-							<option value="sell">Sell Property</option>
-							<option value="rent">Rent Property</option>
-							<option value="buy">Buy Property</option>
-						</select>
-					</motion.div>
-				)}
-			</AnimatePresence>
-
-			<AnimatePresence>
-				{intent && (
-					<motion.div
-						key={intent}
-						initial={{ opacity: 0, y: 20 }}
-						animate={{ opacity: 1, y: 0 }}
-						exit={{ opacity: 0, y: 20 }}
-						transition={{ duration: 0.4 }}
-					>
-						{/* Go Back Button */}
-						<button
-							type="button"
-							onClick={handleGoBack}
-							className="flex items-center gap-2 px-4 py-2 md:ml-23 mb-4 rounded-full bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors shadow-sm"
-						>
-							<ArrowLeft className="w-4 h-4" />
-							Go Back
-						</button>
-						{renderForm()}
-					</motion.div>
-				)}
-			</AnimatePresence>
+		<main className="sm:p-6 max-w-4xl mx-auto">
+			<Dialog open={dialogOpen} onOpenChange={handleDialogOpenChange}>
+				<DialogContent
+					showClose={false}
+					className={`max-w-md w-full rounded-2xl shadow-xl p-8 bg-gradient-to-br from-white via-slate-50 to-slate-100 border border-gray-200 ${
+						shake ? "animate-shake" : ""
+					}`}
+				>
+					<DialogHeader>
+						<DialogTitle className="text-2xl font-bold text-gray-800 mb-2 flex items-center gap-2">
+							Post Your Property
+						</DialogTitle>
+						<DialogDescription asChild>
+							<div>
+								<p className="text-gray-600 mb-6 text-base">
+									Choose what you want to do. Select an intent to get started.
+								</p>
+								<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+									<button
+										type="button"
+										onClick={() => {
+											navigate("/dashboard/new-post/sell");
+											setDialogOpen(false);
+										}}
+										className={`group flex flex-col items-center justify-center p-6 rounded-xl border-2 transition-all shadow-sm cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary-500 
+										}`}
+										aria-label="Sell Property"
+									>
+										<Home className="w-8 h-8 mb-2 text-primary-500 group-hover:scale-110 transition-transform" />
+										<span className="font-semibold text-lg text-primary-700">
+											Sell
+										</span>
+										<span className="text-xs text-gray-500 mt-1">
+											List your property for sale
+										</span>
+									</button>
+									<button
+										type="button"
+										onClick={() => {
+											navigate("/dashboard/new-post/rent");
+											setDialogOpen(false);
+										}}
+										className={`group flex flex-col items-center justify-center p-6 rounded-xl border-2 transition-all shadow-sm cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 
+										}`}
+										aria-label="Rent Property"
+									>
+										<Key className="w-8 h-8 mb-2 text-blue-500 group-hover:scale-110 transition-transform" />
+										<span className="font-semibold text-lg text-blue-700">
+											Rent
+										</span>
+										<span className="text-xs text-gray-500 mt-1">
+											Offer your property for rent
+										</span>
+									</button>
+								</div>
+							</div>
+						</DialogDescription>
+					</DialogHeader>
+				</DialogContent>
+			</Dialog>
 		</main>
 	);
 }

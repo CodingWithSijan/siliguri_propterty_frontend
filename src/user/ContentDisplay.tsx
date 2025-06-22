@@ -30,6 +30,7 @@ const ContentDisplay: React.FC<Props> = ({ activeMenu }) => {
 						exit={{ opacity: 0 }}
 						className="h-full overflow-y-auto px-6 py-4"
 					>
+						{/* <NewPost /> */}
 						<NewPost />
 					</motion.div>
 				);
@@ -92,7 +93,7 @@ const ContentDisplay: React.FC<Props> = ({ activeMenu }) => {
 	};
 
 	return (
-		<div className="w-full h-[calc(100vh-4rem)]">
+		<div className="w-full h-full ">
 			<AnimatePresence mode="wait">{renderContent()}</AnimatePresence>
 		</div>
 	);

@@ -1,40 +1,19 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import Sidebar from "./Sidebar";
-import ContentDisplay from "./ContentDisplay";
 import { Bars3Icon } from "@heroicons/react/24/outline";
-import Navbar from "../components/header_and_footer/Navbar";
 import ProtectedRoute from "../route/ProtectedRoute";
 import { AnimatePresence } from "framer-motion";
-import { useAuth } from "../contextAPI/UserAuthContext";
-import BASE_URL from "../services";
+import { Outlet } from "react-router-dom";
 
 const DashboardLayout: React.FC = () => {
 	const [activeMenu, setActiveMenu] = useState("Your Profile");
 	const [sidebarOpen, setSidebarOpen] = useState(false);
-	const { user, setUser, token } = useAuth();
-
-	useEffect(() => {
-		const fetchLatestUser = async () => {
-			if (!user?.id || !token) return;
-			try {
-				const res = await BASE_URL.get(
-					`${import.meta.env.VITE_BACKEND_URL}/api/users/${user.id}`
-				);
-				setUser((prev) => ({ ...prev, ...res.data }));
-			} catch (err) {
-				console.error("Failed to refresh user context", err);
-			}
-		};
-
-		fetchLatestUser();
-	}, [user?.id, token, setUser]);
 
 	return (
 		<div className="flex flex-col h-screen bg-gray-50">
-			<Navbar />
-			<div className="flex flex-1 overflow-hidden">
+			<div className="flex flex-1 ">
 				{/* Mobile Menu Button */}
-				<div className="md:hidden fixed top-20 left-4 z-50">
+				<div className="md:hidden fixed top-2 right-2 z-50">
 					<button
 						onClick={() => setSidebarOpen(!sidebarOpen)}
 						className="p-2 bg-primary text-primary-foreground rounded-lg shadow-lg hover:bg-primary/90 transition-colors"
@@ -73,7 +52,7 @@ const DashboardLayout: React.FC = () => {
 				<main className="flex-1 overflow-hidden">
 					<ProtectedRoute allowedRoles={["user"]}>
 						<div className="h-full bg-white">
-							<ContentDisplay activeMenu={activeMenu} />
+							<Outlet />
 						</div>
 					</ProtectedRoute>
 				</main>

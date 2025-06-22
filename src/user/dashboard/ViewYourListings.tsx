@@ -17,9 +17,7 @@ import {
 import ListingsAccordingToIntentType from "../../components/viewYourListingsComponent/ListingsAccordingToIntentType";
 
 const ViewYourListings = () => {
-	const [listings, setListings] = useState<
-		Partial<IUniversalListingType>[] | null
-	>([]);
+	const [listings, setListings] = useState<IUniversalListingType[] | null>([]);
 
 	const [activeListings, setActiveListings] = useState<
 		IUniversalListingType[] | null
@@ -41,8 +39,8 @@ const ViewYourListings = () => {
 					"/api/user/post/view-your-listings"
 				);
 				const allPostsOrListings = response.data.postArray;
-				setListings(allPostsOrListings);
 				console.log(allPostsOrListings);
+				setListings(allPostsOrListings);
 				setActiveListings(
 					allPostsOrListings.filter(
 						(item: IUniversalListingType | null) =>
@@ -50,7 +48,6 @@ const ViewYourListings = () => {
 					)
 				);
 
-				console.log(activeListings);
 				setPendingListings(
 					allPostsOrListings.filter(
 						(item: IUniversalListingType | null) =>
@@ -79,28 +76,28 @@ const ViewYourListings = () => {
 			</h2>
 			<Tabs defaultValue="allListings" className="mx-auto w-full">
 				<div className="flex justify-center w-full">
-					<TabsList className="flex flex-wrap justify-center gap-2 sm:gap-4 bg-gray-100 rounded-lg p-2 mb-6 w-auto">
+					<TabsList className="flex flex-wrap justify-center gap-2 sm:gap-4 bg-gray-100 rounded-lg mb-6 w-auto">
 						<TabsTrigger
 							value="allListings"
-							className="px-4 sm:px-6 py-2 font-semibold text-gray-700 data-[state=active]:bg-blue-600 data-[state=active]:text-white rounded-lg transition-colors text-center"
+							className="px-4 sm:p-4 font-semibold text-gray-700 data-[state=active]:bg-blue-600 data-[state=active]:text-white rounded-lg transition-colors text-center"
 						>
 							All Listings
 						</TabsTrigger>
 						<TabsTrigger
 							value="active"
-							className="px-4 sm:px-6 py-2 font-semibold text-green-700 data-[state=active]:bg-green-600 data-[state=active]:text-white rounded-lg transition-colors text-center"
+							className="px-4 sm:p-4 font-semibold text-green-700 data-[state=active]:bg-green-600 data-[state=active]:text-white rounded-lg transition-colors text-center"
 						>
 							Active
 						</TabsTrigger>
 						<TabsTrigger
 							value="pending"
-							className="px-4 sm:px-6 py-2 font-semibold text-yellow-700 data-[state=active]:bg-yellow-500 data-[state=active]:text-white rounded-lg transition-colors text-center"
+							className="px-4 sm:p-4 font-semibold text-yellow-700 data-[state=active]:bg-yellow-500 data-[state=active]:text-white rounded-lg transition-colors text-center"
 						>
 							Pending
 						</TabsTrigger>
 						<TabsTrigger
 							value="rejected"
-							className="px-4 sm:px-6 py-2 font-semibold text-red-700 data-[state=active]:bg-red-600 data-[state=active]:text-white rounded-lg transition-colors text-center"
+							className="px-4 sm:p-4 font-semibold text-red-700 data-[state=active]:bg-red-600 data-[state=active]:text-white rounded-lg transition-colors text-center"
 						>
 							Rejected
 						</TabsTrigger>

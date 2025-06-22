@@ -13,14 +13,11 @@ const PropertyIconHelper: React.FC<{
 			case "shop":
 				return <Store className={className} />;
 
-			case "apartment":
+			case "flat":
 				return <Building2 className={className} />;
 
 			case "house":
 				return <Home className={className} />;
-
-			case "room":
-				return <DoorOpen className={className} />;
 
 			default:
 				break;

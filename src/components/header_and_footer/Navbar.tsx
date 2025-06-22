@@ -1,26 +1,70 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Transition } from "@headlessui/react";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import { NavLink, useNavigate } from "react-router-dom";
 import siliguri_property_logo_noBG from "../../assets/logo_siliguri_property.png";
-import { useAuth } from "../../contextAPI/UserAuthContext";
 import { getInitials } from "../../utils/getInitial";
 import { motion } from "framer-motion";
 import { PostYourPropertyButton } from "../common/PostYourPropertyButton";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "../../app/store";
+import { logout } from "../../app/slices/authSlice";
+import { formatFullName } from "../../utils/capitalizeName";
 
 const Navbar: React.FC = () => {
+	const mobileMenuRef = useRef<HTMLDivElement>(null);
+	const desktopMenuDropdownRef = useRef<HTMLDivElement>(null);
+
 	const [isOpen, setIsOpen] = useState<boolean>(false);
 	const [dropdownOpen, setDropdownOpen] = useState<boolean>(false);
-	const { user, logout } = useAuth();
+	const { user } = useSelector((state: RootState) => state.auth);
+	const dispatch = useDispatch<AppDispatch>();
 	const navigate = useNavigate();
+	useEffect(() => {
+		const handleClickOutside = (event: MouseEvent) => {
+			if (
+				mobileMenuRef.current &&
+				!mobileMenuRef.current.contains(event.target as Node)
+			) {
+				setIsOpen(false);
+				setDropdownOpen(false);
+			}
+		};
 
+		if (isOpen) {
+			document.addEventListener("mousedown", handleClickOutside);
+		}
+
+		return () => {
+			document.removeEventListener("mousedown", handleClickOutside);
+		};
+	}, [isOpen]);
+
+	useEffect(() => {
+		const handleClickOutside = (event: MouseEvent) => {
+			if (
+				desktopMenuDropdownRef.current &&
+				!desktopMenuDropdownRef.current.contains(event.target as Node)
+			) {
+				setDropdownOpen(false);
+			}
+		};
+
+		if (dropdownOpen) {
+			document.addEventListener("mousedown", handleClickOutside);
+		}
+
+		return () => {
+			document.removeEventListener("mousedown", handleClickOutside);
+		};
+	}, [dropdownOpen]);
 	const handleLogout = () => {
-		logout();
+		dispatch(logout());
 		navigate("/login");
 	};
 
 	return (
-		<nav className="bg-white shadow-sm sticky top-0 z-50">
+		<nav className="bg-white shadow-sm sticky top-0 z-50 opacity-90">
 			<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 				<div className="flex justify-between h-16 items-center">
 					{/* Logo */}
@@ -34,6 +78,39 @@ const Navbar: React.FC = () => {
 							className="w-full h-full object-contain"
 						/>
 					</NavLink>
+					{/* New: Main navigation links */}
+					<div className="hidden md:flex items-center space-x-6 ml-6">
+						<NavLink
+							to="/rentals"
+							className={({ isActive }) =>
+								isActive
+									? "text-blue-600 font-semibold"
+									: "text-gray-700 hover:text-blue-600 font-medium transition-colors"
+							}
+						>
+							Rental Listings
+						</NavLink>
+						<NavLink
+							to="/sales"
+							className={({ isActive }) =>
+								isActive
+									? "text-blue-600 font-semibold"
+									: "text-gray-700 hover:text-blue-600 font-medium transition-colors"
+							}
+						>
+							Sell Listings
+						</NavLink>
+						<NavLink
+							to="/about"
+							className={({ isActive }) =>
+								isActive
+									? "text-blue-600 font-semibold"
+									: "text-gray-700 hover:text-blue-600 font-medium transition-colors"
+							}
+						>
+							About Us
+						</NavLink>
+					</div>
 					<PostYourPropertyButton />
 					{/* Desktop Menu */}
 					<div className="hidden md:flex items-center space-x-4">
@@ -56,7 +133,9 @@ const Navbar: React.FC = () => {
 											{getInitials(user?.name ?? "")}
 										</div>
 									)}
-									<span className="text-gray-700 font-medium">{user.name}</span>
+									<span className="text-gray-700 font-medium">
+										{formatFullName(user?.name)}
+									</span>
 								</motion.div>
 
 								{/* Dropdown Menu */}
@@ -69,7 +148,10 @@ const Navbar: React.FC = () => {
 									leaveFrom="transform opacity-100 scale-100"
 									leaveTo="transform opacity-0 scale-95"
 								>
-									<div className="absolute right-0 mt-3 w-48 bg-white rounded-xl shadow-lg py-2 z-50 ring-1 ring-black ring-opacity-5">
+									<div
+										ref={desktopMenuDropdownRef}
+										className="absolute right-0 mt-3 w-48 bg-white rounded-xl shadow-lg py-2 z-50 ring-1 ring-black ring-opacity-5"
+									>
 										<NavLink
 											to={user.role === "user" ? "/dashboard" : "/admin"}
 											className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
@@ -132,7 +214,10 @@ const Navbar: React.FC = () => {
 				leaveFrom="opacity-100 translate-y-0"
 				leaveTo="opacity-0 -translate-y-1"
 			>
-				<div className="md:hidden px-4 pt-2 pb-4 bg-white shadow-lg">
+				<div
+					className="md:hidden px-4 pt-2 pb-4 bg-white shadow-lg"
+					ref={mobileMenuRef}
+				>
 					{user ? (
 						<div className="space-y-3">
 							<div className="flex items-center space-x-3 px-4 py-2">
@@ -147,7 +232,42 @@ const Navbar: React.FC = () => {
 										{getInitials(user?.name ?? "")}
 									</div>
 								)}
-								<span className="text-gray-700 font-medium">{user.name}</span>
+								<span className="text-gray-700 font-medium">
+									{formatFullName(user?.name)}
+								</span>
+							</div>
+							{/* New: Mobile nav links */}
+							<div className="space-y-2 mb-2">
+								<NavLink
+									to="/rentals"
+									className={({ isActive }) =>
+										isActive
+											? "block w-full text-blue-600 font-semibold px-4 py-2"
+											: "block w-full text-gray-700 hover:bg-gray-50 rounded-lg px-4 py-2"
+									}
+								>
+									Rental Listings
+								</NavLink>
+								<NavLink
+									to="/sales"
+									className={({ isActive }) =>
+										isActive
+											? "block w-full text-blue-600 font-semibold px-4 py-2"
+											: "block w-full text-gray-700 hover:bg-gray-50 rounded-lg px-4 py-2"
+									}
+								>
+									Sell Listings
+								</NavLink>
+								<NavLink
+									to="/about"
+									className={({ isActive }) =>
+										isActive
+											? "block w-full text-blue-600 font-semibold px-4 py-2"
+											: "block w-full text-gray-700 hover:bg-gray-50 rounded-lg px-4 py-2"
+									}
+								>
+									About Us
+								</NavLink>
 							</div>
 							<NavLink
 								to={user.role === "user" ? "/dashboard" : "/admin"}
@@ -164,6 +284,38 @@ const Navbar: React.FC = () => {
 						</div>
 					) : (
 						<div className="space-y-3">
+							<div className="space-y-2 mb-2">
+								<NavLink
+									to="/rentals"
+									className={({ isActive }) =>
+										isActive
+											? "block w-full text-blue-600 font-semibold px-4 py-2"
+											: "block w-full text-gray-700 hover:bg-gray-50 rounded-lg px-4 py-2"
+									}
+								>
+									Rental Listings
+								</NavLink>
+								<NavLink
+									to="/sales"
+									className={({ isActive }) =>
+										isActive
+											? "block w-full text-blue-600 font-semibold px-4 py-2"
+											: "block w-full text-gray-700 hover:bg-gray-50 rounded-lg px-4 py-2"
+									}
+								>
+									Sell Listings
+								</NavLink>
+								<NavLink
+									to="/about"
+									className={({ isActive }) =>
+										isActive
+											? "block w-full text-blue-600 font-semibold px-4 py-2"
+											: "block w-full text-gray-700 hover:bg-gray-50 rounded-lg px-4 py-2"
+									}
+								>
+									About Us
+								</NavLink>
+							</div>
 							<NavLink
 								to="/login"
 								className="block w-full text-center px-4 py-2 text-gray-700 hover:bg-gray-50 rounded-lg"
