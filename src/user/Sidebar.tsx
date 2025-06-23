@@ -61,7 +61,7 @@ const Sidebar: React.FC<SidebarProps> = ({ setActiveMenu, setSidebarOpen }) => {
 			animate={{ x: 0 }}
 			exit={{ x: -300 }}
 			transition={{ type: "spring", stiffness: 100, damping: 20 }}
-			className="h-full w-full flex flex-col  border-r border-gray-200 shadow-sm bg-gray-100"
+			className=" h-full w-full flex flex-col  border-r border-gray-200 shadow-sm bg-gray-100"
 		>
 			<div className="flex flex-col flex-1">
 				<div className=" border-b border-gray-100 block">
