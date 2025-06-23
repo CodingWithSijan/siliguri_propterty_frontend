@@ -42,7 +42,7 @@ const HomepageAboutWebapp: React.FC = () => {
 				Why Choose Siliguri Property?
 			</motion.h2>
 			<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 w-full max-w-6xl">
-				{features.map((f, i) => (
+				{features.map((f) => (
 					<motion.div
 						key={f.title}
 						whileHover={{ scale: 1.07, rotate: [0, 2, -2, 0] }}

@@ -19,7 +19,7 @@ const NavigationForPostsHomepage: React.FC = () => {
 		propertyType: "All",
 	});
 
-	const handleSwitch = (key: "buyOnly" | "rentOnly" | "sellOnly") => {
+	const handleSwitch = (key: "buyOnly" | "rentOnly") => {
 		setFilters((prev) => ({
 			...prev,
 			[key]: !prev[key],

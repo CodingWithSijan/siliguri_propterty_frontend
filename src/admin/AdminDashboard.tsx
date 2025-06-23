@@ -8,12 +8,12 @@ import {
 } from "@heroicons/react/24/outline";
 
 import logo from "../../public/logo_siliguri_property.png";
-import { useSelector } from "react-redux";
-import { RootState } from "../app/store";
+// import { useSelector } from "react-redux";
+// import { RootState } from "../app/store";
 // import { Divider } from "@tremor/react";
 const AdminDashboard: React.FC = () => {
-	const [activeMenu, setActiveMenu] = useState<string>("My Profile");
-	const { user } = useSelector((state: RootState) => state.auth);
+	// const [activeMenu, setActiveMenu] = useState<string>("My Profile");
+	// const { user } = useSelector((state: RootState) => state.auth);
 	return (
 		<div className="min-h-screen bg-[#fcf4f4] text-black font-mono">
 			<aside className="w-64 bg-white h-screen flex flex-col">

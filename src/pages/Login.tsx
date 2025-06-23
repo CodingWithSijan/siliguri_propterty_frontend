@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { showSuccess, showError } from "../utils/toastUtils";
+import { showError } from "../utils/toastUtils";
 import BASE_URL from "../services";
 import { useNavigate, useLocation, NavLink } from "react-router-dom";
 import { AxiosError } from "axios";

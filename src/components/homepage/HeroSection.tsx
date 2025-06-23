@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { FaSearch } from "react-icons/fa";
 import HeroSectionImage1Background from "../../assets/image1_hero_section.jpg";
 import HeroSectionImage2Background from "../../assets/image2_hero_section.jpg";
 import { motion, AnimatePresence } from "framer-motion";

@@ -1,5 +1,5 @@
 import React from "react";
-import { Home, Store, TreePalm, Building2, DoorOpen } from "lucide-react";
+import { Home, Store, TreePalm, Building2 } from "lucide-react";
 
 const PropertyIconHelper: React.FC<{
 	propertyCategory: string;
