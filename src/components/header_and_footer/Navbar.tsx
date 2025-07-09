@@ -88,17 +88,17 @@ const Navbar: React.FC = () => {
 									: "text-gray-700 hover:text-blue-600 font-medium transition-colors"
 							}
 						>
-							Rental Listings
+							Property for rent
 						</NavLink>
 						<NavLink
-							to="/sales"
+							to="/buys"
 							className={({ isActive }) =>
 								isActive
 									? "text-blue-600 font-semibold"
 									: "text-gray-700 hover:text-blue-600 font-medium transition-colors"
 							}
 						>
-							Sell Listings
+							Property for sale
 						</NavLink>
 						<NavLink
 							to="/about"

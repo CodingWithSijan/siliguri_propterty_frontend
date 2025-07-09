@@ -22,6 +22,9 @@ import ScrollToTopButton from "./components/common/scrollToTopButton";
 import PostStepperForm from "./components/post_form/PostStepperForm";
 import YourProfile from "./user/dashboard/YourProfile";
 import EditPostPage from "./pages/EditPostPage";
+import RentalProperties from "./pages/RentalProperties";
+import SaleProperties from "./pages/SaleProperties";
+import AboutUs from "./components/homepage/AboutUs";
 
 const App: React.FC = () => {
 	return (
@@ -30,6 +33,9 @@ const App: React.FC = () => {
 
 			<Routes>
 				<Route path="/" element={<Homepage />} />
+				<Route path="/rentals" element={<RentalProperties />} />
+				<Route path="/buys" element={<SaleProperties />} />
+				<Route path="/about" element={<AboutUs />} />
 				<Route path="/signup" element={<Signup />} />
 				<Route
 					path="/SignupLocalComponent"
