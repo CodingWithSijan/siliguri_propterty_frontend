@@ -60,7 +60,7 @@ const RentListingCard: React.FC<{
 				</div>
 			)}
 			{listing.approvalStatus && userOrGlobal === "global" && (
-				<div className="absolute top-3 right-3 bg-white/90 text-orange-700 text-[10px] px-2 py-1 rounded shadow font-bold z-20 border border-gray-200">
+				<div className="absolute top-3 right-3 bg-white/90 text-blue-700 text-[10px] px-2 py-1 rounded shadow font-bold z-20 border border-gray-200">
 					<span>Posted on </span>
 					{listing._id
 						? new Date(

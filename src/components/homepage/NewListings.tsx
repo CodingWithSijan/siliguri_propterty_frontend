@@ -1,154 +1,99 @@
 import React, { useEffect, useState } from "react";
-import BASE_URL from "../../services";
-import SellListingCard from "../card/SellListingCard";
-import RentListingCard from "../card/RentListingCard";
 import {
+	Carousel,
+	CarouselContent,
+	CarouselItem,
+	CarouselNext,
+	CarouselPrevious,
+} from "../ui/carousel";
+import BASE_URL from "../../services";
+import axios from "axios";
+import {
+	IUniversalListingType,
 	IRentListingType,
 	ISellListingType,
-	IUniversalListingType,
 } from "../../types/listingTypes";
-import { motion } from "framer-motion";
-import { Carousel } from "react-responsive-carousel";
-import "react-responsive-carousel/lib/styles/carousel.min.css";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import RentListingCard from "../card/RentListingCard";
+import SellListingCard from "../card/SellListingCard";
+import { useNavigate } from "react-router-dom";
+import Autoplay from "embla-carousel-autoplay";
 
 const NewListings: React.FC = () => {
-	const [posts, setPosts] = useState<IUniversalListingType[]>([]);
-	const [loading, setLoading] = useState(true);
-	const [error, setError] = useState("");
-
-	const [slidePercentage, setSlidePercentage] = useState(100);
+	const [latestPosts, setLatestPosts] = useState<IUniversalListingType[]>([]);
+	const navigate = useNavigate();
 
 	useEffect(() => {
-		const fetchPosts = async () => {
+		const fetchLatest = async () => {
 			try {
-				setLoading(true);
-				const response = await BASE_URL.get("api/user/post/view-latest-posts");
-				setPosts(response.data.recentPosts);
-			} catch {
-				setError("Failed to fetch posts. Please try again later.");
-			} finally {
-				setLoading(false);
+				const response = await BASE_URL.get("/api/user/post/view-latest-posts");
+				setLatestPosts(response.data.recentPosts);
+			} catch (error: unknown) {
+				if (axios.isAxiosError(error)) {
+					console.error(
+						"Error fetching latest posts:",
+						error.response?.status,
+						error.response?.data || error.message
+					);
+				} else {
+					console.error("Unexpected Error:", (error as Error).message);
+				}
 			}
 		};
-		fetchPosts();
+		fetchLatest();
 	}, []);
 
-	useEffect(() => {
-		const updateSlidePercentage = () => {
-			const width = window.innerWidth;
-			if (width >= 1480) setSlidePercentage(25); // 4 cards
-			else if (width >= 1280) setSlidePercentage(33.33); // 3 cards
-			else if (width >= 900) setSlidePercentage(50); // 2 cards
-			else setSlidePercentage(100); // 1 card
-		};
-		updateSlidePercentage();
-		window.addEventListener("resize", updateSlidePercentage);
-		return () => window.removeEventListener("resize", updateSlidePercentage);
-	}, []);
+	const handleCardClick = (postId: string) => {
+		navigate(`/post/${postId}`);
+	};
 
-	if (loading)
-		return (
-			<div className="py-12 text-center text-gray-500">Loading posts...</div>
-		);
-	if (error)
-		return <div className="py-12 text-center text-red-500">{error}</div>;
-
-	// Custom arrow components
-	const customArrow = (onClick: () => void, direction: "left" | "right") => (
-		<button
-			onClick={onClick}
-			className={`absolute z-10 top-1/2 transform -translate-y-1/2 ${
-				direction === "left" ? "left-2" : "right-2"
-			} bg-white shadow-md rounded-full p-2 hover:bg-gray-100 transition`}
-		>
-			{direction === "left" ? (
-				<ChevronLeft size={24} />
-			) : (
-				<ChevronRight size={24} />
-			)}
-		</button>
+	const plugin = React.useRef(
+		Autoplay({ delay: 4000, stopOnInteraction: true })
 	);
 
 	return (
-		<section className="bg-white my-10 w-full mx-auto px-0 h-full">
-			<h1 className="text-3xl font-extrabold text-center pt-8 text-blue-700 drop-shadow mb-2">
-				New Properties
-			</h1>
-			<h3 className="text-center text-gray-600 text-lg mb-4">
-				Discover our new listings
-			</h3>
-
-			<motion.div
-				className="w-full mt-6 pt-6 px-2 md:px-8 lg:px-16 xl:px-32 flex justify-center"
-				initial={{ opacity: 0, y: 30 }}
-				animate={{ opacity: 1, y: 0 }}
-				transition={{ duration: 0.5 }}
+		<div className="w-full max-w-7xl mx-auto px-4 py-8">
+			<h2 className="text-2xl font-semibold mb-6 text-gray-800">
+				Latest Properties
+			</h2>
+			<Carousel
+				opts={{
+					align: "start",
+					loop: true,
+				}}
+				plugins={[plugin.current]}
+				className="w-full"
 			>
-				{posts && posts.length > 0 ? (
-					<div className="relative w-full max-w-[1600px]">
-						<Carousel
-							showArrows={true}
-							autoPlay
-							infiniteLoop
-							transitionTime={2000}
-							swipeable
-							centerMode
-							centerSlidePercentage={slidePercentage}
-							renderArrowPrev={(onClick) => customArrow(onClick, "left")}
-							renderArrowNext={(onClick) => customArrow(onClick, "right")}
-							className="rounded-2xl bg-white py-6"
-						>
-							{posts.map((post) => {
-								switch (post.intent) {
-									case "sell":
-										return (
-											<div
-												key={post._id}
-												className="px-2 md:px-4 h-full flex items-stretch"
-											>
-												<SellListingCard
-													listing={post as ISellListingType}
-													onClick={() => {}}
-													userOrGlobal="global"
-												/>
-											</div>
-										);
-									case "rent":
-										return (
-											<div
-												key={post._id}
-												className="px-2 md:px-4 h-full flex items-stretch"
-											>
-												<RentListingCard
-													listing={post as IRentListingType}
-													onClick={() => {}}
-													userOrGlobal="global"
-												/>
-											</div>
-										);
-									default:
-										return null;
-								}
-							})}
-						</Carousel>
-					</div>
-				) : (
-					<div className="w-full flex flex-col items-center justify-center py-16">
-						<div className="text-2xl font-semibold text-gray-500 mb-2">
-							No new posts available
-						</div>
-						<div className="text-gray-600 mb-4">Check out other listings!</div>
-						<a
-							href="/"
-							className="inline-block bg-blue-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-blue-700 transition"
-						>
-							Go to Homepage
-						</a>
-					</div>
-				)}
-			</motion.div>
-		</section>
+				<CarouselContent>
+					{latestPosts &&
+						latestPosts.map((item) => (
+							<CarouselItem
+								key={item._id}
+								className="sm:basis-1/1 md:basis-1/2 lg:basis-1/3 xl:basis-1/4 p-2 flex"
+							>
+								<div className="w-full h-full flex items-stretch">
+									{item.intent === "rent" ? (
+										<RentListingCard
+											listing={item as IRentListingType}
+											onClick={() => handleCardClick(item._id)}
+											userOrGlobal="global"
+										/>
+									) : (
+										<SellListingCard
+											listing={item as ISellListingType}
+											onClick={() => handleCardClick(item._id)}
+											userOrGlobal="global"
+										/>
+									)}
+								</div>
+							</CarouselItem>
+						))}
+				</CarouselContent>
+				<div className="hidden sm:flex justify-between w-full absolute top-1/2 -translate-y-1/2 px-4">
+					<CarouselPrevious className="-translate-x-2" />
+					<CarouselNext className="translate-x-2" />
+				</div>
+			</Carousel>
+		</div>
 	);
 };
 
