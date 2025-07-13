@@ -9,26 +9,33 @@ import { IRentListingType } from "../../types/listingTypes";
 import propertyImagePlaceholder from "../../assets/looking_for_rent.png";
 import PropertyIconHelper from "../common/PropertyIconHelper";
 import { BiRupee } from "react-icons/bi";
+import { useNavigate } from "react-router-dom";
 
 const capitalize = (str: string | undefined) =>
 	str ? str.charAt(0).toUpperCase() + str.slice(1) : "";
 
 const RentListingCard: React.FC<{
 	listing: IRentListingType;
-	onClick: () => void;
 	userOrGlobal: string;
-}> = ({ listing, onClick, userOrGlobal }) => {
+}> = ({ listing, userOrGlobal }) => {
 	const priceNum = Number(listing.pricePerFrequency);
 	const formattedPrice = isNaN(priceNum)
 		? listing.pricePerFrequency
 		: formatIndianCurrency(priceNum);
 
+	const navigate = useNavigate();
+	const handleClick = () => {
+		const path =
+			userOrGlobal === "global" ? `/rentals/${listing._id}` : `/rentals`;
+
+		navigate(path);
+	};
 	return (
 		<motion.div
 			whileHover={{ y: -5 }}
 			transition={{ type: "spring", stiffness: 300 }}
 			className="relative bg-white rounded-md shadow-md border border-gray-200  group w-full max-w-sm mx-auto cursor-pointer"
-			onClick={onClick}
+			onClick={handleClick}
 		>
 			{/* Rent Tag */}
 			<div className="absolute top-3 left-3 z-20">

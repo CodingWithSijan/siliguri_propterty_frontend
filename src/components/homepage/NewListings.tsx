@@ -74,7 +74,6 @@ const NewListings: React.FC = () => {
 									{item.intent === "rent" ? (
 										<RentListingCard
 											listing={item as IRentListingType}
-											onClick={() => handleCardClick(item._id)}
 											userOrGlobal="global"
 										/>
 									) : (

@@ -4,13 +4,14 @@ import {
 	UnitOfMeasurement,
 } from "./postFormTypes";
 
+export type ISODateString = string;
 export interface IBaseListingType {
 	_id: string;
 	intent: "sell" | "rent";
 	user?: string;
 	title: string;
 	description: string;
-	pictures?: string;
+	pictures?: string[];
 	location: string;
 	propertyCategory: PropertyCategory;
 	approvalStatus: "approved" | "pending" | "rejected";
@@ -43,6 +44,7 @@ export interface IRentListingType extends IBaseListingType {
 	frequency?: "day" | "week" | "month" | "year";
 	pricePerFrequency?: number;
 	furnishing?: FurnishingType;
+	availableFrom?: ISODateString;
 	availableForDuration?: number;
 	availableForDurationUnit?: "day" | "week" | "month" | "year";
 

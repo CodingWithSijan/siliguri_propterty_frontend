@@ -37,8 +37,6 @@ const RentalProperties: React.FC = () => {
 					params: { page: currentPage, limit: 9 },
 				});
 
-				console.log(res.data.rentals);
-
 				setPosts(res.data.rentals || []);
 				setTotalPages(res.data.totalPages || 1);
 			} catch (err) {
@@ -127,7 +125,6 @@ const RentalProperties: React.FC = () => {
 									<RentListingCard
 										key={post._id}
 										listing={post}
-										onClick={() => {}}
 										userOrGlobal="global"
 									/>
 								))
