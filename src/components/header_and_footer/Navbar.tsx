@@ -215,12 +215,12 @@ const Navbar: React.FC = () => {
 				leaveTo="opacity-0 -translate-y-1"
 			>
 				<div
-					className="md:hidden px-4 pt-2 pb-4 bg-white shadow-lg"
+					className="md:hidden px-4 pt-4 pb-6 bg-white shadow-lg rounded-b-2xl border-t border-blue-100"
 					ref={mobileMenuRef}
 				>
 					{user ? (
-						<div className="space-y-3">
-							<div className="flex items-center space-x-3 px-4 py-2">
+						<div className="space-y-4">
+							<div className="flex items-center space-x-3 px-4 py-2 border-b border-gray-100 mb-2">
 								{user.avatar ? (
 									<img
 										className="w-10 h-10 rounded-full border-2 border-blue-500"
@@ -232,102 +232,151 @@ const Navbar: React.FC = () => {
 										{getInitials(user?.name ?? "")}
 									</div>
 								)}
-								<span className="text-gray-700 font-medium">
+								<span className="text-gray-700 font-medium text-base">
 									{formatFullName(user?.name)}
 								</span>
 							</div>
-							{/* New: Mobile nav links */}
-							<div className="space-y-2 mb-2">
-								<NavLink
-									to="/rentals"
-									className={({ isActive }) =>
-										isActive
-											? "block w-full text-blue-600 font-semibold px-4 py-2"
-											: "block w-full text-gray-700 hover:bg-gray-50 rounded-lg px-4 py-2"
-									}
-								>
-									Rental Listings
-								</NavLink>
-								<NavLink
-									to="/sales"
-									className={({ isActive }) =>
-										isActive
-											? "block w-full text-blue-600 font-semibold px-4 py-2"
-											: "block w-full text-gray-700 hover:bg-gray-50 rounded-lg px-4 py-2"
-									}
-								>
-									Sell Listings
-								</NavLink>
-								<NavLink
-									to="/about"
-									className={({ isActive }) =>
-										isActive
-											? "block w-full text-blue-600 font-semibold px-4 py-2"
-											: "block w-full text-gray-700 hover:bg-gray-50 rounded-lg px-4 py-2"
-									}
-								>
-									About Us
-								</NavLink>
+							<div className="mb-2">
+								<p className="text-xs text-gray-400 font-semibold uppercase tracking-wider px-4 mb-1 mt-2">
+									Navigation
+								</p>
+								<div className="space-y-1 divide-y divide-gray-100">
+									<NavLink
+										to="/rentals"
+										className={({ isActive }) =>
+											(isActive
+												? "block w-full text-blue-600 font-semibold px-4 py-2 bg-blue-50 rounded-lg"
+												: "block w-full text-gray-700 hover:bg-blue-50 rounded-lg px-4 py-2 transition-colors") +
+											" flex items-center gap-2"
+										}
+									>
+										<span role="img" aria-label="rent">
+											🏠
+										</span>{" "}
+										Property for rent
+									</NavLink>
+									<NavLink
+										to="/buys"
+										className={({ isActive }) =>
+											(isActive
+												? "block w-full text-blue-600 font-semibold px-4 py-2 bg-blue-50 rounded-lg"
+												: "block w-full text-gray-700 hover:bg-blue-50 rounded-lg px-4 py-2 transition-colors") +
+											" flex items-center gap-2"
+										}
+									>
+										<span role="img" aria-label="sale">
+											💼
+										</span>{" "}
+										Property for sale
+									</NavLink>
+									<NavLink
+										to="/about"
+										className={({ isActive }) =>
+											(isActive
+												? "block w-full text-blue-600 font-semibold px-4 py-2 bg-blue-50 rounded-lg"
+												: "block w-full text-gray-700 hover:bg-blue-50 rounded-lg px-4 py-2 transition-colors") +
+											" flex items-center gap-2"
+										}
+									>
+										<span role="img" aria-label="about">
+											ℹ️
+										</span>{" "}
+										About Us
+									</NavLink>
+								</div>
 							</div>
-							<NavLink
-								to={user.role === "user" ? "/dashboard" : "/admin"}
-								className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-50 rounded-lg"
-							>
-								{user.role === "user" ? "User Dashboard" : "Admin Dashboard"}
-							</NavLink>
-							<button
-								onClick={handleLogout}
-								className="block w-full text-left px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg"
-							>
-								Logout
-							</button>
+							<div className="mt-4">
+								<p className="text-xs text-gray-400 font-semibold uppercase tracking-wider px-4 mb-1">
+									Account
+								</p>
+								<div className="space-y-2">
+									<NavLink
+										to={user.role === "user" ? "/dashboard" : "/admin"}
+										className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-blue-50 rounded-lg"
+									>
+										{user.role === "user"
+											? "User Dashboard"
+											: "Admin Dashboard"}
+									</NavLink>
+									<button
+										onClick={handleLogout}
+										className="block w-full text-left px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg"
+									>
+										Logout
+									</button>
+								</div>
+							</div>
 						</div>
 					) : (
-						<div className="space-y-3">
-							<div className="space-y-2 mb-2">
-								<NavLink
-									to="/rentals"
-									className={({ isActive }) =>
-										isActive
-											? "block w-full text-blue-600 font-semibold px-4 py-2"
-											: "block w-full text-gray-700 hover:bg-gray-50 rounded-lg px-4 py-2"
-									}
-								>
-									Rental Listings
-								</NavLink>
-								<NavLink
-									to="/sales"
-									className={({ isActive }) =>
-										isActive
-											? "block w-full text-blue-600 font-semibold px-4 py-2"
-											: "block w-full text-gray-700 hover:bg-gray-50 rounded-lg px-4 py-2"
-									}
-								>
-									Sell Listings
-								</NavLink>
-								<NavLink
-									to="/about"
-									className={({ isActive }) =>
-										isActive
-											? "block w-full text-blue-600 font-semibold px-4 py-2"
-											: "block w-full text-gray-700 hover:bg-gray-50 rounded-lg px-4 py-2"
-									}
-								>
-									About Us
-								</NavLink>
+						<div className="space-y-4">
+							<div className="mb-2">
+								<p className="text-xs text-gray-400 font-semibold uppercase tracking-wider px-4 mb-1 mt-2">
+									Navigation
+								</p>
+								<div className="space-y-1 divide-y divide-gray-100">
+									<NavLink
+										to="/rentals"
+										className={({ isActive }) =>
+											(isActive
+												? "block w-full text-blue-600 font-semibold px-4 py-2 bg-blue-50 rounded-lg"
+												: "block w-full text-gray-700 hover:bg-blue-50 rounded-lg px-4 py-2 transition-colors") +
+											" flex items-center gap-2"
+										}
+									>
+										<span role="img" aria-label="rent">
+											🏠
+										</span>{" "}
+										Property for rent
+									</NavLink>
+									<NavLink
+										to="/buys"
+										className={({ isActive }) =>
+											(isActive
+												? "block w-full text-blue-600 font-semibold px-4 py-2 bg-blue-50 rounded-lg"
+												: "block w-full text-gray-700 hover:bg-blue-50 rounded-lg px-4 py-2 transition-colors") +
+											" flex items-center gap-2"
+										}
+									>
+										<span role="img" aria-label="sale">
+											💼
+										</span>{" "}
+										Property for sale
+									</NavLink>
+									<NavLink
+										to="/about"
+										className={({ isActive }) =>
+											(isActive
+												? "block w-full text-blue-600 font-semibold px-4 py-2 bg-blue-50 rounded-lg"
+												: "block w-full text-gray-700 hover:bg-blue-50 rounded-lg px-4 py-2 transition-colors") +
+											" flex items-center gap-2"
+										}
+									>
+										<span role="img" aria-label="about">
+											ℹ️
+										</span>{" "}
+										About Us
+									</NavLink>
+								</div>
 							</div>
-							<NavLink
-								to="/login"
-								className="block w-full text-center px-4 py-2 text-gray-700 hover:bg-gray-50 rounded-lg"
-							>
-								Login
-							</NavLink>
-							<NavLink
-								to="/signup"
-								className="block w-full text-center px-4 py-2 bg-blue-600 text-white hover:bg-blue-700 rounded-lg"
-							>
-								Sign Up
-							</NavLink>
+							<div className="mt-4">
+								<p className="text-xs text-gray-400 font-semibold uppercase tracking-wider px-4 mb-1">
+									Account
+								</p>
+								<div className="space-y-2">
+									<NavLink
+										to="/login"
+										className="block w-full text-center px-4 py-2 text-gray-700 hover:bg-blue-50 rounded-lg"
+									>
+										Login
+									</NavLink>
+									<NavLink
+										to="/signup"
+										className="block w-full text-center px-4 py-2 bg-blue-600 text-white hover:bg-blue-700 rounded-lg"
+									>
+										Sign Up
+									</NavLink>
+								</div>
+							</div>
 						</div>
 					)}
 				</div>

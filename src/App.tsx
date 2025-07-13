@@ -25,6 +25,8 @@ import EditPostPage from "./pages/EditPostPage";
 import RentalProperties from "./pages/RentalProperties";
 import SaleProperties from "./pages/SaleProperties";
 import AboutUs from "./components/homepage/AboutUs";
+import RentalPropertyDetails from "./pages/RentalPropertyDetails";
+import SellPropertyDetails from "./pages/SellPropertyDetails";
 
 const App: React.FC = () => {
 	return (
@@ -34,7 +36,10 @@ const App: React.FC = () => {
 			<Routes>
 				<Route path="/" element={<Homepage />} />
 				<Route path="/rentals" element={<RentalProperties />} />
+				<Route path="/rentals/:id" element={<RentalPropertyDetails />} />
 				<Route path="/buys" element={<SaleProperties />} />
+				<Route path="/buys/:id" element={<SellPropertyDetails />} />
+
 				<Route path="/about" element={<AboutUs />} />
 				<Route path="/signup" element={<Signup />} />
 				<Route
