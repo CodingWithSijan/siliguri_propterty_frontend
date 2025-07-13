@@ -36,7 +36,7 @@ const ListingsAccordingToIntentType: React.FC<{
 									<RentListingCard
 										key={listing._id as string}
 										listing={listing as IRentListingType}
-										onClick={() => handleCardClick(listing as IRentListingType)}
+										// onClick={() => handleCardClick(listing as IRentListingType)}
 										userOrGlobal="user"
 									/>
 								);
