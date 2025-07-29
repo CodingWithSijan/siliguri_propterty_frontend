@@ -3,12 +3,13 @@ import {
 	PropertyCategory,
 	UnitOfMeasurement,
 } from "./postFormTypes";
+import { IUser } from "./userTypes";
 
 export type ISODateString = string;
 export interface IBaseListingType {
 	_id: string;
 	intent: "sell" | "rent";
-	user?: string;
+	user?: IUser;
 	title: string;
 	description: string;
 	pictures?: string[];
