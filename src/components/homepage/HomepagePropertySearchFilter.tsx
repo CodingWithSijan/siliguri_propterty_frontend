@@ -4,6 +4,7 @@ import {
 	FaMapMarkerAlt,
 	FaHome,
 	FaMoneyBillWave,
+	FaHandshake,
 } from "react-icons/fa";
 
 const propertyTypes = [
@@ -33,11 +34,18 @@ const locations = [
 	{ value: "other", label: "Other" },
 ];
 
+const purposeOptions = [
+	{ value: "", label: "Any" },
+	{ value: "rent", label: "Rent" },
+	{ value: "buy", label: "Buy" },
+];
+
 const HomepagePropertySearchFilter: React.FC = () => {
 	const [filters, setFilters] = useState({
 		propertyType: "",
 		priceRange: "",
 		location: "",
+		purpose: "",
 	});
 
 	const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -50,23 +58,45 @@ const HomepagePropertySearchFilter: React.FC = () => {
 
 	const handleSearch = (e: React.FormEvent) => {
 		e.preventDefault();
-		// Implement your search logic here
 		alert(
-			`Searching for:\nProperty Type: ${
-				filters.propertyType || "Any"
-			}\nPrice Range: ${filters.priceRange || "Any"}\nLocation: ${
-				filters.location || "Any"
-			}`
+			`Searching for:
+Property Type: ${filters.propertyType || "Any"}
+Price Range: ${filters.priceRange || "Any"}
+Location: ${filters.location || "Any"}
+Purpose: ${filters.purpose || "Any"}`
 		);
 	};
 
 	return (
 		<form
 			onSubmit={handleSearch}
-			className="w-full max-w-4xl mx-auto bg-white/90 rounded-xl shadow-lg px-6 py-8 flex flex-col md:flex-row items-center gap-6 md:gap-4 mt-8 border border-blue-100"
+			className="w-full max-w-5xl mx-auto bg-white/90 rounded-xl shadow-lg px-6 py-8 flex flex-wrap gap-6 justify-between items-end border border-blue-100 mt-8"
 		>
+			{/* Purpose */}
+			<div className="flex flex-col flex-1 min-w-[180px]">
+				<label
+					htmlFor="purpose"
+					className="mb-1 font-semibold text-gray-700 flex items-center gap-1"
+				>
+					<FaHandshake className="text-purple-500" /> Rent or Buy
+				</label>
+				<select
+					name="purpose"
+					id="purpose"
+					value={filters.purpose}
+					onChange={handleChange}
+					className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
+				>
+					{purposeOptions.map((option) => (
+						<option key={option.value} value={option.value}>
+							{option.label}
+						</option>
+					))}
+				</select>
+			</div>
+
 			{/* Property Type */}
-			<div className="flex flex-col items-start flex-1 min-w-[180px]">
+			<div className="flex flex-col flex-1 min-w-[180px]">
 				<label
 					htmlFor="propertyType"
 					className="mb-1 font-semibold text-gray-700 flex items-center gap-1"
@@ -89,7 +119,7 @@ const HomepagePropertySearchFilter: React.FC = () => {
 			</div>
 
 			{/* Price Range */}
-			<div className="flex flex-col items-start flex-1 min-w-[180px]">
+			<div className="flex flex-col flex-1 min-w-[180px]">
 				<label
 					htmlFor="priceRange"
 					className="mb-1 font-semibold text-gray-700 flex items-center gap-1"
@@ -112,7 +142,7 @@ const HomepagePropertySearchFilter: React.FC = () => {
 			</div>
 
 			{/* Location */}
-			<div className="flex flex-col items-start flex-1 min-w-[180px]">
+			<div className="flex flex-col flex-1 min-w-[180px]">
 				<label
 					htmlFor="location"
 					className="mb-1 font-semibold text-gray-700 flex items-center gap-1"
@@ -135,10 +165,10 @@ const HomepagePropertySearchFilter: React.FC = () => {
 			</div>
 
 			{/* Search Button */}
-			<div className="flex items-end h-full pt-5 md:pt-0">
+			<div className="flex flex-col min-w-[180px] w-full md:w-auto">
 				<button
 					type="submit"
-					className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-lg shadow transition-all duration-200"
+					className="w-full md:w-auto flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-lg shadow transition-all duration-200"
 				>
 					<FaSearch className="text-lg" />
 					<span>Search</span>

@@ -30,6 +30,8 @@ import ResetPassword from "./pages/ResetPassword";
 import AdminDashboardPage from "./pages/AdminDashboardPage";
 import HomeTab from "./components/adminComponents/HomeTab";
 import ManagePosts from "./components/adminComponents/ManagePosts";
+import ManageUsers from "./components/adminComponents/ManageUsers";
+import ViewUser from "./components/adminComponents/ViewUser";
 
 const App: React.FC = () => {
 	return (
@@ -98,6 +100,8 @@ const App: React.FC = () => {
 					<Route index element={<Navigate to="/admin/home" replace />} />
 					<Route path="home" element={<HomeTab />} />
 					<Route path="posts" element={<ManagePosts />} />
+					<Route path="users" element={<ManageUsers />} />
+					<Route path="users/view-user/:id" element={<ViewUser />} />
 				</Route>
 
 				{/* Utility & Error Pages */}

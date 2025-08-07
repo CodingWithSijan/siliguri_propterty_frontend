@@ -1,40 +1,16 @@
 import React from "react";
-import { IRentListingType } from "../../../../types/listingTypes";
+import { ISellListingType } from "../../../../types/listingTypes";
 import { IListingUserDetails } from "../../../../types/listingUserDetails";
 import Image_UserDetails from "../../Image_UserDetails";
 import CommonListingDetails from "../../CommonListingDetails";
 import { ICommonListingDetailsType } from "../../../../types/commonListingDetailsTypes";
-import ShopRental from "../shop/ShopRental";
-import LandRental from "../land/LandRental";
-import {
-	FaBed,
-	FaBath,
-	FaCarAlt,
-	FaRulerCombined,
-	FaLayerGroup,
-	FaCalendarAlt,
-	FaCouch,
-	FaCheckCircle,
-	FaTimesCircle,
-	FaRupeeSign,
-} from "react-icons/fa";
-import { convert_ISO_Date_to_Normal } from "../../../../utils/convert_ISO_Date_to_Normal";
+import { FaMapMarkerAlt, FaRulerCombined, FaRupeeSign } from "react-icons/fa";
 import { formatIndianCurrency } from "../../../../utils/priceFormatHelper";
 
-const House: React.FC<{
-	listing: IRentListingType;
+const LandSell: React.FC<{
+	listing: ISellListingType;
 	userDetails: IListingUserDetails | null;
 }> = ({ listing, userDetails }) => {
-	// Route to appropriate component based on property category
-	if (listing.propertyCategory === "shop") {
-		return <ShopRental listing={listing} userDetails={userDetails} />;
-	}
-
-	if (listing.propertyCategory === "land") {
-		return <LandRental listing={listing} userDetails={userDetails} />;
-	}
-
-	// Default to house/flat rendering
 	const commonListingDetails: ICommonListingDetailsType = {
 		title: listing.title,
 		description: listing.description,
@@ -43,12 +19,18 @@ const House: React.FC<{
 		intent: listing.intent,
 	};
 
-	// Format rental price
-	const formatRentalPrice = () => {
-		if (listing.pricePerFrequency && listing.frequency) {
-			return `₹${formatIndianCurrency(listing.pricePerFrequency)} per ${
-				listing.frequency
+	// Format price based on land specifics
+	const formatPrice = () => {
+		if (listing.pricePerUnit && listing.availableLandSpace) {
+			return `₹${formatIndianCurrency(listing.pricePerUnit)} per ${
+				listing.availableLandSpaceUnit || "unit"
 			}`;
+		}
+		if (listing.totalPrice) {
+			return `₹${formatIndianCurrency(listing.totalPrice)}`;
+		}
+		if (listing.price) {
+			return `₹${formatIndianCurrency(Number(listing.price))}`;
 		}
 		return "Price on request";
 	};
@@ -67,67 +49,61 @@ const House: React.FC<{
 				<CommonListingDetails {...commonListingDetails} />
 			</div>
 
-			{/* Additional Info Grid */}
+			{/* Price Section */}
+			<div className="px-6 sm:px-8 pb-6">
+				<div className="bg-gradient-to-br from-emerald-50 to-green-100 rounded-xl p-6 border border-emerald-200/60 shadow-sm">
+					<div className="flex items-center gap-3 mb-3">
+						<div className="w-10 h-10 bg-gradient-to-br from-emerald-600 to-green-700 rounded-xl flex items-center justify-center shadow-sm">
+							<FaRupeeSign className="text-white text-base" />
+						</div>
+						<h3 className="text-lg font-semibold text-gray-900">Land Price</h3>
+					</div>
+					<p className="text-2xl font-bold text-emerald-700 mb-1">
+						{formatPrice()}
+					</p>
+					{listing.totalPrice && listing.pricePerUnit && (
+						<p className="text-sm text-gray-600">
+							Total: ₹{formatIndianCurrency(listing.totalPrice)}
+						</p>
+					)}
+				</div>
+			</div>
+
+			{/* Land Features */}
 			<div className="bg-gradient-to-br from-slate-50 to-gray-100 border-t border-gray-200 p-6 sm:p-8">
 				<h3 className="text-xl font-semibold text-gray-900 mb-6 flex items-center gap-2">
 					<div className="w-1 h-6 bg-gradient-to-b from-blue-500 to-blue-600 rounded-full"></div>
-					Property Features
+					Land Features
 				</h3>
 				<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-					<InfoItem
-						icon={<FaBed className="text-blue-600" />}
-						label="Bedrooms"
-						value={listing.bedrooms}
-						variant="primary"
-					/>
-					<InfoItem
-						icon={<FaBath className="text-blue-600" />}
-						label="Bathrooms"
-						value={listing.bathrooms}
-						variant="primary"
-					/>
-					<InfoItem
-						icon={<FaRulerCombined className="text-blue-600" />}
-						label="Built-up Area"
-						value={`${listing.builtUpArea} sq ft`}
-						variant="primary"
-					/>
-					<InfoItem
-						icon={<FaLayerGroup className="text-slate-600" />}
-						label="Floor"
-						value={listing.floor}
-						variant="secondary"
-					/>
-					<InfoItem
-						icon={<FaCouch className="text-slate-600" />}
-						label="Furnishing"
-						value={listing.furnishing}
-						variant="secondary"
-					/>
-					<InfoItem
-						icon={<FaCarAlt className="text-slate-600" />}
-						label="Parking"
-						value={listing.parking ? "Available" : "Not Available"}
-						variant="secondary"
-					/>
-					<InfoItem
-						icon={<FaCalendarAlt className="text-slate-600" />}
-						label="Available From"
-						value={convert_ISO_Date_to_Normal(listing.availableFrom)}
-						variant="secondary"
-					/>
-					<InfoItem
-						icon={
-							listing.attachedBathroom ? (
-								<FaCheckCircle className="text-emerald-600" />
-							) : (
-								<FaTimesCircle className="text-red-500" />
-							)
-						}
-						label="Attached Bathroom"
-						value={listing.attachedBathroom ? "Yes" : "No"}
-						variant={listing.attachedBathroom ? "success" : "danger"}
-					/>
+					{listing.availableLandSpace && (
+						<InfoItem
+							icon={<FaMapMarkerAlt className="text-blue-600" />}
+							label="Available Land"
+							value={`${listing.availableLandSpace} ${
+								listing.availableLandSpaceUnit || ""
+							}`}
+							variant="primary"
+						/>
+					)}
+
+					{listing.pricePerUnit && (
+						<InfoItem
+							icon={<FaRupeeSign className="text-blue-600" />}
+							label="Price per Unit"
+							value={`₹${formatIndianCurrency(listing.pricePerUnit)}`}
+							variant="primary"
+						/>
+					)}
+
+					{listing.unit && (
+						<InfoItem
+							icon={<FaRulerCombined className="text-slate-600" />}
+							label="Unit of Measurement"
+							value={listing.unit}
+							variant="secondary"
+						/>
+					)}
 				</div>
 			</div>
 		</div>
@@ -194,4 +170,4 @@ const InfoItem: React.FC<{
 	);
 };
 
-export default House;
+export default LandSell;

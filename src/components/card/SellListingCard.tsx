@@ -18,10 +18,19 @@ const SellListingCard: React.FC<{
 	onClick: () => void;
 	userOrGlobal?: string;
 }> = ({ listing, onClick, userOrGlobal }) => {
-	const priceNum = Number(listing.price);
-	const formattedPrice = isNaN(priceNum)
-		? listing.price
-		: formatIndianCurrency(priceNum);
+	// Format price based on property type
+	const formatPrice = () => {
+		if (listing.totalPrice) {
+			return formatIndianCurrency(listing.totalPrice);
+		}
+
+		if (listing.price) {
+			const priceNum = Number(listing.price);
+			return isNaN(priceNum) ? listing.price : formatIndianCurrency(priceNum);
+		}
+
+		return "Price on request";
+	};
 
 	return (
 		<motion.div
@@ -95,7 +104,7 @@ const SellListingCard: React.FC<{
 
 			{/* Main Content */}
 			<div className="p-3">
-				<h3 className="text-base font-semibold text-gray-800 ">
+				<h3 className="font-semibold text-gray-800 overflow-ellipsis ">
 					{listing.title}
 				</h3>
 
@@ -105,12 +114,12 @@ const SellListingCard: React.FC<{
 				</div>
 
 				{/* Price */}
-				{listing.price && (
+				{(listing.price || listing.totalPrice) && (
 					<div className="flex flex-wrap gap-2 mb-2">
 						<span className="bg-green-50 text-green-800 px-2 py-1 rounded text-xs font-medium flex items-center">
 							Price:
 							<BiRupee className="text-sm" />
-							{formattedPrice}
+							{formatPrice()}
 							{listing.unit && ` / ${capitalize(listing.unit)}`}
 						</span>
 					</div>

@@ -37,6 +37,7 @@ import {
 	fetchAllPosts,
 	fetchAnalytics,
 	fetchPostsByStatus,
+	rejectPost,
 } from "../../services/fetchFunctionsForAdmin";
 import { Skeleton } from "../ui/skeleton";
 
@@ -109,7 +110,7 @@ const ManagePosts = () => {
 	const handleReject = async (postId: string) => {
 		try {
 			setIsActionLoading(postId);
-			// await rejectPost(postId);
+			await rejectPost(postId);
 			await refetchPosts();
 		} catch (err) {
 			console.error("Error rejecting:", err);
