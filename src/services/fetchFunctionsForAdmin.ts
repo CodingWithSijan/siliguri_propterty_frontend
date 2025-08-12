@@ -47,13 +47,12 @@ export const deleteUserById = async (userId: string) => {
 	try {
 		const response = await BASE_URL.delete(`/api/admin/delete-user/${userId}`);
 
-		const data = await response.json();
-
-		if (!response.ok) {
-			throw new Error(data.message || "Failed to delete user");
+		// Axios automatically parses JSON, so response.data contains the parsed data
+		if (response.status >= 200 && response.status < 300) {
+			return response.data;
+		} else {
+			throw new Error(response.data?.message || "Failed to delete user");
 		}
-
-		return data;
 	} catch (error) {
 		console.error("Error deleting user:", error);
 		throw error;
