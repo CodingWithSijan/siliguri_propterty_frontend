@@ -178,25 +178,25 @@ const ManagePosts = () => {
 				<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
 					<StatsCard
 						title="Total Posts"
-						value={analytics?.postsRes}
+						value={analytics?.postsRes ?? 0}
 						icon={HomeIcon}
 						color="text-blue-500"
 					/>
 					<StatsCard
 						title="Approved"
-						value={analytics?.approvedPostsRes}
+						value={analytics?.approvedPostsRes ?? 0}
 						icon={CheckCircle2}
 						color="text-green-500"
 					/>
 					<StatsCard
 						title="Rejected"
-						value={analytics?.rejectedPostsRes}
+						value={analytics?.rejectedPostsRes ?? 0}
 						icon={XCircle}
 						color="text-red-500"
 					/>
 					<StatsCard
 						title="Pending"
-						value={analytics?.pendingPostsRes}
+						value={analytics?.pendingPostsRes ?? 0}
 						icon={Clock}
 						color="text-yellow-500"
 					/>
