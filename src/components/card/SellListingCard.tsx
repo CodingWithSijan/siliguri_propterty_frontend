@@ -120,20 +120,30 @@ const SellListingCard: React.FC<{
 							Price:
 							<BiRupee className="text-sm" />
 							{formatPrice()}
-							{listing.unit && ` / ${capitalize(listing.unit)}`}
+							{listing.propertyCategory != "land" &&
+								listing.unit &&
+								` / ${capitalize(listing.unit)}`}
 						</span>
 					</div>
 				)}
 
 				{/* Land Info */}
-				{listing.propertyCategory === "land" && listing.availableLandSpace && (
-					<div className="text-xs text-gray-600 mb-2">
-						Total Land Space:{" "}
-						<span className="text-green-700 font-semibold">
-							{listing.availableLandSpace +
-								" " +
-								capitalize(listing.availableLandSpaceUnit)}
-						</span>
+				{listing.propertyCategory === "land" && (
+					<div className="flex flex-wrap gap-2 mb-2 mt-1">
+						{listing.availableLandSpace && (
+							<span className="flex items-center gap-1 bg-gray-100 text-gray-800 px-2 py-1 rounded text-xs">
+								<TbRulerMeasure className="text-sm" />
+								Land Space: {listing.availableLandSpace}{" "}
+								{capitalize(listing.availableLandSpaceUnit)}
+							</span>
+						)}
+						{listing.pricePerUnit && (
+							<span className="flex items-center gap-1 bg-gray-100 text-gray-800 px-2 py-1 rounded text-xs">
+								<BiRupee className="text-sm" />
+								Per {capitalize(listing.availableLandSpaceUnit)}:{" "}
+								{formatIndianCurrency(listing.pricePerUnit)}
+							</span>
+						)}
 					</div>
 				)}
 

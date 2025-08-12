@@ -54,7 +54,7 @@ const House: React.FC<{
 	};
 
 	return (
-		<div className="max-w-4xl mx-auto bg-white rounded-xl shadow-xl border border-gray-200 overflow-hidden">
+		<div className="w-full max-w-4xl mx-auto bg-white rounded-none sm:rounded-xl shadow-xl border-0 sm:border border-gray-200 overflow-hidden">
 			{/* Top Image + User Info */}
 			<Image_UserDetails
 				user={userDetails}
@@ -65,6 +65,30 @@ const House: React.FC<{
 			{/* Main Details */}
 			<div className="px-6 sm:px-8">
 				<CommonListingDetails {...commonListingDetails} />
+			</div>
+
+			{/* Rental Price Section */}
+			<div className="px-6 sm:px-8 pb-6">
+				<div className="bg-gradient-to-br from-amber-50 to-yellow-100 rounded-xl p-6 border border-amber-200/60 shadow-sm">
+					<div className="flex items-center gap-3 mb-3">
+						<div className="w-10 h-10 bg-gradient-to-br from-amber-600 to-yellow-700 rounded-xl flex items-center justify-center shadow-sm">
+							<FaRupeeSign className="text-white text-base" />
+						</div>
+						<h3 className="text-lg font-semibold text-gray-900">
+							Rental Price
+						</h3>
+					</div>
+					<p className="text-2xl font-bold text-amber-700 mb-1">
+						{formatRentalPrice()}
+					</p>
+					{listing.availableForDuration && listing.availableForDurationUnit && (
+						<p className="text-sm text-gray-600">
+							Available for {listing.availableForDuration}{" "}
+							{listing.availableForDurationUnit}
+							{listing.availableForDuration > 1 ? "s" : ""}
+						</p>
+					)}
+				</div>
 			</div>
 
 			{/* Additional Info Grid */}
