@@ -12,14 +12,8 @@ export default function NewPost() {
 	const navigate = useNavigate();
 
 	const [dialogOpen, setDialogOpen] = useState(true);
-	const [shake, setShake] = useState(false);
 
 	const handleDialogOpenChange = (open: boolean) => {
-		if (!open) {
-			setShake(true);
-			setTimeout(() => setShake(false), 500);
-			return;
-		}
 		setDialogOpen(open);
 	};
 
@@ -28,8 +22,7 @@ export default function NewPost() {
 			<Dialog open={dialogOpen} onOpenChange={handleDialogOpenChange}>
 				<DialogContent
 					showClose={false}
-					className={`max-w-md w-full rounded-2xl shadow-xl p-8 bg-gradient-to-br from-white via-slate-50 to-slate-100 border border-gray-200 ${
-						shake ? "animate-shake" : ""
+					className={`max-w-md w-full rounded-2xl shadow-xl p-8 bg-gradient-to-br from-white via-slate-50 to-slate-100 border border-gray-200 
 					}`}
 				>
 					<DialogHeader>

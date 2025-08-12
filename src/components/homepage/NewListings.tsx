@@ -42,8 +42,12 @@ const NewListings: React.FC = () => {
 		fetchLatest();
 	}, []);
 
-	const handleCardClick = (postId: string) => {
-		navigate(`/post/${postId}`);
+	const handleCardClick = (postId: string, intent: "rent" | "sell") => {
+		if (intent === "rent") {
+			navigate(`/rentals/${postId}`);
+		} else {
+			navigate(`/buys/${postId}`);
+		}
 	};
 
 	const plugin = React.useRef(
@@ -79,7 +83,7 @@ const NewListings: React.FC = () => {
 									) : (
 										<SellListingCard
 											listing={item as ISellListingType}
-											onClick={() => handleCardClick(item._id)}
+											onClick={() => handleCardClick(item._id, "sell")}
 											userOrGlobal="global"
 										/>
 									)}

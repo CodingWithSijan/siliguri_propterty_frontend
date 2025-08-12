@@ -10,56 +10,81 @@ const CommonListingDetails: React.FC<ICommonListingDetailsType> = ({
 	intent,
 }) => {
 	return (
-		<div className="bg-white p-6 sm:p-8 w-full mx-auto space-y-6">
+		<div className="bg-white sm:p-4 w-full mx-auto space-y-4">
 			{/* Title & Intent Badge */}
-			<div className="flex flex-col sm:flex-row sm:justify-between sm:items-center">
-				<h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2 sm:mb-0">
+			<div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3">
+				<h1 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900 leading-tight max-w-3xl">
 					{title}
 				</h1>
-				<span
-					className={`px-4 py-1 text-sm max-w-fit font-semibold rounded-full shadow-sm ${
-						intent === "rent"
-							? "bg-yellow-100 text-yellow-700"
-							: intent === "sell"
-							? "bg-green-100 text-green-700"
-							: "bg-blue-100 text-blue-700"
-					}`}
-				>
-					{intent?.toUpperCase()}
-				</span>
+				<div className="flex-shrink-0">
+					<span
+						className={`inline-block px-3 py-1.5 text-xs font-semibold rounded-full shadow-sm border transition-all duration-200 ${
+							intent === "rent"
+								? "bg-gradient-to-br from-amber-50 to-yellow-100 text-amber-800 border-amber-200/60"
+								: intent === "sell"
+								? "bg-gradient-to-br from-emerald-50 to-green-100 text-emerald-800 border-emerald-200/60"
+								: "bg-gradient-to-br from-blue-50 to-blue-100 text-blue-800 border-blue-200/60"
+						}`}
+					>
+						{intent?.toUpperCase()}
+					</span>
+				</div>
 			</div>
 
 			{/* Grid Info Section */}
-			<div className="grid grid-cols-1 sm:grid-cols-2 gap-6 text-sm sm:text-base text-gray-800">
+			<div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
 				{/* Location */}
-				<div className="flex items-center gap-3">
-					<FaMapMarkerAlt className="text-red-500 text-lg" />
-					<div>
-						<span className="block text-gray-500 text-xs uppercase">
+				<div className="flex items-center gap-3 p-3 bg-gradient-to-br from-slate-50 to-gray-100 rounded-lg border border-slate-200/60 hover:shadow-md hover:border-slate-300/60 transition-all duration-300 group">
+					<div className="flex-shrink-0 w-8 h-8 bg-gradient-to-br from-slate-600 to-slate-700 rounded-lg flex items-center justify-center shadow-sm group-hover:shadow-md transition-shadow duration-300">
+						<FaMapMarkerAlt className="text-white text-sm" />
+					</div>
+					<div className="min-w-0 flex-1">
+						<span className="block text-slate-600 text-xs font-semibold uppercase tracking-wider mb-1">
 							Location
 						</span>
-						<span className="font-medium">{location}</span>
+						<span
+							className="font-semibold text-gray-900 text-sm truncate block"
+							title={location}
+						>
+							{location}
+						</span>
 					</div>
 				</div>
 
 				{/* Property Category */}
-				<div className="flex items-center gap-3">
-					<FaHome className="text-blue-600 text-lg" />
-					<div>
-						<span className="block text-gray-500 text-xs uppercase">
+				<div className="flex items-center gap-3 p-3 bg-gradient-to-br from-slate-50 to-gray-100 rounded-lg border border-slate-200/60 ">
+					<div className="flex-shrink-0 w-8 h-8 bg-gradient-to-br from-slate-600 to-slate-700 rounded-lg flex items-center justify-center shadow-sm group-hover:shadow-md transition-shadow duration-300">
+						<FaHome className="text-white text-sm" />
+					</div>
+					<div className="min-w-0 flex-1">
+						<span className="block text-slate-600 text-xs font-semibold uppercase tracking-wider mb-1">
 							Property Type
 						</span>
-						<span className="font-medium">{propertyCategory}</span>
+						<span
+							className="font-semibold text-gray-900 text-sm truncate block"
+							title={propertyCategory}
+						>
+							{propertyCategory}
+						</span>
 					</div>
 				</div>
 			</div>
 
-			{/* Description */}
-			<div className="flex items-start gap-3 mt-2">
-				<FaInfoCircle className="text-gray-500 mt-1" />
-				<p className="text-gray-700 text-sm sm:text-base leading-relaxed">
-					{description}
-				</p>
+			{/* Description Section */}
+			<div className="bg-gradient-to-br from-gray-50 to-slate-100 rounded-lg p-4 border border-gray-200/60 shadow-sm">
+				<div className="flex items-center gap-2 mb-3">
+					<div className="w-6 h-6 bg-gradient-to-br from-gray-600 to-slate-700 rounded-lg flex items-center justify-center shadow-sm">
+						<FaInfoCircle className="text-white text-sm" />
+					</div>
+					<h2 className="text-base font-semibold text-gray-900">
+						Property Description
+					</h2>
+				</div>
+				<div className="prose prose-gray max-w-none">
+					<p className="text-gray-700 leading-relaxed text-sm whitespace-pre-wrap">
+						{description || "No description available for this property."}
+					</p>
+				</div>
 			</div>
 		</div>
 	);

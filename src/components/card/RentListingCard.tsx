@@ -17,7 +17,8 @@ const capitalize = (str: string | undefined) =>
 const RentListingCard: React.FC<{
 	listing: IRentListingType;
 	userOrGlobal: string;
-}> = ({ listing, userOrGlobal }) => {
+	onClick?: () => void;
+}> = ({ listing, userOrGlobal, onClick }) => {
 	const priceNum = Number(listing.pricePerFrequency);
 	const formattedPrice = isNaN(priceNum)
 		? listing.pricePerFrequency
@@ -25,10 +26,13 @@ const RentListingCard: React.FC<{
 
 	const navigate = useNavigate();
 	const handleClick = () => {
-		const path =
-			userOrGlobal === "global" ? `/rentals/${listing._id}` : `/rentals`;
-
-		navigate(path);
+		if (onClick) {
+			onClick();
+		} else {
+			const path =
+				userOrGlobal === "global" ? `/rentals/${listing._id}` : `/rentals`;
+			navigate(path);
+		}
 	};
 	return (
 		<motion.div

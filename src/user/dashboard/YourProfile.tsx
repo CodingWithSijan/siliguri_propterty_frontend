@@ -70,8 +70,9 @@ const YourProfile: React.FC = () => {
 				login({ user: updatedUser, token: sessionStorage.getItem("token")! })
 			);
 			setSelectedFile(null);
-		} catch (error: any) {
-			showError(error.response?.data?.message || "Upload failed.");
+		} catch (error) {
+			if (axios.isAxiosError(error)) showError(error.response?.data?.message);
+			else showError("Upload Failed! Please Try again");
 		} finally {
 			setUploading(false);
 		}
@@ -86,6 +87,12 @@ const YourProfile: React.FC = () => {
 				email: user?.email,
 			});
 			showInfo(res.data.message);
+
+			const updatedUser = res.data.user;
+
+			dispatch(
+				login({ user: updatedUser, token: sessionStorage.getItem("token")! })
+			);
 		} catch (error) {
 			if (axios.isAxiosError(error)) {
 				showError(`${error.response?.data?.message}`);
@@ -170,7 +177,8 @@ const YourProfile: React.FC = () => {
 							readOnly
 						/>
 					</div>
-					{!user?.isVerified && (
+
+					{user?.isVerified !== true && (
 						<p className="text-xs text-red-500 mt-1 flex justify-between items-center">
 							<span>Email not verified</span>
 							<button

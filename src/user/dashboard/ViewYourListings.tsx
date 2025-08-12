@@ -31,41 +31,40 @@ const ViewYourListings = () => {
 
 	const [loading, setLoading] = useState<boolean>(false);
 
-	useEffect(() => {
-		const fetchListings = async () => {
-			try {
-				setLoading(true);
-				const response = await BASE_URL.get(
-					"/api/user/post/view-your-listings"
-				);
-				const allPostsOrListings = response.data.postArray;
-				console.log(allPostsOrListings);
-				setListings(allPostsOrListings);
-				setActiveListings(
-					allPostsOrListings.filter(
-						(item: IUniversalListingType | null) =>
-							item?.approvalStatus === "approved"
-					)
-				);
+	const fetchListings = async () => {
+		try {
+			setLoading(true);
+			const response = await BASE_URL.get("/api/user/post/view-your-listings");
+			const allPostsOrListings = response.data.postArray;
+			console.log(allPostsOrListings);
+			setListings(allPostsOrListings);
+			setActiveListings(
+				allPostsOrListings.filter(
+					(item: IUniversalListingType | null) =>
+						item?.approvalStatus === "approved"
+				)
+			);
 
-				setPendingListings(
-					allPostsOrListings.filter(
-						(item: IUniversalListingType | null) =>
-							item?.approvalStatus === "pending"
-					)
-				);
-				setRejectedListings(
-					allPostsOrListings.filter(
-						(item: IUniversalListingType | null) =>
-							item?.approvalStatus === "rejected"
-					)
-				);
-			} catch {
-				showError("Failed to fetch listings");
-			} finally {
-				setLoading(false);
-			}
-		};
+			setPendingListings(
+				allPostsOrListings.filter(
+					(item: IUniversalListingType | null) =>
+						item?.approvalStatus === "pending"
+				)
+			);
+			setRejectedListings(
+				allPostsOrListings.filter(
+					(item: IUniversalListingType | null) =>
+						item?.approvalStatus === "rejected"
+				)
+			);
+		} catch {
+			showError("Failed to fetch listings");
+		} finally {
+			setLoading(false);
+		}
+	};
+
+	useEffect(() => {
 		fetchListings();
 	}, []);
 
@@ -110,7 +109,10 @@ const ViewYourListings = () => {
 							<p className="text-lg text-gray-500">Loading your listings...</p>
 						</div>
 					) : (
-						<ListingsAccordingToIntentType listings={listings} />
+						<ListingsAccordingToIntentType
+							listings={listings}
+							onRefresh={fetchListings}
+						/>
 					)}
 				</TabsContent>
 				<TabsContent value="active">
@@ -120,7 +122,10 @@ const ViewYourListings = () => {
 							<p className="text-lg text-gray-500">Loading your listings...</p>
 						</div>
 					) : (
-						<ListingsAccordingToIntentType listings={activeListings} />
+						<ListingsAccordingToIntentType
+							listings={activeListings}
+							onRefresh={fetchListings}
+						/>
 					)}
 				</TabsContent>
 				<TabsContent value="pending">
@@ -130,7 +135,10 @@ const ViewYourListings = () => {
 							<p className="text-lg text-gray-500">Loading your listings...</p>
 						</div>
 					) : (
-						<ListingsAccordingToIntentType listings={pendingListings} />
+						<ListingsAccordingToIntentType
+							listings={pendingListings}
+							onRefresh={fetchListings}
+						/>
 					)}
 				</TabsContent>
 				<TabsContent value="rejected">
@@ -140,7 +148,10 @@ const ViewYourListings = () => {
 							<p className="text-lg text-gray-500">Loading your listings...</p>
 						</div>
 					) : (
-						<ListingsAccordingToIntentType listings={rejectedListings} />
+						<ListingsAccordingToIntentType
+							listings={rejectedListings}
+							onRefresh={fetchListings}
+						/>
 					)}
 				</TabsContent>
 			</Tabs>

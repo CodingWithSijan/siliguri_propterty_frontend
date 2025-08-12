@@ -18,10 +18,19 @@ const SellListingCard: React.FC<{
 	onClick: () => void;
 	userOrGlobal?: string;
 }> = ({ listing, onClick, userOrGlobal }) => {
-	const priceNum = Number(listing.price);
-	const formattedPrice = isNaN(priceNum)
-		? listing.price
-		: formatIndianCurrency(priceNum);
+	// Format price based on property type
+	const formatPrice = () => {
+		if (listing.totalPrice) {
+			return formatIndianCurrency(listing.totalPrice);
+		}
+
+		if (listing.price) {
+			const priceNum = Number(listing.price);
+			return isNaN(priceNum) ? listing.price : formatIndianCurrency(priceNum);
+		}
+
+		return "Price on request";
+	};
 
 	return (
 		<motion.div
@@ -95,7 +104,7 @@ const SellListingCard: React.FC<{
 
 			{/* Main Content */}
 			<div className="p-3">
-				<h3 className="text-base font-semibold text-gray-800 ">
+				<h3 className="font-semibold text-gray-800 overflow-ellipsis ">
 					{listing.title}
 				</h3>
 
@@ -105,26 +114,36 @@ const SellListingCard: React.FC<{
 				</div>
 
 				{/* Price */}
-				{listing.price && (
+				{(listing.price || listing.totalPrice) && (
 					<div className="flex flex-wrap gap-2 mb-2">
 						<span className="bg-green-50 text-green-800 px-2 py-1 rounded text-xs font-medium flex items-center">
 							Price:
 							<BiRupee className="text-sm" />
-							{formattedPrice}
-							{listing.unit && ` / ${capitalize(listing.unit)}`}
+							{formatPrice()}
+							{listing.propertyCategory != "land" &&
+								listing.unit &&
+								` / ${capitalize(listing.unit)}`}
 						</span>
 					</div>
 				)}
 
 				{/* Land Info */}
-				{listing.propertyCategory === "land" && listing.availableLandSpace && (
-					<div className="text-xs text-gray-600 mb-2">
-						Total Land Space:{" "}
-						<span className="text-green-700 font-semibold">
-							{listing.availableLandSpace +
-								" " +
-								capitalize(listing.availableLandSpaceUnit)}
-						</span>
+				{listing.propertyCategory === "land" && (
+					<div className="flex flex-wrap gap-2 mb-2 mt-1">
+						{listing.availableLandSpace && (
+							<span className="flex items-center gap-1 bg-gray-100 text-gray-800 px-2 py-1 rounded text-xs">
+								<TbRulerMeasure className="text-sm" />
+								Land Space: {listing.availableLandSpace}{" "}
+								{capitalize(listing.availableLandSpaceUnit)}
+							</span>
+						)}
+						{listing.pricePerUnit && (
+							<span className="flex items-center gap-1 bg-gray-100 text-gray-800 px-2 py-1 rounded text-xs">
+								<BiRupee className="text-sm" />
+								Per {capitalize(listing.availableLandSpaceUnit)}:{" "}
+								{formatIndianCurrency(listing.pricePerUnit)}
+							</span>
+						)}
 					</div>
 				)}
 

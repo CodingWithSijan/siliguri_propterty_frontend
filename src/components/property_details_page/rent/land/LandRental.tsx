@@ -4,37 +4,19 @@ import { IListingUserDetails } from "../../../../types/listingUserDetails";
 import Image_UserDetails from "../../Image_UserDetails";
 import CommonListingDetails from "../../CommonListingDetails";
 import { ICommonListingDetailsType } from "../../../../types/commonListingDetailsTypes";
-import ShopRental from "../shop/ShopRental";
-import LandRental from "../land/LandRental";
 import {
-	FaBed,
-	FaBath,
-	FaCarAlt,
 	FaRulerCombined,
-	FaLayerGroup,
 	FaCalendarAlt,
-	FaCouch,
-	FaCheckCircle,
-	FaTimesCircle,
+	FaClock,
 	FaRupeeSign,
 } from "react-icons/fa";
 import { convert_ISO_Date_to_Normal } from "../../../../utils/convert_ISO_Date_to_Normal";
 import { formatIndianCurrency } from "../../../../utils/priceFormatHelper";
 
-const House: React.FC<{
+const LandRental: React.FC<{
 	listing: IRentListingType;
 	userDetails: IListingUserDetails | null;
 }> = ({ listing, userDetails }) => {
-	// Route to appropriate component based on property category
-	if (listing.propertyCategory === "shop") {
-		return <ShopRental listing={listing} userDetails={userDetails} />;
-	}
-
-	if (listing.propertyCategory === "land") {
-		return <LandRental listing={listing} userDetails={userDetails} />;
-	}
-
-	// Default to house/flat rendering
 	const commonListingDetails: ICommonListingDetailsType = {
 		title: listing.title,
 		description: listing.description,
@@ -54,7 +36,7 @@ const House: React.FC<{
 	};
 
 	return (
-		<div className="w-full max-w-4xl mx-auto bg-white rounded-none sm:rounded-xl shadow-xl border-0 sm:border border-gray-200 overflow-hidden">
+		<div className="max-w-4xl mx-auto bg-white rounded-xl shadow-xl border border-gray-200 overflow-hidden">
 			{/* Top Image + User Info */}
 			<Image_UserDetails
 				user={userDetails}
@@ -91,67 +73,43 @@ const House: React.FC<{
 				</div>
 			</div>
 
-			{/* Additional Info Grid */}
+			{/* Land Features */}
 			<div className="bg-gradient-to-br from-slate-50 to-gray-100 border-t border-gray-200 p-6 sm:p-8">
 				<h3 className="text-xl font-semibold text-gray-900 mb-6 flex items-center gap-2">
 					<div className="w-1 h-6 bg-gradient-to-b from-blue-500 to-blue-600 rounded-full"></div>
-					Property Features
+					Land Features
 				</h3>
 				<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-					<InfoItem
-						icon={<FaBed className="text-blue-600" />}
-						label="Bedrooms"
-						value={listing.bedrooms}
-						variant="primary"
-					/>
-					<InfoItem
-						icon={<FaBath className="text-blue-600" />}
-						label="Bathrooms"
-						value={listing.bathrooms}
-						variant="primary"
-					/>
-					<InfoItem
-						icon={<FaRulerCombined className="text-blue-600" />}
-						label="Built-up Area"
-						value={`${listing.builtUpArea} sq ft`}
-						variant="primary"
-					/>
-					<InfoItem
-						icon={<FaLayerGroup className="text-slate-600" />}
-						label="Floor"
-						value={listing.floor}
-						variant="secondary"
-					/>
-					<InfoItem
-						icon={<FaCouch className="text-slate-600" />}
-						label="Furnishing"
-						value={listing.furnishing}
-						variant="secondary"
-					/>
-					<InfoItem
-						icon={<FaCarAlt className="text-slate-600" />}
-						label="Parking"
-						value={listing.parking ? "Available" : "Not Available"}
-						variant="secondary"
-					/>
-					<InfoItem
-						icon={<FaCalendarAlt className="text-slate-600" />}
-						label="Available From"
-						value={convert_ISO_Date_to_Normal(listing.availableFrom)}
-						variant="secondary"
-					/>
-					<InfoItem
-						icon={
-							listing.attachedBathroom ? (
-								<FaCheckCircle className="text-emerald-600" />
-							) : (
-								<FaTimesCircle className="text-red-500" />
-							)
-						}
-						label="Attached Bathroom"
-						value={listing.attachedBathroom ? "Yes" : "No"}
-						variant={listing.attachedBathroom ? "success" : "danger"}
-					/>
+					{listing.availableFrom && (
+						<InfoItem
+							icon={<FaCalendarAlt className="text-slate-600" />}
+							label="Available From"
+							value={convert_ISO_Date_to_Normal(listing.availableFrom)}
+							variant="secondary"
+						/>
+					)}
+
+					{listing.frequency && (
+						<InfoItem
+							icon={<FaClock className="text-slate-600" />}
+							label="Billing Frequency"
+							value={listing.frequency}
+							variant="secondary"
+						/>
+					)}
+
+					{/* Note: Land-specific fields from sell listing types aren't available in rent listing types */}
+					{/* We show available duration and frequency for land rentals */}
+					{listing.availableForDuration && listing.availableForDurationUnit && (
+						<InfoItem
+							icon={<FaRulerCombined className="text-blue-600" />}
+							label="Lease Duration"
+							value={`${listing.availableForDuration} ${
+								listing.availableForDurationUnit
+							}${listing.availableForDuration > 1 ? "s" : ""}`}
+							variant="primary"
+						/>
+					)}
 				</div>
 			</div>
 		</div>
@@ -218,4 +176,4 @@ const InfoItem: React.FC<{
 	);
 };
 
-export default House;
+export default LandRental;

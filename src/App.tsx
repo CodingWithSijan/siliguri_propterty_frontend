@@ -13,7 +13,6 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Login from "./pages/Login";
 import DashboardLayout from "./user/DashboardLayout";
-import AdminDashboard from "./admin/AdminDashboard";
 import NotFound404 from "./components/homepage/NotFound404";
 import VerifyEmail from "./components/homepage/VerifyEmail";
 import NewPost from "./user/dashboard/NewPost";
@@ -27,6 +26,12 @@ import SaleProperties from "./pages/SaleProperties";
 import AboutUs from "./components/homepage/AboutUs";
 import RentalPropertyDetails from "./pages/RentalPropertyDetails";
 import SellPropertyDetails from "./pages/SellPropertyDetails";
+import ResetPassword from "./pages/ResetPassword";
+import AdminDashboardPage from "./pages/AdminDashboardPage";
+import HomeTab from "./components/adminComponents/HomeTab";
+import ManagePosts from "./components/adminComponents/ManagePosts";
+import ManageUsers from "./components/adminComponents/ManageUsers";
+import ViewUser from "./components/adminComponents/ViewUser";
 
 const App: React.FC = () => {
 	return (
@@ -34,20 +39,29 @@ const App: React.FC = () => {
 			<ScrollToTopButton />
 
 			<Routes>
+				{/* Homepage & Info */}
 				<Route path="/" element={<Homepage />} />
+				<Route path="/about" element={<AboutUs />} />
+
+				{/* Rental Property Routes */}
 				<Route path="/rentals" element={<RentalProperties />} />
 				<Route path="/rentals/:id" element={<RentalPropertyDetails />} />
+
+				{/* Sale Property Routes */}
 				<Route path="/buys" element={<SaleProperties />} />
 				<Route path="/buys/:id" element={<SellPropertyDetails />} />
 
-				<Route path="/about" element={<AboutUs />} />
+				{/* Auth & Account */}
 				<Route path="/signup" element={<Signup />} />
 				<Route
 					path="/SignupLocalComponent"
 					element={<SignupLocalComponent />}
 				/>
 				<Route path="/login" element={<Login />} />
+				<Route path="/reset-password/:token" element={<ResetPassword />} />
+				<Route path="/verify-email" element={<VerifyEmail />} />
 
+				{/* User Dashboard (Protected) */}
 				<Route
 					path="/dashboard"
 					element={
@@ -74,17 +88,24 @@ const App: React.FC = () => {
 					/>
 				</Route>
 
+				{/* Admin Dashboard (Protected) */}
 				<Route
-					path="/admin"
+					path="/admin/*"
 					element={
 						<ProtectedRoute allowedRoles={["admin"]}>
-							<AdminDashboard />
+							<AdminDashboardPage />
 						</ProtectedRoute>
 					}
-				/>
+				>
+					<Route index element={<Navigate to="/admin/home" replace />} />
+					<Route path="home" element={<HomeTab />} />
+					<Route path="posts" element={<ManagePosts />} />
+					<Route path="users" element={<ManageUsers />} />
+					<Route path="users/view-user/:id" element={<ViewUser />} />
+				</Route>
 
+				{/* Utility & Error Pages */}
 				<Route path="/access-denied" element={<NotFound404 />} />
-				<Route path="/verify-email" element={<VerifyEmail />} />
 			</Routes>
 			<ToastContainer position="top-center" autoClose={2000} newestOnTop />
 		</Router>
