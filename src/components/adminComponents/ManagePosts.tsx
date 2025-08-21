@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import {
 	Table,
 	TableBody,
@@ -21,7 +22,6 @@ import {
 	XCircle,
 	Clock,
 	HomeIcon,
-	User,
 	Building2,
 	MapPin,
 	IndianRupee,
@@ -41,7 +41,7 @@ import {
 } from "../../services/fetchFunctionsForAdmin";
 import { Skeleton } from "../ui/skeleton";
 
-import { IUniversalListingType } from "../../types/listingTypes";
+import { Post } from "../../services/fetchFunctionsForAdmin";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -50,6 +50,7 @@ import {
 } from "../ui/dropdown-menu";
 
 const ManagePosts = () => {
+	const navigate = useNavigate();
 	const [selectedStatus, setSelectedStatus] = useState<string>("all");
 	const [isActionLoading, setIsActionLoading] = useState<string | null>(null);
 
@@ -119,28 +120,65 @@ const ManagePosts = () => {
 		}
 	};
 
-	const formatPrice = (post: any) => {
-		if (post.intent === "rent") {
-			return post.pricePerFrequency
-				? `₹${post.pricePerFrequency.toLocaleString()}/${
-						post.frequency || "month"
-				  }`
+	const formatPrice = (post: Post) => {
+		const isRent = post.postType === "rent" || post.intent === "rent";
+
+		if (isRent) {
+			// For rent posts
+			if (post.pricePerFrequency && post.frequency) {
+				const frequencyText =
+					post.frequency === "day"
+						? "day"
+						: post.frequency === "week"
+						? "week"
+						: post.frequency === "month"
+						? "month"
+						: "year";
+				return `₹${post.pricePerFrequency.toLocaleString()}/${frequencyText}`;
+			}
+			// Fallback to legacy price field
+			return post.price
+				? `₹${post.price.toLocaleString()}/month`
 				: "Price not set";
+		} else {
+			// For sell posts
+			if (post.totalPrice) {
+				return `₹${Number(post.totalPrice).toLocaleString()}`;
+			}
+			if (post.pricePerUnit && post.unit) {
+				return `₹${post.pricePerUnit.toLocaleString()}/${post.unit}`;
+			}
+			// Fallback to legacy price field
+			return post.price ? `₹${post.price.toLocaleString()}` : "Price not set";
 		}
-		return post.totalPrice
-			? `₹${post.totalPrice.toLocaleString()}`
-			: post.price || "Price not set";
 	};
 
-	const getPropertyDetails = (post: IUniversalListingType) => {
-		const details: string[] = [];
-		if ("bedrooms" in post && post.bedrooms)
-			details.push(`${post.bedrooms} BHK`);
-		if ("builtUpArea" in post && post.builtUpArea)
-			details.push(`${post.builtUpArea} sq.ft`);
-		if ("shopArea" in post && post.shopArea)
-			details.push(`${post.shopArea} sq.ft`);
-		return details.join(" • ");
+	const formatCurrency = (amount: number | string) => {
+		const num = typeof amount === "string" ? Number(amount) : amount;
+		if (isNaN(num)) return "N/A";
+
+		// Format large numbers in Indian currency format
+		if (num >= 10000000) {
+			// 1 crore
+			return `₹${(num / 10000000).toFixed(1)}Cr`;
+		} else if (num >= 100000) {
+			// 1 lakh
+			return `₹${(num / 100000).toFixed(1)}L`;
+		} else if (num >= 1000) {
+			// 1 thousand
+			return `₹${(num / 1000).toFixed(1)}K`;
+		}
+		return `₹${num.toLocaleString()}`;
+	};
+
+	const getUserInitials = (name?: string) => {
+		if (!name) return "U";
+		return name
+			.split(" ")
+			.map((n) => n[0])
+			.join("")
+			.toUpperCase()
+			.slice(0, 2);
 	};
 
 	const StatsCard = ({
@@ -227,9 +265,10 @@ const ManagePosts = () => {
 									<TableHead className="min-w-[200px] ">
 										Title & Location
 									</TableHead>
-									<TableHead className="min-w-[200px]">
-										Price & Category
+									<TableHead className="min-w-[150px]">
+										Intent & Category
 									</TableHead>
+									<TableHead className="min-w-[150px]">Price & Type</TableHead>
 									<TableHead className="min-w-[180px] ">Created By</TableHead>
 									<TableHead className="min-w-[120px]">Status</TableHead>
 									<TableHead className="min-w-[150px]">Created At</TableHead>
@@ -240,13 +279,13 @@ const ManagePosts = () => {
 							<TableBody>
 								{isLoadingPosts ? (
 									<TableRow>
-										<TableCell colSpan={6}>
+										<TableCell colSpan={7}>
 											<Skeleton className="h-4 w-full" />
 										</TableCell>
 									</TableRow>
 								) : !posts?.length ? (
 									<TableRow>
-										<TableCell colSpan={6} className="text-center py-10">
+										<TableCell colSpan={7} className="text-center py-10">
 											<div className="flex flex-col items-center gap-2 text-muted-foreground">
 												<AlertCircle className="h-8 w-8" />
 												<p>No posts found</p>
@@ -254,7 +293,7 @@ const ManagePosts = () => {
 										</TableCell>
 									</TableRow>
 								) : (
-									posts.map((post: any) => (
+									posts.map((post: Post) => (
 										<TableRow key={post._id}>
 											<TableCell className="break-words whitespace-normal">
 												<div className="space-y-1">
@@ -272,42 +311,108 @@ const ManagePosts = () => {
 											</TableCell>
 											<TableCell>
 												<div className="space-y-1">
-													<div className="flex items-center gap-1">
-														<IndianRupee className="h-3 w-3" />
-														<span>{formatPrice(post)}</span>
-													</div>
-													<div className="text-sm text-muted-foreground flex items-center gap-1">
-														<Building2 className="h-3 w-3" />
-														<Badge variant="outline">
-															{post.propertyCategory}
+													<div className="text-sm font-medium">
+														<Badge variant="secondary" className="capitalize">
+															{post.intent || post.postType || "N/A"}
 														</Badge>
 													</div>
-													<div className="text-xs text-muted-foreground">
-														{getPropertyDetails(post)}
+													<div className="text-sm text-muted-foreground">
+														<Badge variant="outline" className="capitalize">
+															{post.propertyCategory ||
+																post.propertyType ||
+																"N/A"}
+														</Badge>
+													</div>
+												</div>
+											</TableCell>
+											<TableCell>
+												<div className="space-y-1">
+													<div className="flex items-center gap-1">
+														<IndianRupee className="h-3 w-3" />
+														<span className="font-medium">
+															{formatPrice(post)}
+														</span>
+													</div>
+													{/* Additional pricing details */}
+													{(post.intent === "sell" ||
+														post.postType === "sell") && (
+														<>
+															{post.pricePerUnit && post.unit && (
+																<div className="text-xs text-muted-foreground">
+																	{formatCurrency(post.pricePerUnit)}/
+																	{post.unit}
+																</div>
+															)}
+															{post.totalPrice && post.pricePerUnit && (
+																<div className="text-xs text-green-600 font-medium">
+																	Total: {formatCurrency(post.totalPrice)}
+																</div>
+															)}
+														</>
+													)}
+													{(post.intent === "rent" ||
+														post.postType === "rent") &&
+														post.frequency && (
+															<div className="text-xs text-muted-foreground capitalize">
+																{post.frequency}ly rental
+															</div>
+														)}
+													<div className="text-sm text-muted-foreground flex items-center gap-1">
+														<Building2 className="h-3 w-3" />
+														<Badge variant="outline">{post.propertyType}</Badge>
 													</div>
 												</div>
 											</TableCell>
 											<TableCell>
 												<div className="space-y-1">
 													<div className="flex items-center gap-2">
-														{post.user?.avatar ? (
-															<img
-																src={post.user.avatar}
-																alt="avatar"
-																className="w-6 h-6 rounded-full"
-															/>
-														) : (
-															<User className="h-4 w-4 text-muted-foreground" />
-														)}
-														<span className="truncate">
-															{post.user?.email || "Unknown"}
-														</span>
+														{/* Avatar display */}
+														<div className="flex-shrink-0">
+															{post.user?.avatar ? (
+																<img
+																	src={post.user.avatar}
+																	alt={post.user.name || "User"}
+																	className="w-8 h-8 rounded-full object-cover border border-gray-200"
+																	onError={(e) => {
+																		// Fallback to initials if image fails to load
+																		const target = e.target as HTMLImageElement;
+																		target.style.display = "none";
+																		const initialsDiv =
+																			target.nextElementSibling as HTMLDivElement;
+																		if (initialsDiv)
+																			initialsDiv.style.display = "flex";
+																	}}
+																/>
+															) : null}
+															<div
+																className={`w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-xs font-medium ${
+																	post.user?.avatar ? "hidden" : "flex"
+																}`}
+															>
+																{getUserInitials(post.user?.name)}
+															</div>
+														</div>
+														<div className="min-w-0 flex-1">
+															<span className="truncate font-medium block">
+																{post.user?.name || "Unknown User"}
+															</span>
+														</div>
 													</div>
 													<div className="text-xs text-muted-foreground flex items-center gap-1">
-														<span>{post.user?.name || "N/A"}</span>
-														<span>|</span>
-														<span>{post.user?.phoneNumber || "N/A"}</span>
+														<span>{post.user?.email || "N/A"}</span>
+														{post.user?.isVerified && (
+															<>
+																<span>|</span>
+																<CheckCircle2 className="h-3 w-3 text-green-500" />
+																<span>Verified</span>
+															</>
+														)}
 													</div>
+													{post.user?.phoneNumber && (
+														<div className="text-xs text-muted-foreground">
+															{post.user.phoneNumber}
+														</div>
+													)}
 												</div>
 											</TableCell>
 											<TableCell>
@@ -331,32 +436,28 @@ const ManagePosts = () => {
 													</DropdownMenuTrigger>
 													<DropdownMenuContent align="end">
 														<DropdownMenuItem
-															onClick={() => console.log("View", post._id)}
+															onClick={() =>
+																navigate(`/admin/posts/view-post/${post._id}`)
+															}
 														>
 															View
 														</DropdownMenuItem>
-
-														{post.approvalStatus === "pending" && (
-															<>
-																<DropdownMenuItem
-																	disabled={isActionLoading === post._id}
-																	onClick={() => handleApprove(post._id)}
-																	className="text-green-600"
-																>
-																	{isActionLoading === post._id
-																		? "Approving..."
-																		: "Approve"}
-																</DropdownMenuItem>
-
-																<DropdownMenuItem
-																	disabled={isActionLoading === post._id}
-																	onClick={() => handleReject(post._id)}
-																	className="text-red-600"
-																>
-																	Reject
-																</DropdownMenuItem>
-															</>
-														)}
+														<DropdownMenuItem
+															disabled={isActionLoading === post._id}
+															onClick={() => handleApprove(post._id)}
+															className="text-green-600"
+														>
+															{isActionLoading === post._id
+																? "Approving..."
+																: "Approve"}
+														</DropdownMenuItem>
+														<DropdownMenuItem
+															disabled={isActionLoading === post._id}
+															onClick={() => handleReject(post._id)}
+															className="text-red-600"
+														>
+															Reject
+														</DropdownMenuItem>
 													</DropdownMenuContent>
 												</DropdownMenu>
 											</TableCell>

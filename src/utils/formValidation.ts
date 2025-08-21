@@ -53,9 +53,9 @@ export const validateForm = (
 		isValid = false;
 	}
 
-	// Phone validation (expects only 9 digits as input, without +91)
-	if (!/^\d{9}$/.test(formData.phone)) {
-		errors.phone = "Phone number must be 9 digits.";
+	// Phone validation (expects only 10 digits as input, without +91)
+	if (!/^\d{10}$/.test(formData.phone)) {
+		errors.phone = "Phone number must be 10 digits.";
 		isValid = false;
 	}
 

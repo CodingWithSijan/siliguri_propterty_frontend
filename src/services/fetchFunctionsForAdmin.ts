@@ -36,12 +36,34 @@ export interface Post {
 	_id: string;
 	title: string;
 	location: string;
-	price: number;
 	propertyType: string;
 	postType: "rent" | "sell";
+	intent: "rent" | "sell";
+	propertyCategory: "land" | "house" | "flat" | "shop";
 	approvalStatus: "approved" | "rejected" | "pending";
 	createdAt: string;
 	updatedAt: string;
+
+	// Legacy price field (for backward compatibility)
+	price?: number;
+
+	// Sell post specific pricing
+	pricePerUnit?: number;
+	totalPrice?: number;
+	unit?: string;
+
+	// Rent post specific pricing
+	frequency?: "day" | "week" | "month" | "year";
+	pricePerFrequency?: number;
+
+	user?: {
+		_id: string;
+		name: string;
+		email: string;
+		phoneNumber?: string;
+		avatar?: string;
+		isVerified: boolean;
+	};
 }
 export const deleteUserById = async (userId: string) => {
 	try {

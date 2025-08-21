@@ -1,18 +1,16 @@
 import Footer from "../components/header_and_footer/Footer";
 import Navbar from "../components/header_and_footer/Navbar";
 import HeroSection from "../components/homepage/HeroSection";
-import HomepageAboutWebapp from "../components/homepage/HomepageAboutWebapp";
-import HomepagePropertySearchFilter from "../components/homepage/HomepagePropertySearchFilter";
 import NewListings from "../components/homepage/NewListings";
+import PropertyStatsSection from "../components/homepage/PropertyStatsSection";
 
 const Homepage = () => {
 	return (
-		<div>
+		<div className="overflow-x-hidden">
 			<Navbar />
 			<HeroSection />
-			<HomepagePropertySearchFilter />
 			<NewListings />
-			<HomepageAboutWebapp />
+			<PropertyStatsSection />
 			<Footer />
 		</div>
 	);

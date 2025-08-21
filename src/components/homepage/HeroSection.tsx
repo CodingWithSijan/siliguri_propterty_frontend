@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import HeroSectionImage1Background from "../../assets/image1_hero_section.jpg";
 import HeroSectionImage2Background from "../../assets/image2_hero_section.jpg";
 import { motion, AnimatePresence } from "framer-motion";
+import HomepagePropertySearchFilter from "./HomepagePropertySearchFilter";
 
 const HeroSection: React.FC = () => {
 	const [currentSlide, setCurrentSlide] = useState(0);
@@ -55,34 +56,59 @@ const HeroSection: React.FC = () => {
 
 			{/* Content */}
 			<div className="relative z-20 h-full flex flex-col items-center justify-center px-4">
+				{/* Hero Text */}
 				<motion.div
 					initial={{ opacity: 0, y: 20 }}
 					animate={{ opacity: 1, y: 0 }}
 					transition={{ duration: 0.5, delay: 0.2 }}
-					className="text-center mb-8"
+					className="text-center mb-12"
 				>
-					<h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4">
+					<h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 drop-shadow-lg">
 						{slides[currentSlide].text}
 					</h1>
-					<p className="text-xl text-gray-200">
+					<p className="text-xl text-gray-200 drop-shadow-md">
 						{slides[currentSlide].subtext}
 					</p>
 				</motion.div>
 
-				{/* Search Bar */}
+				{/* Interactive Search Filter */}
+				<motion.div
+					initial={{ opacity: 0, y: 30 }}
+					animate={{ opacity: 1, y: 0 }}
+					transition={{ duration: 0.6, delay: 0.4 }}
+					className="w-full max-w-6xl px-4"
+				>
+					<div className="backdrop-blur-md bg-white/10 rounded-2xl border border-white/20 shadow-2xl p-1">
+						<div className="bg-white/95 backdrop-blur-sm rounded-xl shadow-lg">
+							<HomepagePropertySearchFilter />
+						</div>
+					</div>
+				</motion.div>
+
+				{/* Interactive Stats or Quick Actions */}
 				<motion.div
 					initial={{ opacity: 0, y: 20 }}
 					animate={{ opacity: 1, y: 0 }}
-					transition={{ duration: 0.5, delay: 0.4 }}
-					className="w-full max-w-3xl"
+					transition={{ duration: 0.5, delay: 0.6 }}
+					className="mt-8 flex flex-wrap justify-center gap-6"
 				>
-					<div className="flex w-full gap-4 justify-center items-center">
-						<button className="p-4 bg-blue-600 text-white font-bold rounded-lg">
-							Browse Properties
-						</button>
-						<button className="p-4 bg-white text-blue-600 border-2 border-blue-600 font-bold rounded-lg">
-							List Your Property
-						</button>
+					<div className="bg-white/10 backdrop-blur-md rounded-xl px-6 py-3 border border-white/20">
+						<div className="text-center">
+							<div className="text-2xl font-bold text-white">10+</div>
+							<div className="text-sm text-gray-200">Properties Listed</div>
+						</div>
+					</div>
+					<div className="bg-white/10 backdrop-blur-md rounded-xl px-6 py-3 border border-white/20">
+						<div className="text-center">
+							<div className="text-2xl font-bold text-white">10+</div>
+							<div className="text-sm text-gray-200">Happy Customers</div>
+						</div>
+					</div>
+					<div className="bg-white/10 backdrop-blur-md rounded-xl px-6 py-3 border border-white/20">
+						<div className="text-center">
+							<div className="text-2xl font-bold text-white">20+</div>
+							<div className="text-sm text-gray-200">Areas Covered</div>
+						</div>
 					</div>
 				</motion.div>
 
@@ -92,10 +118,10 @@ const HeroSection: React.FC = () => {
 						<button
 							key={index}
 							onClick={() => setCurrentSlide(index)}
-							className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${
+							className={`w-3 h-3 rounded-full transition-all duration-300 backdrop-blur-sm ${
 								index === currentSlide
-									? "bg-white w-8"
-									: "bg-white/50 hover:bg-white/75"
+									? "bg-white w-10 shadow-lg"
+									: "bg-white/50 hover:bg-white/75 hover:scale-110"
 							}`}
 						/>
 					))}

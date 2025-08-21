@@ -26,12 +26,14 @@ import SaleProperties from "./pages/SaleProperties";
 import AboutUs from "./components/homepage/AboutUs";
 import RentalPropertyDetails from "./pages/RentalPropertyDetails";
 import SellPropertyDetails from "./pages/SellPropertyDetails";
+import AllListings from "./pages/AllListings";
 import ResetPassword from "./pages/ResetPassword";
 import AdminDashboardPage from "./pages/AdminDashboardPage";
 import HomeTab from "./components/adminComponents/HomeTab";
 import ManagePosts from "./components/adminComponents/ManagePosts";
 import ManageUsers from "./components/adminComponents/ManageUsers";
 import ViewUser from "./components/adminComponents/ViewUser";
+import ViewPost from "./components/adminComponents/ViewPost";
 
 const App: React.FC = () => {
 	return (
@@ -50,6 +52,9 @@ const App: React.FC = () => {
 				{/* Sale Property Routes */}
 				<Route path="/buys" element={<SaleProperties />} />
 				<Route path="/buys/:id" element={<SellPropertyDetails />} />
+
+				{/* All Properties Route */}
+				<Route path="/properties" element={<AllListings />} />
 
 				{/* Auth & Account */}
 				<Route path="/signup" element={<Signup />} />
@@ -100,6 +105,7 @@ const App: React.FC = () => {
 					<Route index element={<Navigate to="/admin/home" replace />} />
 					<Route path="home" element={<HomeTab />} />
 					<Route path="posts" element={<ManagePosts />} />
+					<Route path="posts/view-post/:id" element={<ViewPost />} />
 					<Route path="users" element={<ManageUsers />} />
 					<Route path="users/view-user/:id" element={<ViewUser />} />
 				</Route>

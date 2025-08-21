@@ -64,28 +64,39 @@ const Navbar: React.FC = () => {
 	};
 
 	return (
-		<nav className="bg-white shadow-sm sticky top-0 z-50 opacity-90">
+		<nav className="bg-white/95 backdrop-blur-md shadow-lg sticky top-0 z-50 border-b border-gray-200">
 			<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 				<div className="flex justify-between h-16 items-center">
 					{/* Logo */}
 					<NavLink
 						to="/"
-						className="relative h-14 w-14 sm:h-16 sm:w-16 transition-transform hover:scale-105"
+						className="relative h-14 w-14 sm:h-16 sm:w-16 transition-all duration-300 hover:scale-110 hover:rotate-3"
 					>
 						<img
 							src={siliguri_property_logo_noBG}
 							alt="Logo"
-							className="w-full h-full object-contain"
+							className="w-full h-full object-contain drop-shadow-sm"
 						/>
 					</NavLink>
-					{/* New: Main navigation links */}
-					<div className="hidden md:flex items-center space-x-6 ml-6">
+
+					{/* Main navigation links */}
+					<div className="hidden md:flex items-center space-x-8 ml-8">
+						<NavLink
+							to="/properties"
+							className={({ isActive }) =>
+								isActive
+									? "text-blue-600 font-semibold bg-blue-50 px-3 py-2 rounded-lg"
+									: "text-gray-700 hover:text-blue-600 hover:bg-gray-50 px-3 py-2 rounded-lg font-medium transition-all duration-200"
+							}
+						>
+							All Properties
+						</NavLink>
 						<NavLink
 							to="/rentals"
 							className={({ isActive }) =>
 								isActive
-									? "text-blue-600 font-semibold"
-									: "text-gray-700 hover:text-blue-600 font-medium transition-colors"
+									? "text-blue-600 font-semibold bg-blue-50 px-3 py-2 rounded-lg"
+									: "text-gray-700 hover:text-blue-600 hover:bg-gray-50 px-3 py-2 rounded-lg font-medium transition-all duration-200"
 							}
 						>
 							Property for rent
@@ -94,8 +105,8 @@ const Navbar: React.FC = () => {
 							to="/buys"
 							className={({ isActive }) =>
 								isActive
-									? "text-blue-600 font-semibold"
-									: "text-gray-700 hover:text-blue-600 font-medium transition-colors"
+									? "text-blue-600 font-semibold bg-blue-50 px-3 py-2 rounded-lg"
+									: "text-gray-700 hover:text-blue-600 hover:bg-gray-50 px-3 py-2 rounded-lg font-medium transition-all duration-200"
 							}
 						>
 							Property for sale
@@ -104,13 +115,14 @@ const Navbar: React.FC = () => {
 							to="/about"
 							className={({ isActive }) =>
 								isActive
-									? "text-blue-600 font-semibold"
-									: "text-gray-700 hover:text-blue-600 font-medium transition-colors"
+									? "text-blue-600 font-semibold bg-blue-50 px-3 py-2 rounded-lg"
+									: "text-gray-700 hover:text-blue-600 hover:bg-gray-50 px-3 py-2 rounded-lg font-medium transition-all duration-200"
 							}
 						>
 							About Us
 						</NavLink>
 					</div>
+
 					<PostYourPropertyButton />
 					{/* Desktop Menu */}
 					<div className="hidden md:flex items-center space-x-4">
@@ -119,21 +131,21 @@ const Navbar: React.FC = () => {
 								<motion.div
 									whileHover={{ scale: 1.05 }}
 									whileTap={{ scale: 0.95 }}
-									className="flex items-center space-x-3 cursor-pointer"
+									className="flex items-center space-x-3 cursor-pointer bg-gradient-to-r from-blue-50 to-purple-50 px-4 py-2 rounded-xl border border-gray-200 hover:border-blue-300 transition-all duration-200"
 									onClick={() => setDropdownOpen(!dropdownOpen)}
 								>
 									{user.avatar ? (
 										<img
-											className="w-10 h-10 rounded-full border-2 border-blue-500 p-0.5"
+											className="w-10 h-10 rounded-full border-2 border-blue-500 p-0.5 shadow-md"
 											src={user.avatar}
 											alt={user.name}
 										/>
 									) : (
-										<div className="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold ring-2 ring-blue-500 ring-offset-2">
+										<div className="w-10 h-10 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 text-white flex items-center justify-center font-bold ring-2 ring-blue-400 ring-offset-2 ring-offset-white shadow-md">
 											{getInitials(user?.name ?? "")}
 										</div>
 									)}
-									<span className="text-gray-700 font-medium">
+									<span className="text-gray-800 font-medium">
 										{formatFullName(user?.name)}
 									</span>
 								</motion.div>
@@ -150,11 +162,11 @@ const Navbar: React.FC = () => {
 								>
 									<div
 										ref={desktopMenuDropdownRef}
-										className="absolute right-0 mt-3 w-48 bg-white rounded-xl shadow-lg py-2 z-50 ring-1 ring-black ring-opacity-5"
+										className="absolute right-0 mt-3 w-56 bg-white rounded-xl shadow-xl py-2 z-50 ring-1 ring-gray-200 border border-gray-200"
 									>
 										<NavLink
 											to={user.role === "user" ? "/dashboard" : "/admin"}
-											className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+											className="block px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 rounded-lg mx-2 transition-colors"
 										>
 											{user.role === "user"
 												? "User Dashboard"
@@ -162,7 +174,7 @@ const Navbar: React.FC = () => {
 										</NavLink>
 										<button
 											onClick={handleLogout}
-											className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50"
+											className="block w-full text-left px-4 py-3 text-sm text-red-600 hover:bg-red-50 rounded-lg mx-2 transition-colors"
 										>
 											Logout
 										</button>
@@ -173,13 +185,13 @@ const Navbar: React.FC = () => {
 							<>
 								<NavLink
 									to="/login"
-									className="text-gray-700 hover:text-blue-600 font-medium transition-colors"
+									className="text-gray-700 hover:text-blue-600 hover:bg-gray-100 px-4 py-2 rounded-lg font-medium transition-all duration-200"
 								>
 									Login
 								</NavLink>
 								<NavLink
 									to="/signup"
-									className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors font-medium"
+									className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-2 rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-200 font-medium shadow-md hover:shadow-lg"
 								>
 									Sign Up
 								</NavLink>
@@ -192,7 +204,7 @@ const Navbar: React.FC = () => {
 						<button
 							onClick={() => setIsOpen(!isOpen)}
 							type="button"
-							className="text-gray-700 hover:text-blue-600 focus:outline-none p-2"
+							className="text-gray-600 hover:text-gray-900 hover:bg-gray-100 focus:outline-none p-2 rounded-lg transition-all duration-200"
 						>
 							{isOpen ? (
 								<XMarkIcon className="h-6 w-6" />
@@ -215,12 +227,12 @@ const Navbar: React.FC = () => {
 				leaveTo="opacity-0 -translate-y-1"
 			>
 				<div
-					className="md:hidden px-4 pt-4 pb-6 bg-white shadow-lg rounded-b-2xl border-t border-blue-100"
+					className="md:hidden px-4 pt-4 pb-6 bg-white shadow-xl rounded-b-2xl border-t border-gray-200"
 					ref={mobileMenuRef}
 				>
 					{user ? (
 						<div className="space-y-4">
-							<div className="flex items-center space-x-3 px-4 py-2 border-b border-gray-100 mb-2">
+							<div className="flex items-center space-x-3 px-4 py-2 border-b border-gray-200 mb-2">
 								{user.avatar ? (
 									<img
 										className="w-10 h-10 rounded-full border-2 border-blue-500"
@@ -232,21 +244,35 @@ const Navbar: React.FC = () => {
 										{getInitials(user?.name ?? "")}
 									</div>
 								)}
-								<span className="text-gray-700 font-medium text-base">
+								<span className="text-gray-800 font-medium text-base">
 									{formatFullName(user?.name)}
 								</span>
 							</div>
 							<div className="mb-2">
-								<p className="text-xs text-gray-400 font-semibold uppercase tracking-wider px-4 mb-1 mt-2">
+								<p className="text-xs text-gray-500 font-semibold uppercase tracking-wider px-4 mb-1 mt-2">
 									Navigation
 								</p>
-								<div className="space-y-1 divide-y divide-gray-100">
+								<div className="space-y-1 divide-y divide-gray-200">
+									<NavLink
+										to="/properties"
+										className={({ isActive }) =>
+											(isActive
+												? "block w-full text-blue-600 font-semibold px-4 py-2 bg-blue-50 rounded-lg"
+												: "block w-full text-gray-700 hover:bg-gray-100 rounded-lg px-4 py-2 transition-colors") +
+											" flex items-center gap-2"
+										}
+									>
+										<span role="img" aria-label="all properties">
+											🏘️
+										</span>{" "}
+										All Properties
+									</NavLink>
 									<NavLink
 										to="/rentals"
 										className={({ isActive }) =>
 											(isActive
 												? "block w-full text-blue-600 font-semibold px-4 py-2 bg-blue-50 rounded-lg"
-												: "block w-full text-gray-700 hover:bg-blue-50 rounded-lg px-4 py-2 transition-colors") +
+												: "block w-full text-gray-700 hover:bg-gray-100 rounded-lg px-4 py-2 transition-colors") +
 											" flex items-center gap-2"
 										}
 									>
@@ -260,7 +286,7 @@ const Navbar: React.FC = () => {
 										className={({ isActive }) =>
 											(isActive
 												? "block w-full text-blue-600 font-semibold px-4 py-2 bg-blue-50 rounded-lg"
-												: "block w-full text-gray-700 hover:bg-blue-50 rounded-lg px-4 py-2 transition-colors") +
+												: "block w-full text-gray-700 hover:bg-gray-100 rounded-lg px-4 py-2 transition-colors") +
 											" flex items-center gap-2"
 										}
 									>
@@ -274,7 +300,7 @@ const Navbar: React.FC = () => {
 										className={({ isActive }) =>
 											(isActive
 												? "block w-full text-blue-600 font-semibold px-4 py-2 bg-blue-50 rounded-lg"
-												: "block w-full text-gray-700 hover:bg-blue-50 rounded-lg px-4 py-2 transition-colors") +
+												: "block w-full text-gray-700 hover:bg-gray-100 rounded-lg px-4 py-2 transition-colors") +
 											" flex items-center gap-2"
 										}
 									>
@@ -314,6 +340,20 @@ const Navbar: React.FC = () => {
 									Navigation
 								</p>
 								<div className="space-y-1 divide-y divide-gray-100">
+									<NavLink
+										to="/properties"
+										className={({ isActive }) =>
+											(isActive
+												? "block w-full text-blue-600 font-semibold px-4 py-2 bg-blue-50 rounded-lg"
+												: "block w-full text-gray-700 hover:bg-blue-50 rounded-lg px-4 py-2 transition-colors") +
+											" flex items-center gap-2"
+										}
+									>
+										<span role="img" aria-label="all properties">
+											🏘️
+										</span>{" "}
+										All Properties
+									</NavLink>
 									<NavLink
 										to="/rentals"
 										className={({ isActive }) =>
