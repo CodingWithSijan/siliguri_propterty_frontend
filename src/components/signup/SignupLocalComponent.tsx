@@ -22,11 +22,13 @@ const SignupLocalComponent: React.FC = () => {
 		confirmPassword: "",
 	});
 
+	const [isLoading, setIsLoading] = useState(false);
+
 	const navigate = useNavigate();
 
 	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const { name, value } = e.target;
-		if (name === "phone" && !/^\d{0,9}$/.test(value)) return;
+		if (name === "phone" && !/^\d{0,10}$/.test(value)) return;
 		setFormData((prev) => ({ ...prev, [name]: value }));
 	};
 
@@ -40,6 +42,7 @@ const SignupLocalComponent: React.FC = () => {
 		}
 
 		try {
+			setIsLoading(true);
 			await BASE_URL.post("/api/auth/register", {
 				name: formData.name,
 				email: formData.email,
@@ -49,12 +52,19 @@ const SignupLocalComponent: React.FC = () => {
 
 			showSuccess("User Signup Successful.");
 			navigate("/login");
-		} catch (error: any) {
-			if (error.response?.data?.message) {
-				showError(error.response.data.message);
-			} else {
-				showError("Something went wrong. Please try again.");
-			}
+		} catch (error: unknown) {
+			const apiMessage =
+				typeof error === "object" &&
+				error !== null &&
+				"response" in error &&
+				// @ts-expect-error runtime guard
+				error.response?.data?.message
+					? // @ts-expect-error runtime guard
+					  error.response.data.message
+					: null;
+			showError(apiMessage || "Something went wrong. Please try again.");
+		} finally {
+			setIsLoading(false);
 		}
 	};
 
@@ -75,7 +85,8 @@ const SignupLocalComponent: React.FC = () => {
 					value={formData.name}
 					onChange={handleChange}
 					required
-					className="w-full px-4 py-2 mt-1 text-sm border rounded-md border-gray-300 focus:ring-blue-500 focus:border-blue-500"
+					disabled={isLoading}
+					className="w-full px-4 py-2 mt-1 text-sm border rounded-md border-gray-300 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
 					placeholder="Your full name"
 				/>
 				{errors.name && <p className="text-sm text-red-500">{errors.name}</p>}
@@ -96,7 +107,8 @@ const SignupLocalComponent: React.FC = () => {
 					value={formData.email}
 					onChange={handleChange}
 					required
-					className="w-full px-4 py-2 mt-1 text-sm border rounded-md border-gray-300 focus:ring-blue-500 focus:border-blue-500"
+					disabled={isLoading}
+					className="w-full px-4 py-2 mt-1 text-sm border rounded-md border-gray-300 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
 					placeholder="you@example.com"
 				/>
 				{errors.email && <p className="text-sm text-red-500">{errors.email}</p>}
@@ -118,12 +130,13 @@ const SignupLocalComponent: React.FC = () => {
 						type="text"
 						name="phone"
 						id="phone"
-						maxLength={9}
+						maxLength={10}
 						value={formData.phone}
 						onChange={handleChange}
 						required
-						className="w-full px-4 py-2 text-sm border rounded-r-md border-gray-300 focus:ring-blue-500 focus:border-blue-500"
-						placeholder="9-digit number"
+						disabled={isLoading}
+						className="w-full px-4 py-2 text-sm border rounded-r-md border-gray-300 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+						placeholder="10-digit number"
 					/>
 				</div>
 				{errors.phone && <p className="text-sm text-red-500">{errors.phone}</p>}
@@ -144,7 +157,8 @@ const SignupLocalComponent: React.FC = () => {
 					value={formData.password}
 					onChange={handleChange}
 					required
-					className="w-full px-4 py-2 mt-1 text-sm border rounded-md border-gray-300 focus:ring-blue-500 focus:border-blue-500"
+					disabled={isLoading}
+					className="w-full px-4 py-2 mt-1 text-sm border rounded-md border-gray-300 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
 					placeholder="Minimum 6 characters"
 				/>
 				{errors.password && (
@@ -167,7 +181,8 @@ const SignupLocalComponent: React.FC = () => {
 					value={formData.confirmPassword}
 					onChange={handleChange}
 					required
-					className="w-full px-4 py-2 mt-1 text-sm border rounded-md border-gray-300 focus:ring-blue-500 focus:border-blue-500"
+					disabled={isLoading}
+					className="w-full px-4 py-2 mt-1 text-sm border rounded-md border-gray-300 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
 					placeholder="Re-enter password"
 				/>
 				{errors.confirmPassword && (
@@ -178,9 +193,16 @@ const SignupLocalComponent: React.FC = () => {
 			{/* Submit */}
 			<button
 				type="submit"
-				className="w-full px-4 py-2 text-white bg-blue-600 hover:bg-blue-700 rounded-md text-sm font-medium transition duration-200"
+				disabled={isLoading}
+				className="relative w-full px-4 py-2 text-white bg-blue-600 hover:bg-blue-700 rounded-md text-sm font-medium transition duration-200 disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
 			>
-				Create Account
+				{isLoading && (
+					<span
+						className="inline-block w-4 h-4 border-2 border-white/60 border-t-white rounded-full animate-spin"
+						aria-hidden="true"
+					/>
+				)}
+				{isLoading ? "Registering..." : "Create Account"}
 			</button>
 		</form>
 	);

@@ -80,14 +80,17 @@ const Image_UserDetails: React.FC<{
 				</div>
 
 				{/* Phone */}
-				<div className="flex items-center gap-2 bg-white rounded-lg px-3 py-2 shadow-sm border border-gray-200/60">
+				<a
+					href={`tel:${user?.phone}`}
+					className="flex items-center gap-2 bg-white rounded-lg px-3 py-2 shadow-sm border border-gray-200/60 hover:bg-blue-50 hover:border-blue-300 transition-colors cursor-pointer"
+				>
 					<div className="w-5 h-5 bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg flex items-center justify-center">
 						<FaPhoneAlt className="text-white text-xs" />
 					</div>
 					<span className="font-medium text-gray-900 text-sm sm:text-base">
 						{user?.phone}
 					</span>
-				</div>
+				</a>
 			</div>
 
 			{/* Listing Image */}
