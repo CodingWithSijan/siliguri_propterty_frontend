@@ -13,10 +13,18 @@ import {
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { ISellListingType } from "../types/listingTypes";
 import BASE_URL from "../services";
+import { ClipLoader } from "react-spinners";
 
+const loaderStyle: React.CSSProperties = {
+	display: "block",
+	margin: "40px auto",
+	borderColor: "#2563eb",
+};
 const SellProperties: React.FC = () => {
 	const [posts, setPosts] = useState<ISellListingType[]>([]);
 	const [totalPages, setTotalPages] = useState(1);
+	const [loading, setLoading] = useState(false);
+
 	const [searchParams, setSearchParams] = useSearchParams();
 	const navigate = useNavigate();
 
@@ -24,9 +32,11 @@ const SellProperties: React.FC = () => {
 
 	useEffect(() => {
 		const fetchPosts = async () => {
+			setLoading(true);
+
 			try {
 				const res = await BASE_URL.get("api/user/post/sell-properties", {
-					params: { page: currentPage, limit: 9 },
+					params: { page: currentPage, limit: 8 },
 				});
 
 				console.log(res.data.sells);
@@ -35,6 +45,8 @@ const SellProperties: React.FC = () => {
 				setTotalPages(res.data.totalPages || 1);
 			} catch (err) {
 				console.error("Error fetching posts", err);
+			} finally {
+				setLoading(false);
 			}
 		};
 		fetchPosts();
@@ -91,50 +103,63 @@ const SellProperties: React.FC = () => {
 		<>
 			<Navbar />
 			<div className="max-w-7xl mx-auto px-4 py-8">
-				<h1 className="text-2xl font-bold mb-6 text-gray-800">
-					Sale Properties
-				</h1>
-				<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-8">
-					{posts.length === 0 ? (
-						<div className="col-span-full text-center text-gray-500">
-							No rental properties found.
+				<h1 className="text-2xl font-bold mb-6 text-gray-800">For Sale</h1>
+				{loading ? (
+					<div className="flex justify-center items-center min-h-[200px]">
+						<ClipLoader
+							cssOverride={loaderStyle}
+							size={80}
+							color={"#2563eb"}
+							loading={loading}
+							aria-label="Loading Spinner"
+							data-testid="loader"
+						/>
+					</div>
+				) : (
+					<>
+						<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-8">
+							{posts.length === 0 ? (
+								<div className="col-span-full text-center text-gray-500">
+									No listing found.
+								</div>
+							) : (
+								posts.map((post) => (
+									<SellListingCard
+										key={post._id}
+										listing={post}
+										onClick={() => navigate(`/buys/${post._id}`)}
+										userOrGlobal="global"
+									/>
+								))
+							)}
 						</div>
-					) : (
-						posts.map((post) => (
-							<SellListingCard
-								key={post._id}
-								listing={post}
-								onClick={() => navigate(`/buys/${post._id}`)}
-								userOrGlobal="global"
-							/>
-						))
-					)}
-				</div>
-				<Pagination>
-					<PaginationContent>
-						<PaginationItem>
-							<PaginationPrevious
-								href={`?page=${currentPage - 1}`}
-								size="default"
-								onClick={(e) => {
-									e.preventDefault();
-									goToPage(currentPage - 1);
-								}}
-							/>
-						</PaginationItem>
-						{renderPageLinks()}
-						<PaginationItem>
-							<PaginationNext
-								href={`?page=${currentPage + 1}`}
-								size="default"
-								onClick={(e) => {
-									e.preventDefault();
-									goToPage(currentPage + 1);
-								}}
-							/>
-						</PaginationItem>
-					</PaginationContent>
-				</Pagination>
+						<Pagination>
+							<PaginationContent>
+								<PaginationItem>
+									<PaginationPrevious
+										href={`?page=${currentPage - 1}`}
+										size="default"
+										onClick={(e) => {
+											e.preventDefault();
+											goToPage(currentPage - 1);
+										}}
+									/>
+								</PaginationItem>
+								{renderPageLinks()}
+								<PaginationItem>
+									<PaginationNext
+										href={`?page=${currentPage + 1}`}
+										size="default"
+										onClick={(e) => {
+											e.preventDefault();
+											goToPage(currentPage + 1);
+										}}
+									/>
+								</PaginationItem>
+							</PaginationContent>
+						</Pagination>
+					</>
+				)}
 			</div>
 		</>
 	);

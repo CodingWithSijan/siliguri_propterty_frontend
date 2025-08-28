@@ -23,7 +23,6 @@ import YourProfile from "./user/dashboard/YourProfile";
 import EditPostPage from "./pages/EditPostPage";
 import RentalProperties from "./pages/RentalProperties";
 import SaleProperties from "./pages/SaleProperties";
-import AboutUs from "./components/homepage/AboutUs";
 import RentalPropertyDetails from "./pages/RentalPropertyDetails";
 import SellPropertyDetails from "./pages/SellPropertyDetails";
 import AllListings from "./pages/AllListings";
@@ -34,6 +33,7 @@ import ManagePosts from "./components/adminComponents/ManagePosts";
 import ManageUsers from "./components/adminComponents/ManageUsers";
 import ViewUser from "./components/adminComponents/ViewUser";
 import ViewPost from "./components/adminComponents/ViewPost";
+import AboutUs from "./pages/AboutUs";
 
 const App: React.FC = () => {
 	return (

@@ -48,7 +48,7 @@ const AllListings: React.FC = () => {
 			setLoading(true);
 			try {
 				const res = await BASE_URL.get("api/user/post/rent-sell-listings", {
-					params: { page: currentPage, limit: 9 },
+					params: { page: currentPage, limit: 8 },
 				});
 
 				setPosts(res.data.listings || []);
@@ -116,9 +116,7 @@ const AllListings: React.FC = () => {
 				<h1 className="text-2xl font-bold mb-6 text-gray-800">
 					All Properties
 				</h1>
-				<p className="text-gray-600 mb-6">
-					Browse all available properties for rent and sale in Siliguri
-				</p>
+
 				{loading ? (
 					<div className="flex justify-center items-center min-h-[200px]">
 						<ClipLoader
@@ -135,7 +133,7 @@ const AllListings: React.FC = () => {
 						<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-8">
 							{posts.length === 0 ? (
 								<div className="col-span-full text-center text-gray-500">
-									No properties found.
+									No listing found.
 								</div>
 							) : (
 								posts.map((post) => (
