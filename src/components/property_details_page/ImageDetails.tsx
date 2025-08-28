@@ -1,15 +1,12 @@
 import React, { useState } from "react";
-import { IListingUserDetails } from "../../types/listingUserDetails";
-import { formatFullName } from "../../utils/capitalizeName";
 import {
-	FaPhoneAlt,
 	FaTimes,
 	FaChevronLeft,
 	FaChevronRight,
 	FaExpand,
 } from "react-icons/fa";
 import propertyImagePlaceholder from "../../assets/looking_for_rent.png";
-import { getInitials } from "../../utils/getInitial";
+
 import {
 	Dialog,
 	DialogContent,
@@ -19,10 +16,9 @@ import {
 	DialogTrigger,
 } from "../ui/dialog";
 const Image_UserDetails: React.FC<{
-	user: IListingUserDetails | null;
 	listing_images: string[] | undefined;
 	listing_title: string | "";
-}> = ({ user, listing_images, listing_title }) => {
+}> = ({ listing_images, listing_title }) => {
 	const [currentImageIndex, setCurrentImageIndex] = useState(0);
 	const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -59,40 +55,6 @@ const Image_UserDetails: React.FC<{
 	};
 	return (
 		<div className="w-full overflow-hidden border border-gray-200/60 shadow-sm bg-white">
-			{/* User Info Bar */}
-			<div className="flex justify-between items-center px-4 py-3 bg-gradient-to-r from-slate-50 to-gray-100 border-b border-gray-200/60">
-				{/* Avatar + Name */}
-				<div className="flex items-center gap-3">
-					{user?.avatar ? (
-						<img
-							src={user.avatar}
-							alt={user.name}
-							className="w-8 h-8 rounded-lg object-cover border border-white shadow-sm"
-						/>
-					) : (
-						<div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-600 to-blue-700 text-white flex items-center justify-center font-bold text-sm shadow-sm">
-							{getInitials(user?.name ?? "")}
-						</div>
-					)}
-					<span className="text-sm sm:text-base font-medium text-gray-900">
-						{formatFullName(user?.name)}
-					</span>
-				</div>
-
-				{/* Phone */}
-				<a
-					href={`tel:${user?.phone}`}
-					className="flex items-center gap-2 bg-white rounded-lg px-3 py-2 shadow-sm border border-gray-200/60 hover:bg-blue-50 hover:border-blue-300 transition-colors cursor-pointer"
-				>
-					<div className="w-5 h-5 bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg flex items-center justify-center">
-						<FaPhoneAlt className="text-white text-xs" />
-					</div>
-					<span className="font-medium text-gray-900 text-sm sm:text-base">
-						{user?.phone}
-					</span>
-				</a>
-			</div>
-
 			{/* Listing Image */}
 			<div className="relative w-full h-56 sm:h-64 md:h-72 lg:h-80 bg-gray-100">
 				<Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
@@ -100,7 +62,7 @@ const Image_UserDetails: React.FC<{
 						<img
 							src={images[0]}
 							alt={listing_title}
-							className="w-full h-full object-cover cursor-pointer hover:opacity-95 transition-opacity"
+							className="w-full h-full object-cover cursor-pointer"
 							onClick={() => handleImageClick(0)}
 							onError={(e) => {
 								const target = e.target as HTMLImageElement;
@@ -126,7 +88,7 @@ const Image_UserDetails: React.FC<{
 									</span>
 									<button
 										onClick={() => setIsModalOpen(false)}
-										className="text-white/80 hover:text-white p-2 rounded-full hover:bg-white/10 transition-colors"
+										className="text-white/80 p-2 rounded-full"
 									>
 										<FaTimes className="w-5 h-5" />
 									</button>
@@ -151,13 +113,13 @@ const Image_UserDetails: React.FC<{
 								<>
 									<button
 										onClick={prevImage}
-										className="absolute left-4 top-1/2 -translate-y-1/2 text-white/80 hover:text-white bg-black/30 hover:bg-black/50 p-3 rounded-full transition-all backdrop-blur-sm"
+										className="absolute left-4 top-1/2 -translate-y-1/2 text-white/80 bg-black/30 p-3 rounded-full backdrop-blur-sm"
 									>
 										<FaChevronLeft className="w-6 h-6" />
 									</button>
 									<button
 										onClick={nextImage}
-										className="absolute right-4 top-1/2 -translate-y-1/2 text-white/80 hover:text-white bg-black/30 hover:bg-black/50 p-3 rounded-full transition-all backdrop-blur-sm"
+										className="absolute right-4 top-1/2 -translate-y-1/2 text-white/80 bg-black/30 p-3 rounded-full backdrop-blur-sm"
 									>
 										<FaChevronRight className="w-6 h-6" />
 									</button>
@@ -173,10 +135,10 @@ const Image_UserDetails: React.FC<{
 										<button
 											key={index}
 											onClick={() => setCurrentImageIndex(index)}
-											className={`flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 transition-all ${
+											className={`flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 ${
 												index === currentImageIndex
 													? "border-white shadow-lg"
-													: "border-white/30 hover:border-white/60"
+													: "border-white/30"
 											}`}
 										>
 											<img
@@ -205,7 +167,7 @@ const Image_UserDetails: React.FC<{
 				)}
 
 				{/* Hover effect overlay */}
-				<div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 hover:opacity-100 transition-opacity pointer-events-none flex items-center justify-center">
+				<div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 pointer-events-none flex items-center justify-center">
 					<div className="bg-white/20 backdrop-blur-sm rounded-full p-3">
 						<FaExpand className="text-white w-6 h-6" />
 					</div>

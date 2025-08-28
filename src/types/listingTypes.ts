@@ -14,6 +14,7 @@ export interface IBaseListingType {
 	description: string;
 	pictures?: string[];
 	location: string;
+	alternateLocaiton?: string;
 	propertyCategory: PropertyCategory;
 	approvalStatus: "approved" | "pending" | "rejected";
 }
@@ -21,6 +22,8 @@ export interface ISellListingType extends IBaseListingType {
 	furnishing?: FurnishingType;
 	unit?: UnitOfMeasurement;
 	price?: string;
+	createdAt?: string;
+	updatedAt?: string;
 	// Common residential fields (house/flat)
 	bedrooms?: number;
 	bathrooms?: number;
@@ -48,7 +51,8 @@ export interface IRentListingType extends IBaseListingType {
 	availableFrom?: ISODateString;
 	availableForDuration?: number;
 	availableForDurationUnit?: "day" | "week" | "month" | "year";
-
+	createdAt?: string;
+	updatedAt?: string;
 	// house/flat
 	bedrooms?: number;
 	bathrooms?: number;

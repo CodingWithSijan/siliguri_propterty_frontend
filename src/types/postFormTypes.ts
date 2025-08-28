@@ -16,6 +16,7 @@ export interface BasePostFormInputs {
 	title: string;
 	description: string;
 	location: string;
+	alternateLocation?: string;
 	propertyCategory: PropertyCategory;
 	pictures?: FileList;
 	availableFrom?: string; // ISO date string

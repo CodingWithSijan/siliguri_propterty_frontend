@@ -58,6 +58,19 @@ const StepPropertyType = () => {
 				/>
 			</div>
 			<div>
+				<label htmlFor="alternateLocation">
+					Alternate Location{" "}
+					<span className="italic">
+						(Enter exact location here if required)
+					</span>
+				</label>
+				<Input
+					type="text"
+					placeholder="Enter detailed location here..."
+					{...register("alternateLocation")}
+				/>
+			</div>
+			<div>
 				<label htmlFor="title" className="block font-medium mb-1">
 					Title
 				</label>
