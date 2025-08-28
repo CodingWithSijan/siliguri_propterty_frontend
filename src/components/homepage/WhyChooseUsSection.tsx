@@ -7,7 +7,6 @@ import {
 	FaHeart,
 	FaShieldAlt,
 	FaClock,
-	FaArrowRight,
 	FaHome,
 } from "react-icons/fa";
 import { useRef } from "react";
@@ -64,28 +63,6 @@ const WhyChooseUsSection: React.FC = () => {
 				"Fast and responsive customer support to help with your queries",
 			color: "from-orange-500 to-orange-600",
 			bgColor: "bg-orange-50",
-		},
-	];
-
-	const steps = [
-		{
-			number: "01",
-			title: "Browse Properties",
-			description:
-				"Search through available properties in your preferred area of Siliguri",
-			icon: FaSearch,
-		},
-		{
-			number: "02",
-			title: "View Details",
-			description: "Check property details, photos, and contact information",
-			icon: FaHome,
-		},
-		{
-			number: "03",
-			title: "Connect & Visit",
-			description: "Contact the owner directly and schedule a property visit",
-			icon: FaHandshake,
 		},
 	];
 
