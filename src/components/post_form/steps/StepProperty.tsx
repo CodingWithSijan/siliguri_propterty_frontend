@@ -5,6 +5,7 @@ import { useFormContext, Controller } from "react-hook-form";
 import AddressInput from "../../../services/AddressInput";
 import { Input } from "../../ui/input";
 import { Textarea } from "../../ui/textarea";
+import { useEffect } from "react";
 
 const StepPropertyType = () => {
 	const {
@@ -12,10 +13,15 @@ const StepPropertyType = () => {
 		control,
 		formState: { errors },
 		getValues,
+		setValue,
+		register: rhfRegister,
 	} = useFormContext();
 
 	const intent = getValues("intent");
-
+	// Make sure coordinates is registered
+	useEffect(() => {
+		rhfRegister("coordinates", { required: true });
+	}, [rhfRegister]);
 	return (
 		<div className="space-y-6">
 			<div>
@@ -40,21 +46,53 @@ const StepPropertyType = () => {
 			</div>
 
 			<div>
-				<label className="block font-medium mb-1">Location *</label>
+				<label className="block font-medium mb-1">
+					Location *{" "}
+					<span className="italic text-blue-500">
+						(Please select approximate location from the list for better
+						accuracy for search, You can enter exact location in alternate
+						location field)
+					</span>
+					<span></span>
+				</label>
 				<Controller
 					name="location"
 					rules={{ required: "Location is required" }}
 					control={control}
 					render={({ field }) => (
 						<>
-							<AddressInput value={field.value} onChange={field.onChange} />
-							{typeof errors.location?.message === "string" && (
-								<p className="text-red-500 text-sm">
-									{errors.location.message}
-								</p>
-							)}
+							<AddressInput
+								value={field.value}
+								onChange={field.onChange} // just updates location string
+								onSelect={(address, coords) => {
+									field.onChange(address); // update location field
+									if (coords) {
+										setValue(
+											"coordinates",
+											{
+												type: "Point",
+												coordinates: [coords.lng, coords.lat],
+											},
+											{ shouldValidate: true, shouldDirty: true }
+										);
+									}
+								}}
+							/>
 						</>
 					)}
+				/>
+			</div>
+			<div>
+				<label htmlFor="alternateLocation" className="font-medium">
+					Alternate Location{" "}
+					<span className="italic text-blue-500 font-medium">
+						(Enter exact location here)
+					</span>
+				</label>
+				<Input
+					type="text"
+					placeholder="Enter detailed location here..."
+					{...register("alternateLocation")}
 				/>
 			</div>
 			<div>

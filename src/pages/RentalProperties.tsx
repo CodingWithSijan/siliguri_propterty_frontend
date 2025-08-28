@@ -34,7 +34,7 @@ const RentalProperties: React.FC = () => {
 			setLoading(true);
 			try {
 				const res = await BASE_URL.get("api/user/post/rental-properties", {
-					params: { page: currentPage, limit: 9 },
+					params: { page: currentPage, limit: 8 },
 				});
 
 				setPosts(res.data.rentals || []);
@@ -118,7 +118,7 @@ const RentalProperties: React.FC = () => {
 						<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-8">
 							{posts.length === 0 ? (
 								<div className="col-span-full text-center text-gray-500">
-									No rental properties found.
+									No listing found.
 								</div>
 							) : (
 								posts.map((post) => (

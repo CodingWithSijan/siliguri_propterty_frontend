@@ -20,6 +20,7 @@ const Navbar: React.FC = () => {
 	const { user } = useSelector((state: RootState) => state.auth);
 	const dispatch = useDispatch<AppDispatch>();
 	const navigate = useNavigate();
+
 	useEffect(() => {
 		const handleClickOutside = (event: MouseEvent) => {
 			if (
@@ -34,7 +35,6 @@ const Navbar: React.FC = () => {
 		if (isOpen) {
 			document.addEventListener("mousedown", handleClickOutside);
 		}
-
 		return () => {
 			document.removeEventListener("mousedown", handleClickOutside);
 		};
@@ -53,40 +53,37 @@ const Navbar: React.FC = () => {
 		if (dropdownOpen) {
 			document.addEventListener("mousedown", handleClickOutside);
 		}
-
 		return () => {
 			document.removeEventListener("mousedown", handleClickOutside);
 		};
 	}, [dropdownOpen]);
+
 	const handleLogout = () => {
 		dispatch(logout());
 		navigate("/login");
 	};
 
 	return (
-		<nav className="bg-white/95 backdrop-blur-md shadow-lg sticky top-0 z-50 border-b border-gray-200">
+		<nav className="bg-white/95 backdrop-blur-md shadow-md sticky top-0 z-50 border-b border-gray-200">
 			<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 				<div className="flex justify-between h-16 items-center">
 					{/* Logo */}
-					<NavLink
-						to="/"
-						className="relative h-14 w-14 sm:h-16 sm:w-16 transition-all duration-300 hover:scale-110 hover:rotate-3"
-					>
+					<NavLink to="/" className="relative h-14 w-14 sm:h-16 sm:w-16">
 						<img
 							src={siliguri_property_logo_noBG}
 							alt="Logo"
-							className="w-full h-full object-contain drop-shadow-sm"
+							className="w-full h-full object-contain"
 						/>
 					</NavLink>
 
 					{/* Main navigation links */}
-					<div className="hidden md:flex items-center space-x-8 ml-8">
+					<div className="hidden md:flex items-center space-x-6 ml-8">
 						<NavLink
 							to="/properties"
 							className={({ isActive }) =>
 								isActive
-									? "text-blue-600 font-semibold bg-blue-50 px-3 py-2 rounded-lg"
-									: "text-gray-700 hover:text-blue-600 hover:bg-gray-50 px-3 py-2 rounded-lg font-medium transition-all duration-200"
+									? "text-blue-600 font-semibold border-b-2 border-blue-600 pb-1"
+									: "text-gray-700 hover:text-blue-600 font-medium transition-colors"
 							}
 						>
 							All Properties
@@ -95,8 +92,8 @@ const Navbar: React.FC = () => {
 							to="/rentals"
 							className={({ isActive }) =>
 								isActive
-									? "text-blue-600 font-semibold bg-blue-50 px-3 py-2 rounded-lg"
-									: "text-gray-700 hover:text-blue-600 hover:bg-gray-50 px-3 py-2 rounded-lg font-medium transition-all duration-200"
+									? "text-blue-600 font-semibold border-b-2 border-blue-600 pb-1"
+									: "text-gray-700 hover:text-blue-600 font-medium transition-colors"
 							}
 						>
 							Property for rent
@@ -105,8 +102,8 @@ const Navbar: React.FC = () => {
 							to="/buys"
 							className={({ isActive }) =>
 								isActive
-									? "text-blue-600 font-semibold bg-blue-50 px-3 py-2 rounded-lg"
-									: "text-gray-700 hover:text-blue-600 hover:bg-gray-50 px-3 py-2 rounded-lg font-medium transition-all duration-200"
+									? "text-blue-600 font-semibold border-b-2 border-blue-600 pb-1"
+									: "text-gray-700 hover:text-blue-600 font-medium transition-colors"
 							}
 						>
 							Property for sale
@@ -115,8 +112,8 @@ const Navbar: React.FC = () => {
 							to="/about"
 							className={({ isActive }) =>
 								isActive
-									? "text-blue-600 font-semibold bg-blue-50 px-3 py-2 rounded-lg"
-									: "text-gray-700 hover:text-blue-600 hover:bg-gray-50 px-3 py-2 rounded-lg font-medium transition-all duration-200"
+									? "text-blue-600 font-semibold border-b-2 border-blue-600 pb-1"
+									: "text-gray-700 hover:text-blue-600 font-medium transition-colors"
 							}
 						>
 							About Us
@@ -124,24 +121,24 @@ const Navbar: React.FC = () => {
 					</div>
 
 					<PostYourPropertyButton />
+
 					{/* Desktop Menu */}
 					<div className="hidden md:flex items-center space-x-4">
 						{user ? (
 							<div className="relative">
 								<motion.div
-									whileHover={{ scale: 1.05 }}
-									whileTap={{ scale: 0.95 }}
-									className="flex items-center space-x-3 cursor-pointer bg-gradient-to-r from-blue-50 to-purple-50 px-4 py-2 rounded-xl border border-gray-200 hover:border-blue-300 transition-all duration-200"
+									whileTap={{ scale: 0.97 }}
+									className="flex items-center space-x-3 cursor-pointer bg-gray-50 px-4 py-2 rounded-lg border border-gray-200"
 									onClick={() => setDropdownOpen(!dropdownOpen)}
 								>
 									{user.avatar ? (
 										<img
-											className="w-10 h-10 rounded-full border-2 border-blue-500 p-0.5 shadow-md"
+											className="w-9 h-9 rounded-full border border-gray-300"
 											src={user.avatar}
 											alt={user.name}
 										/>
 									) : (
-										<div className="w-10 h-10 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 text-white flex items-center justify-center font-bold ring-2 ring-blue-400 ring-offset-2 ring-offset-white shadow-md">
+										<div className="w-9 h-9 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold">
 											{getInitials(user?.name ?? "")}
 										</div>
 									)}
@@ -154,19 +151,19 @@ const Navbar: React.FC = () => {
 								<Transition
 									show={dropdownOpen}
 									enter="transition ease-out duration-100"
-									enterFrom="transform opacity-0 scale-95"
-									enterTo="transform opacity-100 scale-100"
+									enterFrom="opacity-0 scale-95"
+									enterTo="opacity-100 scale-100"
 									leave="transition ease-in duration-75"
-									leaveFrom="transform opacity-100 scale-100"
-									leaveTo="transform opacity-0 scale-95"
+									leaveFrom="opacity-100 scale-100"
+									leaveTo="opacity-0 scale-95"
 								>
 									<div
 										ref={desktopMenuDropdownRef}
-										className="absolute right-0 mt-3 w-56 bg-white rounded-xl shadow-xl py-2 z-50 ring-1 ring-gray-200 border border-gray-200"
+										className="absolute right-0 mt-3 w-56 bg-white rounded-lg shadow-lg py-2 z-50 border border-gray-200"
 									>
 										<NavLink
 											to={user.role === "user" ? "/dashboard" : "/admin"}
-											className="block px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 rounded-lg mx-2 transition-colors"
+											className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md"
 										>
 											{user.role === "user"
 												? "User Dashboard"
@@ -174,7 +171,7 @@ const Navbar: React.FC = () => {
 										</NavLink>
 										<button
 											onClick={handleLogout}
-											className="block w-full text-left px-4 py-3 text-sm text-red-600 hover:bg-red-50 rounded-lg mx-2 transition-colors"
+											className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 rounded-md"
 										>
 											Logout
 										</button>
@@ -185,13 +182,13 @@ const Navbar: React.FC = () => {
 							<>
 								<NavLink
 									to="/login"
-									className="text-gray-700 hover:text-blue-600 hover:bg-gray-100 px-4 py-2 rounded-lg font-medium transition-all duration-200"
+									className="text-gray-700 hover:text-blue-600 px-4 py-2 font-medium"
 								>
 									Login
 								</NavLink>
 								<NavLink
 									to="/signup"
-									className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-2 rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-200 font-medium shadow-md hover:shadow-lg"
+									className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors font-medium"
 								>
 									Sign Up
 								</NavLink>
@@ -204,7 +201,7 @@ const Navbar: React.FC = () => {
 						<button
 							onClick={() => setIsOpen(!isOpen)}
 							type="button"
-							className="text-gray-600 hover:text-gray-900 hover:bg-gray-100 focus:outline-none p-2 rounded-lg transition-all duration-200"
+							className="text-gray-600 hover:text-gray-900 focus:outline-none p-2 rounded-lg"
 						>
 							{isOpen ? (
 								<XMarkIcon className="h-6 w-6" />
@@ -227,7 +224,7 @@ const Navbar: React.FC = () => {
 				leaveTo="opacity-0 -translate-y-1"
 			>
 				<div
-					className="md:hidden px-4 pt-4 pb-6 bg-white shadow-xl rounded-b-2xl border-t border-gray-200"
+					className="md:hidden px-4 pt-4 pb-6 bg-white shadow-lg rounded-b-2xl border-t border-gray-200"
 					ref={mobileMenuRef}
 				>
 					{user ? (
@@ -235,12 +232,12 @@ const Navbar: React.FC = () => {
 							<div className="flex items-center space-x-3 px-4 py-2 border-b border-gray-200 mb-2">
 								{user.avatar ? (
 									<img
-										className="w-10 h-10 rounded-full border-2 border-blue-500"
+										className="w-9 h-9 rounded-full border border-gray-300"
 										src={user.avatar}
 										alt={user.name}
 									/>
 								) : (
-									<div className="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold">
+									<div className="w-9 h-9 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold">
 										{getInitials(user?.name ?? "")}
 									</div>
 								)}
@@ -248,77 +245,45 @@ const Navbar: React.FC = () => {
 									{formatFullName(user?.name)}
 								</span>
 							</div>
-							<div className="mb-2">
-								<p className="text-xs text-gray-500 font-semibold uppercase tracking-wider px-4 mb-1 mt-2">
+							<div>
+								<p className="text-xs text-gray-500 font-semibold uppercase tracking-wide px-4 mb-2">
 									Navigation
 								</p>
-								<div className="space-y-1 divide-y divide-gray-200">
+								<div className="space-y-1">
 									<NavLink
 										to="/properties"
-										className={({ isActive }) =>
-											(isActive
-												? "block w-full text-blue-600 font-semibold px-4 py-2 bg-blue-50 rounded-lg"
-												: "block w-full text-gray-700 hover:bg-gray-100 rounded-lg px-4 py-2 transition-colors") +
-											" flex items-center gap-2"
-										}
+										className="block w-full text-gray-700 hover:text-blue-600 px-4 py-2 rounded-md"
 									>
-										<span role="img" aria-label="all properties">
-											🏘️
-										</span>{" "}
-										All Properties
+										🏘️ All Properties
 									</NavLink>
 									<NavLink
 										to="/rentals"
-										className={({ isActive }) =>
-											(isActive
-												? "block w-full text-blue-600 font-semibold px-4 py-2 bg-blue-50 rounded-lg"
-												: "block w-full text-gray-700 hover:bg-gray-100 rounded-lg px-4 py-2 transition-colors") +
-											" flex items-center gap-2"
-										}
+										className="block w-full text-gray-700 hover:text-blue-600 px-4 py-2 rounded-md"
 									>
-										<span role="img" aria-label="rent">
-											🏠
-										</span>{" "}
-										Property for rent
+										🏠 Property for rent
 									</NavLink>
 									<NavLink
 										to="/buys"
-										className={({ isActive }) =>
-											(isActive
-												? "block w-full text-blue-600 font-semibold px-4 py-2 bg-blue-50 rounded-lg"
-												: "block w-full text-gray-700 hover:bg-gray-100 rounded-lg px-4 py-2 transition-colors") +
-											" flex items-center gap-2"
-										}
+										className="block w-full text-gray-700 hover:text-blue-600 px-4 py-2 rounded-md"
 									>
-										<span role="img" aria-label="sale">
-											💼
-										</span>{" "}
-										Property for sale
+										💼 Property for sale
 									</NavLink>
 									<NavLink
 										to="/about"
-										className={({ isActive }) =>
-											(isActive
-												? "block w-full text-blue-600 font-semibold px-4 py-2 bg-blue-50 rounded-lg"
-												: "block w-full text-gray-700 hover:bg-gray-100 rounded-lg px-4 py-2 transition-colors") +
-											" flex items-center gap-2"
-										}
+										className="block w-full text-gray-700 hover:text-blue-600 px-4 py-2 rounded-md"
 									>
-										<span role="img" aria-label="about">
-											ℹ️
-										</span>{" "}
-										About Us
+										ℹ️ About Us
 									</NavLink>
 								</div>
 							</div>
-							<div className="mt-4">
-								<p className="text-xs text-gray-400 font-semibold uppercase tracking-wider px-4 mb-1">
+							<div className="pt-2 border-t border-gray-200">
+								<p className="text-xs text-gray-500 font-semibold uppercase tracking-wide px-4 mb-2">
 									Account
 								</p>
 								<div className="space-y-2">
 									<NavLink
 										to={user.role === "user" ? "/dashboard" : "/admin"}
-										className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-blue-50 rounded-lg"
+										className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-md"
 									>
 										{user.role === "user"
 											? "User Dashboard"
@@ -326,7 +291,7 @@ const Navbar: React.FC = () => {
 									</NavLink>
 									<button
 										onClick={handleLogout}
-										className="block w-full text-left px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg"
+										className="block w-full text-left px-4 py-2 text-red-600 hover:bg-red-50 rounded-md"
 									>
 										Logout
 									</button>
@@ -335,83 +300,51 @@ const Navbar: React.FC = () => {
 						</div>
 					) : (
 						<div className="space-y-4">
-							<div className="mb-2">
-								<p className="text-xs text-gray-400 font-semibold uppercase tracking-wider px-4 mb-1 mt-2">
+							<div>
+								<p className="text-xs text-gray-500 font-semibold uppercase tracking-wide px-4 mb-2">
 									Navigation
 								</p>
-								<div className="space-y-1 divide-y divide-gray-100">
+								<div className="space-y-1">
 									<NavLink
 										to="/properties"
-										className={({ isActive }) =>
-											(isActive
-												? "block w-full text-blue-600 font-semibold px-4 py-2 bg-blue-50 rounded-lg"
-												: "block w-full text-gray-700 hover:bg-blue-50 rounded-lg px-4 py-2 transition-colors") +
-											" flex items-center gap-2"
-										}
+										className="block w-full text-gray-700 hover:text-blue-600 px-4 py-2 rounded-md"
 									>
-										<span role="img" aria-label="all properties">
-											🏘️
-										</span>{" "}
-										All Properties
+										🏘️ All Properties
 									</NavLink>
 									<NavLink
 										to="/rentals"
-										className={({ isActive }) =>
-											(isActive
-												? "block w-full text-blue-600 font-semibold px-4 py-2 bg-blue-50 rounded-lg"
-												: "block w-full text-gray-700 hover:bg-blue-50 rounded-lg px-4 py-2 transition-colors") +
-											" flex items-center gap-2"
-										}
+										className="block w-full text-gray-700 hover:text-blue-600 px-4 py-2 rounded-md"
 									>
-										<span role="img" aria-label="rent">
-											🏠
-										</span>{" "}
-										Property for rent
+										🏠 Property for rent
 									</NavLink>
 									<NavLink
 										to="/buys"
-										className={({ isActive }) =>
-											(isActive
-												? "block w-full text-blue-600 font-semibold px-4 py-2 bg-blue-50 rounded-lg"
-												: "block w-full text-gray-700 hover:bg-blue-50 rounded-lg px-4 py-2 transition-colors") +
-											" flex items-center gap-2"
-										}
+										className="block w-full text-gray-700 hover:text-blue-600 px-4 py-2 rounded-md"
 									>
-										<span role="img" aria-label="sale">
-											💼
-										</span>{" "}
-										Property for sale
+										💼 Property for sale
 									</NavLink>
 									<NavLink
 										to="/about"
-										className={({ isActive }) =>
-											(isActive
-												? "block w-full text-blue-600 font-semibold px-4 py-2 bg-blue-50 rounded-lg"
-												: "block w-full text-gray-700 hover:bg-blue-50 rounded-lg px-4 py-2 transition-colors") +
-											" flex items-center gap-2"
-										}
+										className="block w-full text-gray-700 hover:text-blue-600 px-4 py-2 rounded-md"
 									>
-										<span role="img" aria-label="about">
-											ℹ️
-										</span>{" "}
-										About Us
+										ℹ️ About Us
 									</NavLink>
 								</div>
 							</div>
-							<div className="mt-4">
-								<p className="text-xs text-gray-400 font-semibold uppercase tracking-wider px-4 mb-1">
+							<div className="pt-2 border-t border-gray-200">
+								<p className="text-xs text-gray-500 font-semibold uppercase tracking-wide px-4 mb-2">
 									Account
 								</p>
 								<div className="space-y-2">
 									<NavLink
 										to="/login"
-										className="block w-full text-center px-4 py-2 text-gray-700 hover:bg-blue-50 rounded-lg"
+										className="block w-full text-center px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-md"
 									>
 										Login
 									</NavLink>
 									<NavLink
 										to="/signup"
-										className="block w-full text-center px-4 py-2 bg-blue-600 text-white hover:bg-blue-700 rounded-lg"
+										className="block w-full text-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
 									>
 										Sign Up
 									</NavLink>

@@ -31,6 +31,7 @@ const allFields = [
 	"title",
 	"description",
 	"location",
+	"coordinates",
 	"pricePerUnit",
 	"unit",
 	"availableLandSpace",
@@ -56,6 +57,7 @@ const PostStepperForm: React.FC<PostStepperFormProps> = ({ intent }) => {
 			intent: intent,
 			propertyCategory: undefined,
 			location: "",
+			coordinates: { type: "Point", coordinates: [0, 0] },
 		},
 	});
 	const { control, resetField } = methods;
@@ -99,7 +101,11 @@ const PostStepperForm: React.FC<PostStepperFormProps> = ({ intent }) => {
 			if (key === "pictures" && value instanceof FileList) {
 				Array.from(value).forEach((file) => formData.append("pictures", file));
 			} else if (value !== undefined && value !== "") {
-				formData.append(key, value as string | Blob);
+				if (typeof value === "object") {
+					formData.append(key, JSON.stringify(value)); // stringify objects
+				} else {
+					formData.append(key, value as string | Blob);
+				}
 			}
 		});
 

@@ -16,6 +16,11 @@ export interface BasePostFormInputs {
 	title: string;
 	description: string;
 	location: string;
+	coordinates?: {
+		type: "Point";
+		coordinates: [number, number];
+	};
+	alternateLocation?: string;
 	propertyCategory: PropertyCategory;
 	pictures?: FileList;
 	availableFrom?: string; // ISO date string

@@ -7,6 +7,7 @@ import { ClipLoader } from "react-spinners";
 import { IListingUserDetails } from "../types/listingUserDetails";
 import Navbar from "../components/header_and_footer/Navbar";
 import House from "../components/property_details_page/rent/common/House";
+import ShopRental from "../components/property_details_page/rent/shop/ShopRental";
 
 const loaderStyle: React.CSSProperties = {
 	display: "block",
@@ -29,7 +30,7 @@ const RentalPropertyDetails: React.FC = () => {
 				console.log("listing:", res.data.listingDetails);
 				console.log("user:", res.data.listingUser);
 			} catch (error) {
-				console.error("Failed to fetch listing");
+				console.error("Failed to fetch listing", error);
 			}
 		};
 
@@ -48,11 +49,25 @@ const RentalPropertyDetails: React.FC = () => {
 				/>
 			</div>
 		);
+	const renderPropertyCategory = () => {
+		switch (listing.propertyCategory) {
+			case "house":
+				return <House listing={listing} userDetails={listingUserDetails} />;
+			case "flat":
+				return <House listing={listing} userDetails={listingUserDetails} />;
+			case "shop":
+				return (
+					<ShopRental listing={listing} userDetails={listingUserDetails} />
+				);
+			default:
+				return <div>Unknown property type</div>;
+		}
+	};
 	return (
 		<>
 			<Navbar />
 			<div className="flex justify-center items-center my-10">
-				<House listing={listing} userDetails={listingUserDetails} />
+				{renderPropertyCategory()}
 			</div>
 		</>
 	);

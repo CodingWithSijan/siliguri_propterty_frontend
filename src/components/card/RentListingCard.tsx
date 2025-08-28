@@ -1,15 +1,13 @@
 import React from "react";
-import { FaMapMarkerAlt, FaBed, FaBath, FaLink, FaCar } from "react-icons/fa";
+import { FaMapMarkerAlt } from "react-icons/fa";
 import { MdSell } from "react-icons/md";
-import { GiSofa } from "react-icons/gi";
-import { TbRulerMeasure } from "react-icons/tb";
+import { BiRupee } from "react-icons/bi";
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 import { formatIndianCurrency } from "../../utils/priceFormatHelper";
 import { IRentListingType } from "../../types/listingTypes";
 import propertyImagePlaceholder from "../../assets/looking_for_rent.png";
 import PropertyIconHelper from "../common/PropertyIconHelper";
-import { BiRupee } from "react-icons/bi";
-import { useNavigate } from "react-router-dom";
 
 const capitalize = (str: string | undefined) =>
 	str ? str.charAt(0).toUpperCase() + str.slice(1) : "";
@@ -34,54 +32,50 @@ const RentListingCard: React.FC<{
 			navigate(path);
 		}
 	};
+
 	return (
 		<motion.div
-			whileHover={{ y: -5 }}
-			transition={{ type: "spring", stiffness: 300 }}
-			className="relative bg-white rounded-md shadow-md border border-gray-200 group w-full max-w-sm mx-auto cursor-pointer h-full flex flex-col"
+			whileHover={{ y: -4, scale: 1.01 }}
+			transition={{ type: "spring", stiffness: 250, damping: 18 }}
+			className="relative bg-white rounded-2xl shadow-md hover:shadow-lg border border-gray-200/60
+    group w-full max-w-sm mx-auto cursor-pointer flex flex-col overflow-hidden h-[400px]"
 			onClick={handleClick}
 		>
 			{/* Rent Tag */}
 			<div className="absolute top-3 left-3 z-20">
-				<span className="bg-blue-600 text-white text-[10px] px-3 py-1 rounded-full font-semibold tracking-wide border border-white uppercase flex items-center gap-1 shadow-md">
+				<span className="bg-blue-600 text-white text-[11px] px-3 py-1.5 rounded-full font-semibold tracking-wide flex items-center gap-1 shadow-sm">
 					<MdSell className="text-sm" /> RENT
 				</span>
 			</div>
 
-			{/* Approval Status */}
-			{listing.approvalStatus && userOrGlobal === "user" && (
-				<div className="absolute top-3 right-3 bg-white/90 text-gray-800 text-[10px] px-2 py-1 rounded shadow font-semibold z-20 border border-gray-200">
+			{/* Approval / Posted */}
+			<div className="absolute top-3 right-3 z-20">
+				{listing.approvalStatus && userOrGlobal === "user" ? (
 					<span
-						className={`mr-2 font-bold ${
+						className={`px-2 py-1 rounded-full text-[11px] font-semibold shadow-sm border ${
 							listing.approvalStatus === "approved"
-								? "text-green-600"
+								? "bg-green-50 text-green-700 border-green-200"
 								: listing.approvalStatus === "pending"
-								? "text-yellow-600"
-								: "text-red-600"
+								? "bg-yellow-50 text-yellow-700 border-yellow-200"
+								: "bg-red-50 text-red-700 border-red-200"
 						}`}
 					>
 						{capitalize(listing.approvalStatus)}
 					</span>
-					Posted on{" "}
-					{listing._id
-						? new Date(
-								parseInt(listing._id.substring(0, 8), 16) * 1000
-						  ).toLocaleDateString()
-						: "-"}
-				</div>
-			)}
-			{listing.approvalStatus && userOrGlobal === "global" && (
-				<div className="absolute top-3 right-3 bg-white/90 text-blue-700 text-[10px] px-2 py-1 rounded shadow font-bold z-20 border border-gray-200">
-					<span>Posted on </span>
-					{listing._id
-						? new Date(
-								parseInt(listing._id.substring(0, 8), 16) * 1000
-						  ).toLocaleDateString()
-						: "-"}
-				</div>
-			)}
+				) : (
+					<span className="bg-white/90 text-gray-700 text-[11px] px-2 py-1 rounded-full shadow-sm border border-gray-200 font-medium">
+						Posted on{" "}
+						{listing._id
+							? new Date(
+									parseInt(listing._id.substring(0, 8), 16) * 1000
+							  ).toLocaleDateString()
+							: "-"}
+					</span>
+				)}
+			</div>
+
 			{/* Image */}
-			<div className="relative w-full h-62 overflow-hidden rounded-t-md">
+			<div className="relative w-full h-52 overflow-hidden">
 				<img
 					src={
 						listing.pictures && listing.pictures.length > 0
@@ -89,103 +83,64 @@ const RentListingCard: React.FC<{
 							: propertyImagePlaceholder
 					}
 					alt={listing.title}
-					className="w-full h-full object-full"
+					className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
 				/>
+				<div className="absolute inset-0 bg-gradient-to-t from-black/40 via-black/10 to-transparent" />
 			</div>
 
-			{/* Category */}
-			<div className="flex items-center justify-between mt-2 px-3">
-				<span className="flex items-center gap-1 bg-blue-50 text-blue-700 text-xs px-3 py-1 rounded-full border border-blue-200">
-					<PropertyIconHelper
-						propertyCategory={listing.propertyCategory}
-						className="inline-block text-xs w-4 h-4"
-					/>
-					{capitalize(listing.propertyCategory)}
-				</span>
-			</div>
-
-			{/* Main Content */}
-			<div className="p-3 flex-grow flex flex-col justify-between">
+			{/* Content */}
+			<div className="p-4 flex flex-col flex-grow justify-between min-h-[180px]">
 				<div>
-					<div className="flex items-center gap-2 text-sm text-gray-500 mt-1 mb-2">
-						<FaMapMarkerAlt className="text-blue-500" />
-						<span>{listing.location}</span>
+					{/* Category */}
+					<div className="flex items-center justify-between mb-2">
+						<span className="flex items-center gap-1 bg-blue-50 text-blue-700 text-xs px-2.5 py-1 rounded-full border border-blue-200 font-medium">
+							<PropertyIconHelper
+								propertyCategory={listing.propertyCategory}
+								className="inline-block text-xs w-4 h-4"
+							/>
+							{capitalize(listing.propertyCategory)}
+						</span>
 					</div>
 
-					{/* Price */}
-					{listing.pricePerFrequency && (
-						<div className="flex flex-wrap items-center gap-2 mb-2">
-							<span className="bg-green-50 text-green-800 px-2 py-1 rounded text-xs font-medium flex items-center gap-1">
-								Rent:
-								<BiRupee className="text-sm" />
-								{formattedPrice}
-								{listing.frequency && " / " + capitalize(listing.frequency)}
-							</span>
-						</div>
-					)}
+					{/* Title */}
+					<h3 className="text-gray-900 font-semibold text-lg leading-snug line-clamp-2 h-[48px] mb-1">
+						{listing.title}
+					</h3>
 
-					{/* Available For */}
-					{listing.availableForDuration && (
-						<div className="text-xs text-gray-600 mb-2">
-							Available For:{" "}
-							<span className="text-blue-700 font-semibold">
-								{listing.availableForDuration}
-								{listing.availableForDurationUnit &&
-									" " + capitalize(listing.availableForDurationUnit) + "s"}
-							</span>
-						</div>
-					)}
+					{/* Location */}
+					<div className="flex items-center gap-1 text-sm text-gray-600 mb-2">
+						<FaMapMarkerAlt className="text-blue-500 text-sm" />
+						<span className="truncate">{listing.location}</span>
+					</div>
 				</div>
 
-				<div>
-					{/* House / Flat Details */}
-					{(listing.propertyCategory === "house" ||
-						listing.propertyCategory === "flat") && (
-						<div className="flex flex-wrap gap-2 mb-2 mt-1">
-							<span className="flex items-center gap-1 bg-gray-100 text-gray-800 px-2 py-1 rounded text-xs">
-								<FaBed className="text-sm" />
-								Bedrooms: {listing.bedrooms ?? 0}
-							</span>
-							<span className="flex items-center gap-1 bg-gray-100 text-gray-800 px-2 py-1 rounded text-xs">
-								<FaBath className="text-sm" />
-								Bathrooms: {listing.bathrooms ?? 0}
-							</span>
-							<span className="flex items-center gap-1 bg-gray-100 text-gray-800 px-2 py-1 rounded text-xs">
-								<FaLink className="text-sm" />
-								<FaBath className="text-sm" />
-								{listing.attachedBathroom
-									? "Attached Bathroom"
-									: "No attached Bathroom"}
-							</span>
-							<span className="flex items-center gap-1 bg-gray-100 text-gray-800 px-2 py-1 rounded text-xs capitalize">
-								<GiSofa className="text-sm" />
-								{listing.furnishing || "-"}
-							</span>
-							<span className="flex items-center gap-1 bg-gray-100 text-gray-800 px-2 py-1 rounded text-xs">
-								<FaCar className="text-sm" />
-								{listing.parking
-									? "Parking available"
-									: "Parking not available"}
+				{/* Footer: Price + Duration (always bottom aligned) */}
+				<div className="mt-auto">
+					{/* Price */}
+					{listing.pricePerFrequency && (
+						<div className="mb-1">
+							<span className="text-green-700 font-bold text-xl flex items-center gap-1">
+								<BiRupee className="text-lg" />
+								{formattedPrice}
+								{listing.frequency && (
+									<span className="text-sm text-gray-600 font-medium">
+										/ {capitalize(listing.frequency)}
+									</span>
+								)}
 							</span>
 						</div>
 					)}
 
-					{/* Shop Details */}
-					{listing.propertyCategory === "shop" && (
-						<div className="flex flex-wrap gap-2 mb-2 mt-1">
-							<span className="flex items-center gap-1 bg-gray-100 text-gray-800 px-2 py-1 rounded text-xs">
-								<TbRulerMeasure className="text-sm" />
-								Area: {listing.shopArea ?? "-"} sq ft
+					{/* Duration */}
+					{listing.availableForDuration && (
+						<p className="text-xs text-gray-500">
+							Available for{" "}
+							<span className="text-blue-700 font-medium">
+								{listing.availableForDuration}{" "}
+								{listing.availableForDurationUnit &&
+									capitalize(listing.availableForDurationUnit) + "s"}
 							</span>
-							<span className="flex items-center gap-1 bg-gray-100 text-gray-800 px-2 py-1 rounded text-xs capitalize">
-								<GiSofa className="text-sm" />
-								{listing.furnishing || "-"}
-							</span>
-							<span className="flex items-center gap-1 bg-gray-100 text-gray-800 px-2 py-1 rounded text-xs">
-								<FaLink className="text-sm" />
-								Shutter: {listing.hasShutter ? "Yes" : "No"}
-							</span>
-						</div>
+						</p>
 					)}
 				</div>
 			</div>

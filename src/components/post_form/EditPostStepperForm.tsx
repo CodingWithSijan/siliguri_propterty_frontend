@@ -34,6 +34,7 @@ const allFields = [
 	"title",
 	"description",
 	"location",
+	"alternateLocation",
 	"pricePerUnit",
 	"unit",
 	"availableLandSpace",
@@ -74,6 +75,7 @@ const EditPostStepperForm: React.FC<EditPostStepperFormProps> = ({
 			title: initialData.title,
 			description: initialData.description,
 			location: initialData.location,
+			alternateLocation: initialData.alternateLocaiton,
 		};
 
 		// Add intent-specific fields with type checking
