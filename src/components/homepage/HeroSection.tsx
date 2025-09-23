@@ -32,7 +32,7 @@ const HeroSection: React.FC = () => {
 	}, [slides.length]);
 
 	return (
-		<div className="relative h-screen w-full overflow-hidden bg-gray-900">
+		<div className="relative h-screen w-full overflow- bg-gray-900">
 			{/* Carousel */}
 			<div className="absolute inset-0">
 				<AnimatePresence initial={false}>
@@ -61,7 +61,7 @@ const HeroSection: React.FC = () => {
 					initial={{ opacity: 0, y: 20 }}
 					animate={{ opacity: 1, y: 0 }}
 					transition={{ duration: 0.5, delay: 0.2 }}
-					className="text-center mb-12"
+					className="text-center mb-12 hidden sm:block"
 				>
 					<h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 drop-shadow-lg">
 						{slides[currentSlide].text}
@@ -76,7 +76,7 @@ const HeroSection: React.FC = () => {
 					initial={{ opacity: 0, y: 30 }}
 					animate={{ opacity: 1, y: 0 }}
 					transition={{ duration: 0.6, delay: 0.4 }}
-					className="w-full max-w-6xl px-4"
+					className="w-full max-w-6xl px-4 pt-15 sm:pt-0"
 				>
 					<div className="backdrop-blur-md bg-white/10 rounded-2xl border border-white/20 shadow-2xl p-1">
 						<div className="bg-white/95 backdrop-blur-sm rounded-xl shadow-lg">
@@ -111,21 +111,6 @@ const HeroSection: React.FC = () => {
 						</div>
 					</div>
 				</motion.div>
-
-				{/* Carousel Indicators */}
-				<div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex gap-2">
-					{slides.map((_, index) => (
-						<button
-							key={index}
-							onClick={() => setCurrentSlide(index)}
-							className={`w-3 h-3 rounded-full transition-all duration-300 backdrop-blur-sm ${
-								index === currentSlide
-									? "bg-white w-10 shadow-lg"
-									: "bg-white/50 hover:bg-white/75 hover:scale-110"
-							}`}
-						/>
-					))}
-				</div>
 			</div>
 		</div>
 	);

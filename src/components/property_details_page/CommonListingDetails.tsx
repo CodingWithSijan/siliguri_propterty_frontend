@@ -6,6 +6,7 @@ const CommonListingDetails: React.FC<ICommonListingDetailsType> = ({
 	title,
 	description,
 	location,
+	alternateLocation,
 	propertyCategory,
 	intent,
 }) => {
@@ -67,6 +68,22 @@ const CommonListingDetails: React.FC<ICommonListingDetailsType> = ({
 							{propertyCategory}
 						</span>
 					</div>
+				</div>
+			</div>
+			<div className="flex items-center gap-3 p-3 bg-white shadow-sm">
+				<div className="flex-shrink-0 w-8 h-8 bg-gradient-to-br from-slate-600 to-slate-700 flex items-center justify-center shadow-sm">
+					<FaMapMarkerAlt className="text-white text-sm" />
+				</div>
+				<div className="min-w-0 flex-1">
+					<span className="block text-slate-600 text-xs font-semibold uppercase tracking-wider mb-1">
+						Detailed Location
+					</span>
+					<span
+						className="font-semibold text-gray-900 text-sm  block"
+						title={alternateLocation}
+					>
+						{alternateLocation}
+					</span>
 				</div>
 			</div>
 

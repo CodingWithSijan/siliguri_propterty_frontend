@@ -1,7 +1,7 @@
 // File: components/PostForm/steps/StepPreview.tsx
-
 import { useFormContext } from "react-hook-form";
 import { useEffect, useState } from "react";
+import { CheckCircle, XCircle, MinusCircle } from "lucide-react";
 
 const StepPreview = () => {
 	const { getValues } = useFormContext();
@@ -21,15 +21,23 @@ const StepPreview = () => {
 
 	const formatBoolean = (val: boolean | undefined | null) => (
 		<span
-			className={`inline-block px-2 py-1 rounded-full text-xs font-semibold ${
-				val === true
-					? "bg-green-100 text-green-600"
-					: val === false
-					? "bg-red-100 text-red-600"
-					: "bg-gray-100 text-gray-500"
-			}`}
+			className={`flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium
+        ${
+					val === true
+						? "bg-green-100 text-green-600"
+						: val === false
+						? "bg-red-100 text-red-600"
+						: "bg-gray-100 text-gray-500"
+				}`}
 		>
-			{val === true ? "Yes" : val === false ? "No" : "-"}
+			{val === true ? (
+				<CheckCircle size={14} />
+			) : val === false ? (
+				<XCircle size={14} />
+			) : (
+				<MinusCircle size={14} />
+			)}
+			{val === true ? "Yes" : val === false ? "No" : "N/A"}
 		</span>
 	);
 
@@ -45,78 +53,63 @@ const StepPreview = () => {
 	const isLand = propertyCategory === "land";
 	const isShop = propertyCategory === "shop";
 
+	const InfoRow = ({ label, value }: { label: string; value: any }) => (
+		<div className="flex flex-col">
+			<span className="text-gray-500 text-sm">{label}</span>
+			<span className="text-gray-900 font-semibold capitalize">
+				{value || "-"}
+			</span>
+		</div>
+	);
+
 	return (
-		<div className="space-y-8 p-4 sm:p-6 bg-white rounded-xl shadow border max-w-4xl mx-auto">
-			<h2 className="text-3xl font-semibold text-center text-blue-700 mb-6 underline decoration-blue-400 underline-offset-4">
+		<div className="space-y-10 p-6 bg-white rounded-2xl shadow-md border border-gray-200 max-w-5xl mx-auto">
+			<h2 className="text-3xl font-bold text-center text-blue-700 tracking-tight">
 				🎯 Review Your Post
 			</h2>
+			<p className="text-center text-gray-500">
+				Please confirm all details before publishing
+			</p>
 
-			<div className="grid grid-cols-1 sm:grid-cols-2 gap-6 text-sm text-gray-800">
-				<div>
-					<p className="text-gray-500 font-medium">Title</p>
-					<p className="text-gray-900 font-semibold">
-						{previewData.title || "-"}
-					</p>
-				</div>
-				<div>
-					<p className="text-gray-500 font-medium">Description</p>
-					<p className="text-gray-900 font-semibold">
-						{previewData.description || "-"}
-					</p>
-				</div>
-				<div>
-					<p className="text-gray-500 font-medium">Location</p>
-					<p className="text-gray-900 font-semibold">
-						{previewData.location || "-"}
-					</p>
-				</div>
-				<div>
-					<p className="text-gray-500 font-medium">Property Type</p>
-					<p className="text-gray-900 font-semibold capitalize">
-						{propertyCategory || "-"}
-					</p>
-				</div>
+			{/* Basic Info */}
+			<div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+				<InfoRow label="Title" value={previewData.title} />
+				<InfoRow label="Description" value={previewData.description} />
+				<InfoRow label="Location" value={previewData.location} />
+				<InfoRow label="Property Type" value={propertyCategory} />
 			</div>
 
+			{/* Conditional Sections */}
 			{isHouseOrFlat && (
-				<div className="bg-gray-50 p-4 sm:p-6 rounded-lg border border-gray-200 shadow-sm space-y-4">
-					<h3 className="text-lg font-medium text-blue-600 border-b pb-1">
+				<div className="bg-gray-50 p-6 rounded-xl border border-gray-200 space-y-4">
+					<h3 className="text-lg font-semibold text-blue-600">
 						🏠 {propertyCategory} Details
 					</h3>
 					<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
 						{["bedrooms", "bathrooms", "builtUpArea", "furnishing"].map(
 							(field) => (
-								<div key={field}>
-									<p className="text-gray-500 font-medium capitalize">
-										{field}
-									</p>
-									<p className="text-gray-900 font-semibold capitalize">
-										{previewData[field] || "-"}
-									</p>
-								</div>
+								<InfoRow key={field} label={field} value={previewData[field]} />
 							)
 						)}
-						<div>
-							<p className="text-gray-500 font-medium">Attached Bathroom</p>
-							{formatBoolean(previewData.attachedBathroom)}
-						</div>
-						<div>
-							<p className="text-gray-500 font-medium">Parking</p>
-							{formatBoolean(previewData.parking)}
-						</div>
-						<div>
-							<p className="text-gray-500 font-medium">Available From</p>
-							<p className="text-gray-900 font-semibold">
-								{formatDate(previewData.availableFrom)}
-							</p>
-						</div>
+						<InfoRow
+							label="Attached Bathroom"
+							value={formatBoolean(previewData.attachedBathroom)}
+						/>
+						<InfoRow
+							label="Parking"
+							value={formatBoolean(previewData.parking)}
+						/>
+						<InfoRow
+							label="Available From"
+							value={formatDate(previewData.availableFrom)}
+						/>
 					</div>
 				</div>
 			)}
 
 			{isLand && (
-				<div className="bg-gray-50 p-4 sm:p-6 rounded-lg border border-gray-200 shadow-sm space-y-4">
-					<h3 className="text-lg font-medium text-blue-600 border-b pb-1">
+				<div className="bg-gray-50 p-6 rounded-xl border border-gray-200 space-y-4">
+					<h3 className="text-lg font-semibold text-blue-600">
 						🌾 Land Details
 					</h3>
 					<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -127,80 +120,65 @@ const StepPreview = () => {
 							"pricePerUnit",
 							"totalPrice",
 						].map((field) => (
-							<div key={field}>
-								<p className="text-gray-500 font-medium capitalize">{field}</p>
-								<p className="text-gray-900 font-semibold capitalize">
-									{previewData[field] || "-"}
-								</p>
-							</div>
+							<InfoRow key={field} label={field} value={previewData[field]} />
 						))}
 					</div>
 				</div>
 			)}
 
 			{isShop && (
-				<div className="bg-gray-50 p-4 sm:p-6 rounded-lg border border-gray-200 shadow-sm space-y-4">
-					<h3 className="text-lg font-medium text-blue-600 border-b pb-1">
+				<div className="bg-gray-50 p-6 rounded-xl border border-gray-200 space-y-4">
+					<h3 className="text-lg font-semibold text-blue-600">
 						🏪 Shop Details
 					</h3>
 					<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-						<div>
-							<p className="text-gray-500 font-medium">
-								Shop Area (in sq foot)
-							</p>
-							<p className="text-gray-900 font-semibold">
-								{previewData.shopArea || "-"}
-							</p>
-						</div>
-						<div>
-							<p className="text-gray-500 font-medium">Has Shutter</p>
-							{formatBoolean(previewData.hasShutter)}
-						</div>
+						<InfoRow label="Shop Area (sq ft)" value={previewData.shopArea} />
+						<InfoRow
+							label="Has Shutter"
+							value={formatBoolean(previewData.hasShutter)}
+						/>
 					</div>
 				</div>
 			)}
 
-			<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-				<div>
-					<p className="text-gray-500 font-medium">Price (in INR)</p>
-					<p className="text-gray-900 font-semibold">
-						{previewData.price ||
-							previewData.pricePerUnit ||
-							previewData.pricePerFrequency ||
-							"-"}
-					</p>
-					{previewData.duration && (
-						<div>
-							<p className="text-gray-500 font-medium">Duration</p>
-							<p className="text-gray-900 font-semibold capitalize">
-								{previewData.duration}
-							</p>
-						</div>
-					)}
-				</div>
-
-				{previews.length > 0 && (
-					<div className="mt-8">
-						<h3 className="text-lg font-semibold text-blue-600 mb-3 border-b pb-1">
-							📷 Uploaded Pictures
-						</h3>
-						<div className="flex flex-wrap gap-4">
-							{previews.map((src, idx) => (
-								<div
-									key={idx}
-									className="w-28 h-28 rounded-lg overflow-hidden shadow border hover:scale-105 transition"
-								>
-									<img
-										src={src}
-										alt={`preview-${idx}`}
-										className="w-full h-full object-cover"
-									/>
-								</div>
-							))}
-						</div>
-					</div>
+			{/* Price Section */}
+			<div className="bg-gray-50 p-6 rounded-xl border border-gray-200 space-y-2">
+				<h3 className="text-lg font-semibold text-blue-600">💰 Pricing</h3>
+				<InfoRow
+					label="Price (INR)"
+					value={
+						previewData.price ||
+						previewData.pricePerUnit ||
+						previewData.pricePerFrequency
+					}
+				/>
+				{previewData.duration && (
+					<InfoRow label="Duration" value={previewData.duration} />
 				)}
 			</div>
+
+			{/* Image Preview */}
+			{previews.length > 0 && (
+				<div className="bg-gray-50 p-6 rounded-xl border border-gray-200">
+					<h3 className="text-lg font-semibold text-blue-600 mb-3">
+						📷 Uploaded Pictures
+					</h3>
+					<div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+						{previews.map((src, idx) => (
+							<div
+								key={idx}
+								className="aspect-square rounded-lg overflow-hidden border shadow-sm hover:shadow-md hover:scale-105 transition"
+							>
+								<img
+									src={src}
+									alt={`preview-${idx}`}
+									className="w-full h-full object-cover"
+								/>
+							</div>
+						))}
+					</div>
+				</div>
+			)}
 		</div>
 	);
 };
