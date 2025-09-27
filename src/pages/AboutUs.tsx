@@ -103,18 +103,23 @@ const AboutUs: React.FC = () => {
 					<h3 className="text-lg font-bold text-gray-800 mb-2">Contact Us</h3>
 					<div className="flex flex-col md:flex-row gap-6 items-center text-gray-700">
 						<span className="flex items-center gap-2">
-							<FaEnvelope /> support@siliguriproperty.com
+							<FaEnvelope /> siliguriproperty@gmail.com
 						</span>
 						<span className="flex items-center gap-2">
-							<FaPhoneAlt /> +91 98765 43210
+							<FaPhoneAlt /> +91 81015 43210
+							<FaPhoneAlt /> +91 81012 43210
 						</span>
 					</div>
 					<div className="flex gap-4 mt-4">
-						<a href="#" aria-label="Facebook" className="text-blue-600 text-xl">
+						<a
+							href="https://www.facebook.com/landmarkinfratechproperty/"
+							aria-label="Facebook"
+							className="text-blue-600 text-xl"
+						>
 							<FaFacebook />
 						</a>
 						<a
-							href="#"
+							href="https://www.instagram.com/linfratech"
 							aria-label="Instagram"
 							className="text-pink-500 text-xl"
 						>

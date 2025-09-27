@@ -131,7 +131,7 @@ Purpose: ${filters.purpose || "Any"}`
 	return (
 		<form
 			onSubmit={handleSearch}
-			className="w-full bg-white/40 backdrop-blur-md rounded-xl px-6 py-6 flex flex-wrap gap-4 justify-between items-end shadow-lg border border-white/20"
+			className=" w-full bg-white/40 backdrop-blur-md rounded-xl px-6 py-6 flex flex-wrap gap-4 justify-between items-end shadow-lg border border-white/20"
 		>
 			{/* Purpose */}
 			<div className="flex flex-col flex-1 min-w-[180px]">

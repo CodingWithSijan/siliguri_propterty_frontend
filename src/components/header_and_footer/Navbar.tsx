@@ -1,6 +1,15 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Transition } from "@headlessui/react";
-import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
+import {
+	Menu,
+	X,
+	Home,
+	Building,
+	Building2,
+	Info,
+	User,
+	LogOut,
+} from "lucide-react";
 import { NavLink, useNavigate } from "react-router-dom";
 import siliguri_property_logo_noBG from "../../assets/logo_siliguri_property.png";
 import { getInitials } from "../../utils/getInitial";
@@ -77,46 +86,50 @@ const Navbar: React.FC = () => {
 					</NavLink>
 
 					{/* Main navigation links */}
-					<div className="hidden md:flex items-center space-x-6 ml-8">
+					<div className="hidden md:flex items-center space-x-8 ml-8">
 						<NavLink
 							to="/properties"
 							className={({ isActive }) =>
 								isActive
-									? "text-blue-600 font-semibold border-b-2 border-blue-600 pb-1"
-									: "text-gray-700 hover:text-blue-600 font-medium transition-colors"
+									? "flex items-center space-x-2 text-blue-600 font-semibold border-b-2 border-blue-600 pb-1"
+									: "flex items-center space-x-2 text-gray-700 hover:text-blue-600 font-medium transition-colors duration-200"
 							}
 						>
-							All Properties
+							<Building className="h-4 w-4" />
+							<span>Available Properties</span>
 						</NavLink>
 						<NavLink
 							to="/rentals"
 							className={({ isActive }) =>
 								isActive
-									? "text-blue-600 font-semibold border-b-2 border-blue-600 pb-1"
-									: "text-gray-700 hover:text-blue-600 font-medium transition-colors"
+									? "flex items-center space-x-2 text-blue-600 font-semibold border-b-2 border-blue-600 pb-1"
+									: "flex items-center space-x-2 text-gray-700 hover:text-blue-600 font-medium transition-colors duration-200"
 							}
 						>
-							Property for rent
+							<Home className="h-4 w-4" />
+							<span>Rent</span>
 						</NavLink>
 						<NavLink
 							to="/buys"
 							className={({ isActive }) =>
 								isActive
-									? "text-blue-600 font-semibold border-b-2 border-blue-600 pb-1"
-									: "text-gray-700 hover:text-blue-600 font-medium transition-colors"
+									? "flex items-center space-x-2 text-blue-600 font-semibold border-b-2 border-blue-600 pb-1"
+									: "flex items-center space-x-2 text-gray-700 hover:text-blue-600 font-medium transition-colors duration-200"
 							}
 						>
-							Property for sale
+							<Building2 className="h-4 w-4" />
+							<span>Buy</span>
 						</NavLink>
 						<NavLink
 							to="/about"
 							className={({ isActive }) =>
 								isActive
-									? "text-blue-600 font-semibold border-b-2 border-blue-600 pb-1"
-									: "text-gray-700 hover:text-blue-600 font-medium transition-colors"
+									? "flex items-center space-x-2 text-blue-600 font-semibold border-b-2 border-blue-600 pb-1"
+									: "flex items-center space-x-2 text-gray-700 hover:text-blue-600 font-medium transition-colors duration-200"
 							}
 						>
-							About Us
+							<Info className="h-4 w-4" />
+							<span>About Us</span>
 						</NavLink>
 					</div>
 
@@ -128,7 +141,7 @@ const Navbar: React.FC = () => {
 							<div className="relative">
 								<motion.div
 									whileTap={{ scale: 0.97 }}
-									className="flex items-center space-x-3 cursor-pointer bg-gray-50 px-4 py-2 rounded-lg border border-gray-200"
+									className="flex items-center space-x-3 cursor-pointer bg-gray-50 px-4 py-2 rounded-lg "
 									onClick={() => setDropdownOpen(!dropdownOpen)}
 								>
 									{user.avatar ? (
@@ -159,22 +172,56 @@ const Navbar: React.FC = () => {
 								>
 									<div
 										ref={desktopMenuDropdownRef}
-										className="absolute right-0 mt-3 w-56 bg-white rounded-lg shadow-lg py-2 z-50 border border-gray-200"
+										className="absolute right-0 mt-3 w-64 bg-white rounded-lg shadow-xl py-1 z-50 border border-gray-200"
 									>
-										<NavLink
-											to={user.role === "user" ? "/dashboard" : "/admin"}
-											className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md"
-										>
-											{user.role === "user"
-												? "User Dashboard"
-												: "Admin Dashboard"}
-										</NavLink>
-										<button
-											onClick={handleLogout}
-											className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 rounded-md"
-										>
-											Logout
-										</button>
+										{/* User Info Section */}
+										<div className="px-4 py-3 border-b border-gray-100 bg-gray-50 rounded-t-lg">
+											<p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">
+												Logged in as
+											</p>
+											<div className="flex items-center space-x-3">
+												{user.avatar ? (
+													<img
+														className="w-10 h-10 rounded-full border-2 border-white shadow-sm"
+														src={user.avatar}
+														alt={user.name}
+													/>
+												) : (
+													<div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 text-white flex items-center justify-center font-bold shadow-sm">
+														{getInitials(user?.name ?? "")}
+													</div>
+												)}
+												<div className="flex-1 min-w-0">
+													<p className="text-sm font-semibold text-gray-900 truncate">
+														{formatFullName(user?.name)}
+													</p>
+													<p className="text-xs text-gray-600 truncate">
+														{user.email}
+													</p>
+												</div>
+											</div>
+										</div>
+										{/* Menu Items */}
+										<div className="py-1">
+											<NavLink
+												to={user.role === "user" ? "/dashboard" : "/admin"}
+												className="group flex items-center justify-center space-x-2 px-3 py-2.5 text-sm text-gray-700 hover:text-blue-600 bg-gray-50 hover:bg-blue-50 rounded-lg transition-all duration-200 border border-gray-200 hover:border-blue-300 shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 font-medium cursor-pointer"
+											>
+												<User className="h-4 w-4 group-hover:scale-110 transition-transform duration-200" />
+												<span>
+													{user.role === "user"
+														? "My Account"
+														: "Admin Dashboard"}
+												</span>
+											</NavLink>
+											<button
+												onClick={handleLogout}
+												className="group flex items-center justify-center space-x-2 w-full px-2 py-1 mt-2 text-red-700 hover:text-red-800 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50 font-medium cursor-pointer"
+											>
+												<LogOut className="h-4 w-4 group-hover:scale-110 transition-transform duration-200" />
+												<span>Log Out</span>
+											</button>
+										</div>
 									</div>
 								</Transition>
 							</div>
@@ -204,9 +251,9 @@ const Navbar: React.FC = () => {
 							className="text-gray-600 hover:text-gray-900 focus:outline-none p-2 rounded-lg"
 						>
 							{isOpen ? (
-								<XMarkIcon className="h-6 w-6" />
+								<X className="h-6 w-6" />
 							) : (
-								<Bars3Icon className="h-6 w-6" />
+								<Menu className="h-6 w-6" />
 							)}
 						</button>
 					</div>
@@ -229,22 +276,6 @@ const Navbar: React.FC = () => {
 				>
 					{user ? (
 						<div className="space-y-4">
-							<div className="flex items-center space-x-3 px-4 py-2 border-b border-gray-200 mb-2">
-								{user.avatar ? (
-									<img
-										className="w-9 h-9 rounded-full border border-gray-300"
-										src={user.avatar}
-										alt={user.name}
-									/>
-								) : (
-									<div className="w-9 h-9 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold">
-										{getInitials(user?.name ?? "")}
-									</div>
-								)}
-								<span className="text-gray-800 font-medium text-base">
-									{formatFullName(user?.name)}
-								</span>
-							</div>
 							<div>
 								<p className="text-xs text-gray-500 font-semibold uppercase tracking-wide px-4 mb-2">
 									Navigation
@@ -252,48 +283,80 @@ const Navbar: React.FC = () => {
 								<div className="space-y-1">
 									<NavLink
 										to="/properties"
-										className="block w-full text-gray-700 hover:text-blue-600 px-4 py-2 rounded-md"
+										className="flex items-center space-x-3 px-4 py-3 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
 									>
-										🏘️ All Properties
+										<Building className="h-5 w-5" />
+										<span className="font-medium">Available Properties</span>
 									</NavLink>
 									<NavLink
 										to="/rentals"
-										className="block w-full text-gray-700 hover:text-blue-600 px-4 py-2 rounded-md"
+										className="flex items-center space-x-3 px-4 py-3 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
 									>
-										🏠 Property for rent
+										<Home className="h-5 w-5" />
+										<span className="font-medium">Rent</span>
 									</NavLink>
 									<NavLink
 										to="/buys"
-										className="block w-full text-gray-700 hover:text-blue-600 px-4 py-2 rounded-md"
+										className="flex items-center space-x-3 px-4 py-3 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
 									>
-										💼 Property for sale
+										<Building2 className="h-5 w-5" />
+										<span className="font-medium">Buy</span>
 									</NavLink>
 									<NavLink
 										to="/about"
-										className="block w-full text-gray-700 hover:text-blue-600 px-4 py-2 rounded-md"
+										className="flex items-center space-x-3 px-4 py-3 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
 									>
-										ℹ️ About Us
+										<Info className="h-5 w-5" />
+										<span className="font-medium">About Us</span>
 									</NavLink>
 								</div>
 							</div>
 							<div className="pt-2 border-t border-gray-200">
-								<p className="text-xs text-gray-500 font-semibold uppercase tracking-wide px-4 mb-2">
+								<p className="text-xs text-gray-500 font-semibold uppercase tracking-wide px-4 mb-3">
 									Account
 								</p>
-								<div className="space-y-2">
+								<div className="space-y-3">
+									<div>
+										<p className="text-xs text-gray-500 font-medium px-4 mb-2">
+											Logged in as
+										</p>
+										<div className="flex items-center space-x-3 px-4 py-3 bg-gray-50 rounded-lg border border-gray-100">
+											{user.avatar ? (
+												<img
+													className="w-10 h-10 rounded-full border-2 border-white shadow-sm"
+													src={user.avatar}
+													alt={user.name}
+												/>
+											) : (
+												<div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 text-white flex items-center justify-center font-bold shadow-sm">
+													{getInitials(user?.name ?? "")}
+												</div>
+											)}
+											<div className="flex-1 min-w-0">
+												<span className="text-gray-800 font-medium text-sm block truncate">
+													{formatFullName(user?.name)}
+												</span>
+												<span className="text-gray-500 text-xs block truncate">
+													{user.email}
+												</span>
+											</div>
+										</div>
+									</div>
 									<NavLink
 										to={user.role === "user" ? "/dashboard" : "/admin"}
-										className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-md"
+										className="group flex items-center justify-center space-x-2 px-3 py-2.5 text-gray-700 hover:text-blue-600 bg-gray-50 hover:bg-blue-50 rounded-lg transition-all duration-200 border border-gray-200 hover:border-blue-300 shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 font-medium cursor-pointer"
 									>
-										{user.role === "user"
-											? "User Dashboard"
-											: "Admin Dashboard"}
+										<User className="h-4 w-4 group-hover:scale-110 transition-transform duration-200" />
+										<span>
+											{user.role === "user" ? "My Account" : "Admin Dashboard"}
+										</span>
 									</NavLink>
 									<button
 										onClick={handleLogout}
-										className="block w-full text-left px-4 py-2 text-red-600 hover:bg-red-50 rounded-md"
+										className="group flex items-center justify-center space-x-2 w-full px-2 py-1 mt-2 text-red-700 hover:text-red-800 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50 font-medium cursor-pointer"
 									>
-										Logout
+										<LogOut className="h-4 w-4 group-hover:scale-110 transition-transform duration-200" />
+										<span>Log Out</span>
 									</button>
 								</div>
 							</div>
@@ -307,27 +370,31 @@ const Navbar: React.FC = () => {
 								<div className="space-y-1">
 									<NavLink
 										to="/properties"
-										className="block w-full text-gray-700 hover:text-blue-600 px-4 py-2 rounded-md"
+										className="flex items-center space-x-3 px-4 py-3 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
 									>
-										🏘️ All Properties
+										<Building className="h-5 w-5" />
+										<span className="font-medium">Available Properties</span>
 									</NavLink>
 									<NavLink
 										to="/rentals"
-										className="block w-full text-gray-700 hover:text-blue-600 px-4 py-2 rounded-md"
+										className="flex items-center space-x-3 px-4 py-3 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
 									>
-										🏠 Property for rent
+										<Home className="h-5 w-5" />
+										<span className="font-medium">Rent</span>
 									</NavLink>
 									<NavLink
 										to="/buys"
-										className="block w-full text-gray-700 hover:text-blue-600 px-4 py-2 rounded-md"
+										className="flex items-center space-x-3 px-4 py-3 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
 									>
-										💼 Property for sale
+										<Building2 className="h-5 w-5" />
+										<span className="font-medium">Buy</span>
 									</NavLink>
 									<NavLink
 										to="/about"
-										className="block w-full text-gray-700 hover:text-blue-600 px-4 py-2 rounded-md"
+										className="flex items-center space-x-3 px-4 py-3 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
 									>
-										ℹ️ About Us
+										<Info className="h-5 w-5" />
+										<span className="font-medium">About Us</span>
 									</NavLink>
 								</div>
 							</div>
@@ -335,16 +402,16 @@ const Navbar: React.FC = () => {
 								<p className="text-xs text-gray-500 font-semibold uppercase tracking-wide px-4 mb-2">
 									Account
 								</p>
-								<div className="space-y-2">
+								<div className="space-y-3">
 									<NavLink
 										to="/login"
-										className="block w-full text-center px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-md"
+										className="flex items-center justify-center px-4 py-3 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors font-medium"
 									>
 										Login
 									</NavLink>
 									<NavLink
 										to="/signup"
-										className="block w-full text-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+										className="flex items-center justify-center px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
 									>
 										Sign Up
 									</NavLink>

@@ -30,6 +30,7 @@ const SellHouse: React.FC<{
 		title: listing.title,
 		description: listing.description,
 		location: listing.location,
+		alternateLocation: listing.alternateLocation,
 		propertyCategory: listing.propertyCategory,
 		intent: listing.intent,
 	};

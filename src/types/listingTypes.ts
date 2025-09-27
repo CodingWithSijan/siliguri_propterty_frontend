@@ -14,7 +14,7 @@ export interface IBaseListingType {
 	description: string;
 	pictures?: string[];
 	location: string;
-	alternateLocaiton?: string;
+	alternateLocation: string;
 	propertyCategory: PropertyCategory;
 	approvalStatus: "approved" | "pending" | "rejected";
 }

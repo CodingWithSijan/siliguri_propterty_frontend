@@ -34,6 +34,7 @@ import ManageUsers from "./components/adminComponents/ManageUsers";
 import ViewUser from "./components/adminComponents/ViewUser";
 import ViewPost from "./components/adminComponents/ViewPost";
 import AboutUs from "./pages/AboutUs";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
 
 const App: React.FC = () => {
 	return (
@@ -44,7 +45,7 @@ const App: React.FC = () => {
 				{/* Homepage & Info */}
 				<Route path="/" element={<Homepage />} />
 				<Route path="/about" element={<AboutUs />} />
-
+				<Route path="/privacy" element={<PrivacyPolicy />} />
 				{/* Rental Property Routes */}
 				<Route path="/rentals" element={<RentalProperties />} />
 				<Route path="/rentals/:id" element={<RentalPropertyDetails />} />

@@ -47,11 +47,17 @@ const Footer: React.FC = () => {
 							</div>
 							<div className="flex items-center gap-3 text-slate-300">
 								<FaPhone className="text-blue-400 flex-shrink-0" />
-								<span className="text-sm">+91 XXXXX XXXXX</span>
+								<a className="text-sm" href="tel:+918101543210">
+									+918101543210
+								</a>
+								<FaPhone className="text-blue-400 flex-shrink-0" />
+								<a className="text-sm" href="tel:+918101243210">
+									+918101243210
+								</a>
 							</div>
 							<div className="flex items-center gap-3 text-slate-300">
 								<FaEnvelope className="text-blue-400 flex-shrink-0" />
-								<span className="text-sm">info@siliguriproperty.com</span>
+								<span className="text-sm">siliguriproperty@gmail.com</span>
 							</div>
 						</div>
 
@@ -99,7 +105,7 @@ const Footer: React.FC = () => {
 								target="_blank"
 								href="https://my-portfolio-murex-iota-66.vercel.app/"
 							>
-								Sijan Pradhan
+								sijan
 							</a>
 						</div>
 					</div>

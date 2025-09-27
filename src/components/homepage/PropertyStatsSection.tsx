@@ -8,8 +8,10 @@ import {
 	FaClock,
 	FaHandshake,
 } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 
 const PropertyStatsSection: React.FC = () => {
+	const navigate = useNavigate();
 	const features = [
 		{
 			icon: <FaSearch className="text-3xl text-blue-600" />,
@@ -119,18 +121,10 @@ const PropertyStatsSection: React.FC = () => {
 								whileHover={{ scale: 1.05 }}
 								whileTap={{ scale: 0.95 }}
 								className="inline-flex items-center gap-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-4 rounded-2xl font-semibold hover:shadow-xl transition-all duration-300"
+								onClick={() => navigate("/properties")}
 							>
 								<FaSearch className="text-lg" />
 								<span>Find Properties</span>
-							</motion.button>
-
-							<motion.button
-								whileHover={{ scale: 1.05 }}
-								whileTap={{ scale: 0.95 }}
-								className="inline-flex items-center gap-3 bg-white text-gray-700 border-2 border-gray-200 px-8 py-4 rounded-2xl font-semibold hover:border-blue-300 hover:shadow-lg transition-all duration-300"
-							>
-								<FaHome className="text-lg" />
-								<span>List Your Property</span>
 							</motion.button>
 						</div>
 					</div>
