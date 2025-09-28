@@ -7,6 +7,8 @@ import { ISellListingType } from "../../types/listingTypes";
 import propertyImagePlaceholder from "../../assets/looking_to_sell.png";
 import { BiRupee } from "react-icons/bi";
 import ActionButtons from "./ActionButtons";
+import { getDaysAgoTextFromObjectId } from "../../utils/getDaysAgo";
+import RenderListingFeaturesSell from "./RenderListingFeaturesSell";
 
 const capitalize = (str: string | undefined) =>
 	str ? str.charAt(0).toUpperCase() + str.slice(1) : "";
@@ -27,26 +29,21 @@ const SellListingCard: React.FC<{
 		return "Price on request";
 	};
 
+	const postedAgoText = getDaysAgoTextFromObjectId(listing._id);
+
 	return (
 		<motion.div
-			whileHover={{ y: -4, scale: 1.01 }}
-			transition={{ type: "spring", stiffness: 250, damping: 18 }}
+			transition={{ type: "spring", stiffness: 100, damping: 18 }}
 			onClick={onClick}
-			className="relative bg-white rounded-2xl shadow-md hover:shadow-lg border border-gray-200/60
-    group w-full max-w-sm mx-auto cursor-pointer flex flex-col overflow-hidden h-[400px]"
+			className="relative bg-white rounded-md shadow-md hover:shadow-lg border border-gray-200/60 group w-full max-w-sm mx-auto cursor-pointer flex flex-col overflow-hidden"
+			style={{ minHeight: 420 }}
 		>
 			{/* Tilted ribbon - diagonal across top-left */}
 			<div className="absolute top-3 left-0 z-20 overflow-visible pointer-events-none">
-				<span className="block bg-red-600 text-white text-xs font-semibold px-8 py-1 transform -rotate-12 origin-left shadow-md -translate-x-3 pointer-events-auto">
+				<span className="block bg-blue-500 text-white text-xs font-semibold px-8 py-1 transform -rotate-12 origin-left shadow-md -translate-x-3 pointer-events-auto">
 					FOR SALE
 				</span>
 			</div>
-			{/* Tag
-			<div className="absolute top-3 left-3 z-20">
-				<span className="bg-red-600 text-white text-[11px] px-3 py-1.5 rounded-full font-semibold tracking-wide flex items-center gap-1 shadow-sm">
-					<MdSell className="text-sm" /> SELL
-				</span>
-			</div> */}
 
 			{listing.approvalStatus && userOrGlobal === "user" && (
 				<div
@@ -69,30 +66,29 @@ const SellListingCard: React.FC<{
 							>
 								{capitalize(listing.approvalStatus)}
 							</span>
-							<span>
-								Posted on{" "}
-								{listing._id
-									? new Date(
-											parseInt(listing._id.substring(0, 8), 16) * 1000
-									  ).toLocaleDateString()
-									: "-"}
-							</span>
 						</>
 					}
 				</div>
 			)}
 
 			{/* Image */}
-			<div className="w-full h-64 overflow-hidden relative">
+			<div className="w-full overflow-hidden relative" style={{ height: 240 }}>
 				<img
 					src={listing.pictures?.[0] || propertyImagePlaceholder}
 					alt={listing.title}
 					className="w-full h-full object-cover mx-auto"
 				/>
+				{/* Share button moved to top-right of card (show for global view to avoid overlap with user-status pill) */}
+				{userOrGlobal === "global" && (
+					// keep action buttons inside image area but slightly inset so they don't overlap status pills
+					<div className="absolute top-2 right-2 z-30 pointer-events-auto">
+						<ActionButtons listing={listing} />
+					</div>
+				)}
 				{/* gradient overlay to improve title readability */}
-				<div className="absolute left-0 right-0 bottom-0 h-28 bg-gradient-to-t from-black/70 to-transparent" />
+				<div className="absolute left-0 right-0 bottom-0 h-36 bg-gradient-to-t from-black/70 to-transparent" />
 				{/* Title pinned to the bottom of the image */}
-				<div className="absolute left-4 right-4 bottom-0 text-white pb-2">
+				<div className="absolute left-3 right-3 bottom-0 text-white pb-1">
 					<h3
 						className="text-white font-semibold text-base leading-snug line-clamp-2 h-[44px] mb-0 tracking-tight"
 						style={{
@@ -106,56 +102,45 @@ const SellListingCard: React.FC<{
 			</div>
 
 			{/* Content */}
-			<div className="p-4 pt-6 flex flex-col justify-between flex-grow">
-				<div className="mt-1">
-					<div className="flex items-center gap-1 text-xs text-gray-600 mb-2">
-						<FaMapMarkerAlt className="text-blue-500 text-sm" />
-						<span className="">{listing.alternateLocation}</span>
-					</div>
+			<div className="p-2 pt-2.5 flex flex-col justify-between flex-grow">
+				{/* Top row: features only */}
+				<div className="flex items-center gap-2 mb-1">
+					<RenderListingFeaturesSell listing={listing} />
 				</div>
 
-				{/* Price Section */}
-				<div className="mt-2">
-					{(listing.price || listing.totalPrice) && (
-						<div className="mb-1">
-							<span
-								className="text-green-700 font-bold text-lg flex items-center gap-1"
-								style={{
-									fontFamily:
-										"Inter, Poppins, ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial",
-								}}
-							>
-								<BiRupee className="text-base" />
-								{formatPrice()}
-								{listing.propertyCategory !== "land" && listing.unit && (
-									<span className="text-sm text-gray-600 font-medium">
-										/ {capitalize(listing.unit)}
-									</span>
-								)}
-							</span>
-						</div>
-					)}
+				{/* Location */}
+				<div className="flex items-center gap-2 text-xs text-gray-600">
+					<FaMapMarkerAlt className="text-blue-500 text-sm" />
+					<span className="text-sm truncate">{listing.alternateLocation}</span>
 				</div>
+
+				{/* Price moved below location */}
+				{(listing.price || listing.totalPrice) && (
+					<div className="mt-2">
+						<span className="text-green-700 font-bold text-base flex items-center gap-1">
+							<BiRupee className="text-base" />
+							{formatPrice()}
+							{listing.propertyCategory !== "land" && listing.unit && (
+								<span className="text-sm text-gray-600 font-medium">
+									/ {capitalize(listing.unit)}
+								</span>
+							)}
+						</span>
+					</div>
+				)}
+
 				{/* Separator line above actions */}
-				<div className="w-full mt-3 border-t border-gray-100" />
-				{/* Action row - favourites and share */}
+				<div className="w-full mt-2 border-t border-gray-100" />
 				{userOrGlobal === "global" && (
-					<div className="mt-3 flex items-center justify-between">
+					<div className="mt-1 flex items-center justify-between">
 						<div className="flex items-center gap-2 text-sm text-gray-600">
 							<span className="px-3 py-1 rounded-md bg-gray-50 text-gray-800 font-medium">
 								{capitalize(listing.propertyCategory as string)}
 							</span>
 						</div>
-						<span className="px-3 py-1 rounded-md bg-gray-50 text-gray-500 text-sm italic">
-							Posted on{" "}
-							{listing._id
-								? new Date(
-										parseInt(listing._id.substring(0, 8), 16) * 1000
-								  ).toLocaleDateString()
-								: "-"}
+						<span className="px-3 rounded-md bg-gray-50 text-gray-500 text-xs font-bold">
+							Posted {postedAgoText}
 						</span>
-
-						<ActionButtons listing={listing} />
 					</div>
 				)}
 			</div>

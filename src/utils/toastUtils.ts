@@ -30,13 +30,14 @@ const showSuccess = (msg: string): void => {
 const showInfo = (msg: string): void => {
 	toast.info(msg, {
 		position: "top-center",
-		autoClose: 1000,
-		hideProgressBar: false,
+		autoClose: 3000,
+		hideProgressBar: true,
 		closeOnClick: false,
 		pauseOnHover: false,
 		draggable: false,
 		progress: undefined,
-		theme: "colored",
+		theme: "light",
+		closeButton: false,
 		transition: Bounce,
 	});
 };

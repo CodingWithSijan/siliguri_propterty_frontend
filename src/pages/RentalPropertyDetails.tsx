@@ -3,17 +3,10 @@ import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { IRentListingType } from "../types/listingTypes";
 import BASE_URL from "../services";
-import { ClipLoader } from "react-spinners";
 import { IListingUserDetails } from "../types/listingUserDetails";
 import Navbar from "../components/header_and_footer/Navbar";
 import House from "../components/property_details_page/rent/common/House";
 import ShopRental from "../components/property_details_page/rent/shop/ShopRental";
-
-const loaderStyle: React.CSSProperties = {
-	display: "block",
-	margin: "40px auto",
-	borderColor: "#2563eb",
-};
 
 const RentalPropertyDetails: React.FC = () => {
 	const { id } = useParams();
@@ -39,14 +32,21 @@ const RentalPropertyDetails: React.FC = () => {
 
 	if (!listing)
 		return (
-			<div className="flex justify-center items-center min-h-[200px]">
-				<ClipLoader
-					cssOverride={loaderStyle}
-					size={80}
-					color={"#2563eb"}
-					aria-label="Loading Spinner"
-					data-testid="loader"
-				/>
+			<div className="container mx-auto px-4 py-12">
+				<div className="space-y-4">
+					<div className="h-8 bg-gray-200 rounded w-2/5 animate-pulse"></div>
+					<div className="h-56 bg-gray-200 rounded animate-pulse"></div>
+					<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+						<div className="space-y-3">
+							<div className="h-6 bg-gray-200 rounded animate-pulse"></div>
+							<div className="h-6 bg-gray-200 rounded animate-pulse w-4/5"></div>
+						</div>
+						<div className="space-y-3">
+							<div className="h-6 bg-gray-200 rounded animate-pulse"></div>
+							<div className="h-6 bg-gray-200 rounded animate-pulse w-3/4"></div>
+						</div>
+					</div>
+				</div>
 			</div>
 		);
 	const renderPropertyCategory = () => {

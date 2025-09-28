@@ -7,7 +7,6 @@ import {
 } from "../../types/listingTypes";
 import { IListingUserDetails } from "../../types/listingUserDetails";
 import BASE_URL from "../../services";
-import { ClipLoader } from "react-spinners";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
@@ -29,12 +28,6 @@ import {
 } from "lucide-react";
 import { approvePost, rejectPost } from "../../services/fetchFunctionsForAdmin";
 import { showSuccess, showError } from "../../utils/toastUtils";
-
-const loaderStyle: React.CSSProperties = {
-	display: "block",
-	margin: "40px auto",
-	borderColor: "#2563eb",
-};
 
 const ViewPost: React.FC = () => {
 	const { id } = useParams();
@@ -154,14 +147,13 @@ const ViewPost: React.FC = () => {
 
 	if (loading) {
 		return (
-			<div className="flex justify-center items-center min-h-[400px]">
-				<ClipLoader
-					cssOverride={loaderStyle}
-					size={80}
-					color={"#2563eb"}
-					aria-label="Loading Spinner"
-					data-testid="loader"
-				/>
+			<div className="min-h-[400px] flex flex-col gap-4 p-6">
+				<div className="h-8 w-1/3 bg-gray-200 rounded animate-pulse" />
+				<div className="h-64 bg-gray-200 rounded-md animate-pulse" />
+				<div className="grid grid-cols-2 gap-4">
+					<div className="h-20 bg-gray-200 rounded animate-pulse" />
+					<div className="h-20 bg-gray-200 rounded animate-pulse" />
+				</div>
 			</div>
 		);
 	}
@@ -384,8 +376,10 @@ const ViewPost: React.FC = () => {
 								>
 									{actionLoading === "approve" ? (
 										<>
-											<ClipLoader size={16} color="white" />
-											<span className="ml-2">Approving...</span>
+											<span className="inline-flex items-center">
+												<span className="h-2 w-2 bg-white rounded-full animate-pulse mr-2" />
+												Approving...
+											</span>
 										</>
 									) : (
 										<>
@@ -402,8 +396,10 @@ const ViewPost: React.FC = () => {
 								>
 									{actionLoading === "reject" ? (
 										<>
-											<ClipLoader size={16} color="white" />
-											<span className="ml-2">Rejecting...</span>
+											<span className="inline-flex items-center">
+												<span className="h-2 w-2 bg-white rounded-full animate-pulse mr-2" />
+												Rejecting...
+											</span>
 										</>
 									) : (
 										<>

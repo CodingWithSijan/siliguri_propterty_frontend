@@ -75,7 +75,7 @@ const EditPostStepperForm: React.FC<EditPostStepperFormProps> = ({
 			title: initialData.title,
 			description: initialData.description,
 			location: initialData.location,
-			alternateLocation: initialData.alternateLocaiton,
+			alternateLocation: initialData.alternateLocation,
 		};
 
 		// Add intent-specific fields with type checking

@@ -1,13 +1,14 @@
 import React from "react";
 import { FaMapMarkerAlt } from "react-icons/fa";
-import { MdSell } from "react-icons/md";
 import { BiRupee } from "react-icons/bi";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import { formatIndianCurrency } from "../../utils/priceFormatHelper";
 import { IRentListingType } from "../../types/listingTypes";
 import propertyImagePlaceholder from "../../assets/looking_for_rent.png";
-import PropertyIconHelper from "../common/PropertyIconHelper";
+import ActionButtons from "./ActionButtons";
+import getDaysAgoTextFromObjectId from "../../utils/getDaysAgo";
+import RenderListingFeaturesRent from "./RenderListingFeaturesRent";
+import { formatIndianCurrency } from "../../utils/priceFormatHelper";
 
 const capitalize = (str: string | undefined) =>
 	str ? str.charAt(0).toUpperCase() + str.slice(1) : "";
@@ -17,11 +18,6 @@ const RentListingCard: React.FC<{
 	userOrGlobal: string;
 	onClick?: () => void;
 }> = ({ listing, userOrGlobal, onClick }) => {
-	const priceNum = Number(listing.pricePerFrequency);
-	const formattedPrice = isNaN(priceNum)
-		? listing.pricePerFrequency
-		: formatIndianCurrency(priceNum);
-
 	const navigate = useNavigate();
 	const handleClick = () => {
 		if (onClick) {
@@ -32,106 +28,110 @@ const RentListingCard: React.FC<{
 			navigate(path);
 		}
 	};
+	const postedAgoText = getDaysAgoTextFromObjectId(listing._id);
 
 	return (
 		<motion.div
-			whileHover={{ y: -4, scale: 1.01 }}
-			transition={{ type: "spring", stiffness: 250, damping: 18 }}
-			className="relative bg-white rounded-2xl shadow-md hover:shadow-lg border border-gray-200/60
-    group w-full max-w-sm mx-auto cursor-pointer flex flex-col overflow-hidden h-[400px]"
+			transition={{ type: "spring", stiffness: 100, damping: 18 }}
 			onClick={handleClick}
+			className="relative bg-white rounded-md shadow-md hover:shadow-lg border border-gray-200/60 group w-full max-w-sm mx-auto cursor-pointer flex flex-col overflow-hidden"
+			style={{ minHeight: 420 }}
 		>
-			{/* Rent Tag */}
-			<div className="absolute top-3 left-3 z-20">
-				<span className="bg-blue-600 text-white text-[11px] px-3 py-1.5 rounded-full font-semibold tracking-wide flex items-center gap-1 shadow-sm">
-					<MdSell className="text-sm" /> RENT
+			{/* Tilted ribbon - diagonal across top-left */}
+			<div className="absolute top-3 left-0 z-20 overflow-visible pointer-events-none">
+				<span className="block bg-orange-500 text-white text-xs font-semibold px-8 py-1 transform -rotate-12 origin-left shadow-md -translate-x-3 pointer-events-auto">
+					FOR RENT
 				</span>
 			</div>
 
 			{/* Approval / Posted */}
-			<div className="absolute top-3 right-3 z-20">
-				{listing.approvalStatus && userOrGlobal === "user" ? (
-					<span
-						className={`px-2 py-1 rounded-full text-[11px] font-semibold shadow-sm border ${
-							listing.approvalStatus === "approved"
-								? "bg-green-50 text-green-700 border-green-200"
-								: listing.approvalStatus === "pending"
-								? "bg-yellow-50 text-yellow-700 border-yellow-200"
-								: "bg-red-50 text-red-700 border-red-200"
-						}`}
-					>
-						{capitalize(listing.approvalStatus)}
-					</span>
-				) : (
-					<span className="bg-white/90 text-gray-700 text-[11px] px-2 py-1 rounded-full shadow-sm border border-gray-200 font-medium">
-						Posted on{" "}
-						{listing._id
-							? new Date(
-									parseInt(listing._id.substring(0, 8), 16) * 1000
-							  ).toLocaleDateString()
-							: "-"}
-					</span>
-				)}
-			</div>
+			{listing.approvalStatus && userOrGlobal === "user" && (
+				<div
+					className={`absolute top-3 right-3 text-[11px] px-2 py-1 rounded-full shadow-sm font-medium z-20 border ${
+						userOrGlobal === "user"
+							? "bg-white/90 border-gray-200 text-gray-700"
+							: "bg-blue-50 border-blue-200 "
+					}`}
+				>
+					{
+						<>
+							<span
+								className={`mr-2 font-bold ${
+									listing.approvalStatus === "approved"
+										? "text-green-600"
+										: listing.approvalStatus === "pending"
+										? "text-yellow-600"
+										: "text-red-600"
+								}`}
+							>
+								{capitalize(listing.approvalStatus)}
+							</span>
+						</>
+					}
+				</div>
+			)}
 
 			{/* Image */}
-			<div className="relative w-full h-52 overflow-hidden">
+			<div className="w-full overflow-hidden relative" style={{ height: 240 }}>
 				<img
-					src={
-						listing.pictures && listing.pictures.length > 0
-							? listing.pictures[0]
-							: propertyImagePlaceholder
-					}
+					src={listing.pictures?.[0] || propertyImagePlaceholder}
 					alt={listing.title}
-					className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+					className="w-full h-full object-cover mx-auto"
 				/>
-				<div className="absolute inset-0 bg-gradient-to-t from-black/40 via-black/10 to-transparent" />
+				{/* Share button moved to top-right of card (show for global view to avoid overlap with user-status pill) */}
+				{userOrGlobal === "global" && (
+					// keep action buttons inside image area but slightly inset so they don't overlap status pills
+					<div className="absolute top-2 right-2 z-30 pointer-events-auto">
+						<ActionButtons listing={listing} />
+					</div>
+				)}
+
+				{/* gradient overlay to improve title readability */}
+				<div className="absolute left-0 right-0 bottom-0 h-36 bg-gradient-to-t from-black/70 to-transparent" />
+				{/* Title pinned to the bottom of the image */}
+				<div className="absolute left-3 right-3 bottom-0 text-white pb-1">
+					<h3
+						className="text-white font-semibold text-base leading-snug line-clamp-2 h-[44px] mb-0 tracking-tight"
+						style={{
+							fontFamily:
+								"Inter, Poppins, ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial",
+						}}
+					>
+						{listing.title}
+					</h3>
+				</div>
 			</div>
 
 			{/* Content */}
-			<div className="p-4 flex flex-col flex-grow justify-between min-h-[180px]">
-				<div>
-					{/* Category */}
-					<div className="flex items-center justify-between mb-2">
-						<span className="flex items-center gap-1 bg-blue-50 text-blue-700 text-xs px-2.5 py-1 rounded-full border border-blue-200 font-medium">
-							<PropertyIconHelper
-								propertyCategory={listing.propertyCategory}
-								className="inline-block text-xs w-4 h-4"
-							/>
-							{capitalize(listing.propertyCategory)}
-						</span>
-					</div>
-
-					{/* Title */}
-					<h3 className="text-gray-900 font-semibold text-lg leading-snug line-clamp-2 h-[48px] mb-1">
-						{listing.title}
-					</h3>
-
-					{/* Location */}
-					<div className="flex items-center gap-1 text-sm text-gray-600 mb-2">
-						<FaMapMarkerAlt className="text-blue-500 text-sm" />
-						<span className="truncate">{listing.location}</span>
-					</div>
+			<div className="p-2 pt-2.5 flex flex-col justify-between flex-grow">
+				{/* Top row: features only */}
+				<div className="flex items-center gap-2 mb-1">
+					<RenderListingFeaturesRent listing={listing} />
 				</div>
 
-				{/* Footer: Price + Duration (always bottom aligned) */}
-				<div className="mt-auto">
-					{/* Price */}
-					{listing.pricePerFrequency && (
-						<div className="mb-1">
-							<span className="text-green-700 font-bold text-xl flex items-center gap-1">
-								<BiRupee className="text-lg" />
-								{formattedPrice}
-								{listing.frequency && (
-									<span className="text-sm text-gray-600 font-medium">
-										/ {capitalize(listing.frequency)}
-									</span>
-								)}
-							</span>
-						</div>
-					)}
+				{/* Location */}
+				<div className="flex items-center gap-2 text-xs text-gray-600">
+					<FaMapMarkerAlt className="text-blue-500 text-sm" />
+					<span className="text-sm truncate">{listing.alternateLocation}</span>
+				</div>
 
-					{/* Duration */}
+				{/* Price moved below location */}
+				{listing.pricePerFrequency && (
+					<div className="mt-2">
+						<span className="text-green-700 font-bold text-base flex items-center gap-1">
+							<BiRupee className="text-base" />
+							{formatIndianCurrency(listing.pricePerFrequency)}
+							{listing.frequency && (
+								<span className="text-sm text-gray-600 font-medium">
+									/ {capitalize(listing.frequency)}
+								</span>
+							)}
+						</span>
+					</div>
+				)}
+
+				{/* Footer: Duration */}
+				<div className="mt-2">
 					{listing.availableForDuration && (
 						<p className="text-xs text-gray-500">
 							Available for{" "}
@@ -144,6 +144,21 @@ const RentListingCard: React.FC<{
 					)}
 				</div>
 			</div>
+
+			{/* Separator line above actions */}
+			<div className="w-full mt-2 border-t border-gray-100" />
+			{userOrGlobal === "global" && (
+				<div className="mt-1 flex items-center justify-between">
+					<div className="flex items-center gap-2 text-sm text-gray-600">
+						<span className="px-3 py-1 rounded-md bg-gray-50 text-gray-800 font-medium">
+							{capitalize(listing.propertyCategory as string)}
+						</span>
+					</div>
+					<span className="px-3 rounded-md bg-gray-50 text-gray-500 text-xs font-bold">
+						Posted {postedAgoText}
+					</span>
+				</div>
+			)}
 		</motion.div>
 	);
 };

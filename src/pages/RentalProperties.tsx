@@ -13,13 +13,6 @@ import {
 import { useSearchParams } from "react-router-dom";
 import { IRentListingType } from "../types/listingTypes";
 import BASE_URL from "../services";
-import { ClipLoader } from "react-spinners";
-
-const loaderStyle: React.CSSProperties = {
-	display: "block",
-	margin: "40px auto",
-	borderColor: "#2563eb",
-};
 
 const RentalProperties: React.FC = () => {
 	const [posts, setPosts] = useState<IRentListingType[]>([]);
@@ -103,15 +96,12 @@ const RentalProperties: React.FC = () => {
 					Rental Properties
 				</h1>
 				{loading ? (
-					<div className="flex justify-center items-center min-h-[200px]">
-						<ClipLoader
-							cssOverride={loaderStyle}
-							size={80}
-							color={"#2563eb"}
-							loading={loading}
-							aria-label="Loading Spinner"
-							data-testid="loader"
-						/>
+					<div className="animate-pulse space-y-4">
+						<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+							{Array.from({ length: 8 }).map((_, i) => (
+								<div key={i} className="h-56 bg-gray-200 rounded-md" />
+							))}
+						</div>
 					</div>
 				) : (
 					<>

@@ -18,13 +18,6 @@ import {
 	ISellListingType,
 } from "../types/listingTypes";
 import BASE_URL from "../services";
-import { ClipLoader } from "react-spinners";
-
-const loaderStyle: React.CSSProperties = {
-	display: "block",
-	margin: "40px auto",
-	borderColor: "#2563eb",
-};
 
 const AllListings: React.FC = () => {
 	const [posts, setPosts] = useState<IUniversalListingType[]>([]);
@@ -118,15 +111,15 @@ const AllListings: React.FC = () => {
 				</h1>
 
 				{loading ? (
-					<div className="flex justify-center items-center min-h-[200px]">
-						<ClipLoader
-							cssOverride={loaderStyle}
-							size={80}
-							color={"#2563eb"}
-							loading={loading}
-							aria-label="Loading Spinner"
-							data-testid="loader"
-						/>
+					<div className="container mx-auto px-4 py-12">
+						<div className="space-y-4">
+							<div className="h-8 bg-gray-200 rounded w-1/2 animate-pulse"></div>
+							<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+								<div className="h-56 bg-gray-200 rounded animate-pulse"></div>
+								<div className="h-56 bg-gray-200 rounded animate-pulse"></div>
+								<div className="h-56 bg-gray-200 rounded animate-pulse"></div>
+							</div>
+						</div>
 					</div>
 				) : (
 					<>
