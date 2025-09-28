@@ -72,7 +72,7 @@ const Image_UserDetails: React.FC<{
 					</DialogTrigger>
 
 					<DialogContent
-						className="w-screen h-screen max-w-none max-h-none rounded-none border-0 p-0 bg-black/95 backdrop-blur-sm"
+						className="w-screen h-[97vh] rounded-none border-0 p-0 bg-black/95 backdrop-blur-sm"
 						onKeyDown={handleKeyDown}
 						onClick={handleBackdropClick}
 					>
@@ -101,7 +101,7 @@ const Image_UserDetails: React.FC<{
 							<img
 								src={images[currentImageIndex]}
 								alt={`${listing_title} - Image ${currentImageIndex + 1}`}
-								className="max-w-[95%] max-h-[95%] object-contain select-none"
+								className="w-[95%] h-[95%] object-contain select-none"
 								onError={(e) => {
 									const target = e.target as HTMLImageElement;
 									target.src = propertyImagePlaceholder;

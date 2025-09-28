@@ -49,10 +49,9 @@ const ActionButtons: React.FC<{ listing: ISellListingType }> = ({
 		<>
 			<button
 				onClick={onShare}
-				className="flex items-center gap-2 text-sm font-medium px-3 py-1 rounded-md bg-gray-50 text-gray-700"
+				className="text-sm font-medium p-2 rounded-md bg-gray-50 text-gray-700 "
 			>
-				<Share2 className="w-4 h-4 text-gray-500" />
-				<span>Share</span>
+				<Share2 className="w-5 h-5 text-gray-500" />
 			</button>
 		</>
 	);

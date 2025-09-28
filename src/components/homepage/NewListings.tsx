@@ -57,7 +57,7 @@ const NewListings: React.FC = () => {
 
 	return (
 		<section className="py-16 bg-gradient-to-br from-gray-50 via-white to-blue-50">
-			<div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+			<div className="w-full max-w-7xl mx-auto px-4 sm:px-4 lg:px-8">
 				{/* Enhanced Header */}
 				<div className="text-center mb-12">
 					<div className="inline-flex items-center gap-2 bg-blue-100 rounded-full px-4 py-2 mb-4">
@@ -80,7 +80,7 @@ const NewListings: React.FC = () => {
 					</p>
 				</div>
 				{/* Carousel Container with Enhanced Styling */}
-				<div className="p-2 sm:p-6">
+				<div className="p-4 sm:p-4">
 					<Carousel
 						opts={{
 							align: "start",
@@ -96,7 +96,7 @@ const NewListings: React.FC = () => {
 										key={item._id}
 										className="sm:basis-1/1 md:basis-1/2 lg:basis-1/3 xl:basis-1/4 p-2 flex"
 									>
-										<div className="w-full h-full flex items-stretch">
+										<div className="w-full h-full flex">
 											{item.intent === "rent" ? (
 												<RentListingCard
 													listing={item as IRentListingType}

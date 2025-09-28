@@ -1,6 +1,37 @@
-import React from "react";
-import { ICommonListingDetailsType } from "../../types/commonListingDetailsTypes";
-import { FaMapMarkerAlt, FaHome, FaInfo } from "react-icons/fa";
+import React, { useState } from "react";
+import { MapPin, Home, Info, ChevronDown, Share2 } from "lucide-react";
+
+interface ICommonListingDetailsType {
+	title: string;
+	description?: string;
+	location: string;
+	alternateLocation: string;
+	propertyCategory: string;
+}
+
+interface InfoCardProps {
+	icon: React.ElementType;
+	label: string;
+	value: string;
+}
+
+const InfoCard: React.FC<InfoCardProps> = ({ icon: Icon, label, value }) => (
+	<div className="bg-white border border-gray-100 p-4">
+		<div className="flex items-start gap-3">
+			<div className="flex-shrink-0 w-5 h-5 flex items-center justify-center mt-0.5">
+				<Icon className="w-5 h-5 text-slate-600" />
+			</div>
+			<div className="flex-1 min-w-0">
+				<p className="text-xs font-medium text-slate-600 uppercase tracking-wide mb-2">
+					{label}
+				</p>
+				<p className="text-sm font-semibold text-slate-800 leading-relaxed line-clamp-3">
+					{value}
+				</p>
+			</div>
+		</div>
+	</div>
+);
 
 const CommonListingDetails: React.FC<ICommonListingDetailsType> = ({
 	title,
@@ -8,100 +39,95 @@ const CommonListingDetails: React.FC<ICommonListingDetailsType> = ({
 	location,
 	alternateLocation,
 	propertyCategory,
-	intent,
 }) => {
+	const [isDescriptionExpanded, setIsDescriptionExpanded] =
+		useState<boolean>(false);
+
+	const handleShare = (): void => {
+		if (navigator.share) {
+			navigator.share({
+				title: title,
+				text: `Check out this property listing: ${title}`,
+				url: window.location.href,
+			});
+		}
+	};
+
+	const shouldShowReadMore = description && description.split(" ").length > 50;
+
 	return (
-		<div className="bg-gradient-to-br from-slate-50 to-gray-100 rounded-xl sm:p-4 w-full mx-auto space-y-4">
-			{/* Title & Intent Badge */}
-			<div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3">
-				<h1 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900 leading-tight max-w-3xl">
-					{title}
-				</h1>
-				<div className="flex-shrink-0">
-					<span
-						className={`inline-block px-3 py-1.5 text-xs font-semibold -froundedull shadow-sm border transition-all duration-200 ${
-							intent === "rent"
-								? "bg-gradient-to-br from-amber-50 to-yellow-100 text-amber-800 border-amber-200/60"
-								: intent === "sell"
-								? "bg-gradient-to-br from-emerald-50 to-green-100 text-emerald-800 border-emerald-200/60"
-								: "bg-gradient-to-br from-blue-50 to-blue-100 text-blue-800 border-blue-200/60"
-						}`}
-					>
-						{intent?.toUpperCase()}
-					</span>
-				</div>
-			</div>
-
-			{/* Grid Info Section */}
-			<div className="grid grid-cols-1 sm:grid-cols-[2fr_1fr] gap-2">
-				{/* Location */}
-				<div className="flex items-center gap-3 p-3 bg-white shadow-sm">
-					<div className="flex-shrink-0 w-8 h-8 bg-gradient-to-br from-slate-600 to-slate-700 flex items-center justify-center shadow-sm">
-						<FaMapMarkerAlt className="text-white text-sm" />
+		<div className="max-w-4xl mx-auto bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+			{/* Header */}
+			<div className="p-6 bg-gradient-to-r from-gray-50 to-white border-b border-gray-100">
+				<div className="flex justify-between gap-4">
+					<div className="flex-1">
+						<h1 className="text-2xl font-bold text-slate-800 leading-tight mb-2">
+							{title}
+						</h1>
 					</div>
-					<div className="min-w-0 flex-1">
-						<span className="block text-slate-600 text-xs font-semibold uppercase tracking-wider mb-1">
-							Location
-						</span>
-						<span
-							className="font-semibold text-gray-900 text-sm  block"
-							title={location}
+					<div className="flex items-center">
+						<button
+							onClick={handleShare}
+							className="p-2 rounded-lg"
+							title="Share listing"
 						>
-							{location}
-						</span>
+							<Share2 className="w-5 h-5 text-slate-600" />
+						</button>
 					</div>
 				</div>
+			</div>
 
-				{/* Property Category */}
-				<div className="flex items-center bg-white gap-3 p-3 shadow-sm">
-					<div className="flex-shrink-0 w-8 h-8 bg-gradient-to-br from-slate-600 to-slate-700 flex items-center justify-center shadow-sm">
-						<FaHome className="text-white text-sm" />
+			{/* Content */}
+			<div className="p-6 space-y-6">
+				{/* Property Details */}
+				<div className="flex flex-col gap-4">
+					<InfoCard icon={MapPin} label="Location" value={location} />
+					<InfoCard
+						icon={Home}
+						label="Property Type"
+						value={propertyCategory}
+					/>
+					<InfoCard
+						icon={MapPin}
+						label="Full Address"
+						value={alternateLocation}
+					/>
+				</div>
+
+				{/* Description */}
+				<div className="bg-gray-50 border border-gray-100 rounded-lg p-6">
+					<div className="flex items-center gap-3 mb-4">
+						<div className="w-5 h-5 flex items-center justify-center">
+							<Info className="w-5 h-5 text-slate-600" />
+						</div>
+						<h2 className="text-sm font-medium text-slate-600 uppercase tracking-wide">
+							Property Description
+						</h2>
 					</div>
-					<div className="min-w-0 flex-1">
-						<span className="block text-slate-600 text-xs font-semibold uppercase tracking-wider mb-1">
-							Property Type
-						</span>
-						<span
-							className="font-semibold text-gray-900 text-sm truncate block"
-							title={propertyCategory}
+
+					<div className="prose prose-slate max-w-none">
+						<p className="text-slate-700 leading-relaxed">
+							{description
+								? isDescriptionExpanded
+									? description
+									: description.split(" ").slice(0, 50).join(" ")
+								: "No description available for this property."}
+						</p>
+					</div>
+
+					{shouldShowReadMore && (
+						<button
+							onClick={() => setIsDescriptionExpanded(!isDescriptionExpanded)}
+							className="mt-4 inline-flex items-center gap-2 text-sm font-medium text-slate-600"
 						>
-							{propertyCategory}
-						</span>
-					</div>
-				</div>
-			</div>
-			<div className="flex items-center gap-3 p-3 bg-white shadow-sm">
-				<div className="flex-shrink-0 w-8 h-8 bg-gradient-to-br from-slate-600 to-slate-700 flex items-center justify-center shadow-sm">
-					<FaMapMarkerAlt className="text-white text-sm" />
-				</div>
-				<div className="min-w-0 flex-1">
-					<span className="block text-slate-600 text-xs font-semibold uppercase tracking-wider mb-1">
-						Detailed Location
-					</span>
-					<span
-						className="font-semibold text-gray-900 text-sm  block"
-						title={alternateLocation}
-					>
-						{alternateLocation}
-					</span>
-				</div>
-			</div>
-
-			{/* Description Section */}
-			<div className=" p-4 border bg-white shadow-sm">
-				<div className="flex items-center gap-2 mb-3">
-					<div className="flex-shrink-0 w-8 h-8 bg-gradient-to-br from-slate-600 to-slate-700 flex items-center justify-center shadow-sm">
-						<FaInfo className="text-white text-sm" />
-					</div>
-					<h2 className="block text-slate-600 text-xs font-semibold uppercase tracking-wider mb-1">
-						Property Description
-					</h2>
-				</div>
-
-				<div className="prose prose-gray max-w-none">
-					<p className="text-gray-700 leading-relaxed text-sm whitespace-pre-wrap">
-						{description || "No description available for this property."}
-					</p>
+							{isDescriptionExpanded ? "Show Less" : "Read More"}
+							<ChevronDown
+								className={`w-4 h-4 ${
+									isDescriptionExpanded ? "rotate-180" : ""
+								}`}
+							/>
+						</button>
+					)}
 				</div>
 			</div>
 		</div>

@@ -5,21 +5,25 @@ import Image_UserDetails from "../../ImageDetails";
 import CommonListingDetails from "../../CommonListingDetails";
 import { ICommonListingDetailsType } from "../../../../types/commonListingDetailsTypes";
 import {
-	FaBed,
-	FaBath,
-	FaCarAlt,
-	FaRulerCombined,
-	FaLayerGroup,
-	FaCouch,
-	FaCheckCircle,
-	FaTimesCircle,
-	FaRupeeSign,
-	FaMapMarkerAlt,
-	FaStore,
-} from "react-icons/fa";
+	Bed,
+	Bath,
+	Car,
+	Ruler,
+	Layers,
+	Sofa,
+	CheckCircle,
+	XCircle,
+	IndianRupee,
+	MapPin,
+	Store,
+	Home,
+	Calendar,
+	User,
+} from "lucide-react";
 import { formatIndianCurrency } from "../../../../utils/priceFormatHelper";
 import PostedByUserDetails from "../../PostedByUserDetails";
 import PostCreationAndUpdateDetails from "../../PostCreationAndUpdateDetails";
+import InfoItem from "../../InfoItem";
 import { IPostCreationDetails } from "../../../../types/postCreationDetails";
 
 const SellHouse: React.FC<{
@@ -67,36 +71,36 @@ const SellHouse: React.FC<{
 				return (
 					<>
 						<InfoItem
-							icon={<FaBed className="text-blue-600" />}
+							icon={<Bed className="w-5 h-5 text-slate-600" />}
 							label="Bedrooms"
 							value={listing.bedrooms}
 						/>
 						<InfoItem
-							icon={<FaBath className="text-blue-600" />}
+							icon={<Bath className="w-5 h-5 text-slate-600" />}
 							label="Bathrooms"
 							value={listing.bathrooms}
 						/>
 						<InfoItem
-							icon={<FaRulerCombined className="text-blue-600" />}
+							icon={<Ruler className="w-5 h-5 text-slate-600" />}
 							label="Built-up Area"
 							value={
 								listing.builtUpArea ? `${listing.builtUpArea} sq ft` : undefined
 							}
 						/>
 						<InfoItem
-							icon={<FaLayerGroup className="text-blue-600" />}
+							icon={<Layers className="w-5 h-5 text-slate-600" />}
 							label="Floor"
 							value={listing.floor}
 							variant="secondary"
 						/>
 						<InfoItem
-							icon={<FaCouch className="text-blue-600" />}
+							icon={<Sofa className="w-5 h-5 text-slate-600" />}
 							label="Furnishing"
 							value={listing.furnishing}
 							variant="secondary"
 						/>
 						<InfoItem
-							icon={<FaCarAlt className="text-blue-600" />}
+							icon={<Car className="w-5 h-5 text-slate-600" />}
 							label="Parking"
 							value={listing.parking ? "Available" : "Not Available"}
 							variant="secondary"
@@ -104,9 +108,9 @@ const SellHouse: React.FC<{
 						<InfoItem
 							icon={
 								listing.attachedBathroom ? (
-									<FaCheckCircle className="text-emerald-600" />
+									<CheckCircle className="w-5 h-5 text-emerald-600" />
 								) : (
-									<FaTimesCircle className="text-red-500" />
+									<XCircle className="w-5 h-5 text-rose-500" />
 								)
 							}
 							label="Attached Bathroom"
@@ -119,23 +123,23 @@ const SellHouse: React.FC<{
 				return (
 					<>
 						<InfoItem
-							icon={<FaStore className="text-blue-600" />}
+							icon={<Store className="w-5 h-5 text-slate-600" />}
 							label="Shop Area"
 							value={listing.shopArea ? `${listing.shopArea} sq ft` : undefined}
 						/>
 						<InfoItem
 							icon={
 								listing.hasShutter ? (
-									<FaCheckCircle className="text-emerald-600" />
+									<CheckCircle className="w-5 h-5 text-emerald-600" />
 								) : (
-									<FaTimesCircle className="text-red-500" />
+									<XCircle className="w-5 h-5 text-rose-500" />
 								)
 							}
 							label="Has Shutter"
 							value={listing.hasShutter ? "Yes" : "No"}
 						/>
 						<InfoItem
-							icon={<FaCouch className="text-blue-600" />}
+							icon={<Sofa className="w-5 h-5 text-slate-600" />}
 							label="Furnishing"
 							value={listing.furnishing}
 							variant="secondary"
@@ -147,7 +151,7 @@ const SellHouse: React.FC<{
 				return (
 					<>
 						<InfoItem
-							icon={<FaMapMarkerAlt className="text-blue-600" />}
+							icon={<MapPin className="w-5 h-5 text-slate-600" />}
 							label="Available Land"
 							value={
 								listing.availableLandSpace
@@ -160,14 +164,14 @@ const SellHouse: React.FC<{
 						/>
 						{listing.pricePerUnit && (
 							<InfoItem
-								icon={<FaRupeeSign className="text-blue-600" />}
+								icon={<IndianRupee className="w-5 h-5 text-slate-600" />}
 								label="Price per Unit"
 								value={`₹${formatIndianCurrency(listing.pricePerUnit)}`}
 								variant="primary"
 							/>
 						)}
 						<InfoItem
-							icon={<FaRulerCombined className="text-slate-600" />}
+							icon={<Ruler className="w-5 h-5 text-slate-600" />}
 							label="Unit of Measurement"
 							value={listing.unit}
 							variant="secondary"
@@ -181,114 +185,91 @@ const SellHouse: React.FC<{
 	};
 
 	return (
-		<div className="w-full min-h-screen bg-white">
-			<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-				<div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-					<div className="space-y-6">
-						<div className="bg-white rounded-xl shadow border border-gray-200 overflow-hidden">
+		<div className="min-h-screen bg-slate-50/50">
+			<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+				<div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
+					{/* Main Content - Takes 2 columns on large screens */}
+					<div className="lg:col-span-2 space-y-6">
+						{/* Image Gallery */}
+						<div className="bg-white rounded-2xl shadow-sm border border-slate-200/60 overflow-hidden">
 							<Image_UserDetails
 								listing_images={listing.pictures}
 								listing_title={listing.title}
 							/>
 						</div>
 
-						<div className="px-0 sm:px-0">
+						{/* Property Details */}
+						<div className="bg-white rounded-2xl shadow-sm border border-slate-200/60 p-6">
 							<CommonListingDetails {...commonListingDetails} />
 						</div>
-					</div>
 
-					<div className="space-y-6">
-						<div className=" rounded-xl p-6 border border-emerald-200/60 shadow-sm">
-							<div className="flex items-center gap-3 mb-3">
-								<div className="w-10 h-10 bg-gradient-to-br from-emerald-600 to-green-700 rounded-xl flex items-center justify-center shadow-sm">
-									<FaRupeeSign className="text-white text-base" />
+						{/* Property Features */}
+						<div className="bg-white rounded-2xl shadow-sm border border-slate-200/60 p-6">
+							<div className="flex items-center gap-3 mb-6">
+								<div className="p-2 bg-slate-100 rounded-xl">
+									<Home className="w-5 h-5 text-slate-700" />
 								</div>
-								<h3 className="text-lg font-semibold text-gray-900">Pricing</h3>
+								<h3 className="text-xl font-semibold text-slate-900">
+									Property Features
+								</h3>
 							</div>
-							<p className="text-2xl font-bold text-emerald-700 mb-1">
-								{formatPrice()}
-							</p>
-							{listing.totalPrice && listing.pricePerUnit && (
-								<p className="text-sm text-gray-600">
-									Total: ₹{formatIndianCurrency(listing.totalPrice)}
-								</p>
-							)}
-						</div>
-
-						<div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-							<PostedByUserDetails userDetails={userDetails} />
-							<PostCreationAndUpdateDetails
-								listingDateDetails={listingDateDetails}
-							/>
-						</div>
-
-						<div className="bg-gradient-to-br from-slate-50 to-gray-100 rounded-xl border border-gray-200 p-6">
-							<h3 className="text-xl font-semibold text-gray-900 mb-6 flex items-center gap-2">
-								<div className="w-1 h-6 bg-gradient-to-b from-blue-500 to-blue-600 rounded-full"></div>
-								Property Features
-							</h3>
-							<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+							<div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4">
 								{renderPropertySpecificFeatures()}
 							</div>
 						</div>
 					</div>
+
+					{/* Sidebar - Takes 1 column on large screens */}
+					<div className="space-y-6">
+						{/* Price Card */}
+						<div className="bg-white rounded-2xl shadow-sm border border-slate-200/60 p-6  top-6">
+							<div className="flex items-center gap-3 mb-4">
+								<div className="p-2 bg-emerald-100 rounded-xl">
+									<IndianRupee className="w-5 h-5 text-emerald-700" />
+								</div>
+								<h3 className="text-lg font-semibold text-slate-900">Price</h3>
+							</div>
+							<div className="space-y-2">
+								<p className="text-2xl font-bold text-emerald-700">
+									{formatPrice()}
+								</p>
+								{listing.totalPrice && listing.pricePerUnit && (
+									<p className="text-sm text-slate-600">
+										Total: ₹{formatIndianCurrency(listing.totalPrice)}
+									</p>
+								)}
+							</div>
+						</div>
+
+						{/* User Details Card */}
+						<div className="bg-white rounded-2xl shadow-sm border border-slate-200/60 p-6">
+							<div className="flex items-center gap-3 mb-4">
+								<div className="p-2 bg-blue-100 rounded-xl">
+									<User className="w-5 h-5 text-blue-700" />
+								</div>
+								<h3 className="text-lg font-semibold text-slate-900">
+									Posted By
+								</h3>
+							</div>
+							<PostedByUserDetails userDetails={userDetails} />
+						</div>
+
+						{/* Date Details Card */}
+						<div className="bg-white rounded-2xl shadow-sm border border-slate-200/60 p-6">
+							<div className="flex items-center gap-3 mb-4">
+								<div className="p-2 bg-amber-100 rounded-xl">
+									<Calendar className="w-5 h-5 text-amber-700" />
+								</div>
+								<h3 className="text-lg font-semibold text-slate-900">
+									Listing Info
+								</h3>
+							</div>
+							<PostCreationAndUpdateDetails
+								listingDateDetails={listingDateDetails}
+							/>
+						</div>
+					</div>
 				</div>
-			</div>
-		</div>
-	);
-};
-
-// ✅ Reusable subcomponent for info items
-const InfoItem: React.FC<{
-	icon: React.ReactNode;
-	label: string;
-	value: string | number | undefined | "" | null;
-	variant?: "primary" | "secondary" | "success" | "danger";
-}> = ({ icon, label, value, variant = "secondary" }) => {
-	const getVariantClasses = (variant: string) => {
-		switch (variant) {
-			case "primary":
-				return {
-					bg: "bg-blue-50/80",
-					border: "border-blue-200/60",
-				};
-			case "success":
-				return {
-					bg: "bg-emerald-50/80",
-					border: "border-emerald-200/60",
-				};
-			case "danger":
-				return {
-					bg: "bg-red-50/80",
-					border: "border-red-200/60",
-				};
-			default:
-				return {
-					bg: "bg-gray-50/80",
-					border: "border-gray-200/60",
-				};
-		}
-	};
-
-	const variantClasses = getVariantClasses(variant);
-
-	return (
-		<div
-			className={`group flex items-center gap-4 p-4 ${variantClasses.bg} border ${variantClasses.border} shadow-sm`}
-		>
-			<div className="flex-shrink-0 w-11 h-11 flex items-center justify-center bg-white shadow-sm">
-				{icon}
-			</div>
-			<div className="min-w-0 flex-1">
-				<span className="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1.5">
-					{label}
-				</span>
-				<span
-					className="font-semibold text-gray-900 text-sm sm:text-base truncate block"
-					title={String(value)}
-				>
-					{value || "-"}
-				</span>
 			</div>
 		</div>
 	);
