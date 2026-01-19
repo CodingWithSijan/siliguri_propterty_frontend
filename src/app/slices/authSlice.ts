@@ -19,16 +19,16 @@ interface AuthState {
 	isAuthenticated: boolean;
 }
 
-const storedUser = sessionStorage.getItem("user");
-const storedToken = sessionStorage.getItem("token");
+const storedUser = localStorage.getItem("user");
+const storedToken = localStorage.getItem("token");
 
 let initialUser: User | null = null;
 let initialToken: string | null = null;
 let isAuthenticated = false;
 
 if (storedToken && isTokenExpired(storedToken)) {
-	sessionStorage.removeItem("user");
-	sessionStorage.removeItem("token");
+	localStorage.removeItem("user");
+	localStorage.removeItem("token");
 	showError("Session expired. Please log in again.");
 } else if (storedToken && storedUser) {
 	initialUser = JSON.parse(storedUser);
@@ -48,15 +48,15 @@ const authSlice = createSlice({
 			state.user = action.payload.user;
 			state.token = action.payload.token;
 			state.isAuthenticated = true;
-			sessionStorage.setItem("user", JSON.stringify(action.payload.user));
-			sessionStorage.setItem("token", action.payload.token);
+			localStorage.setItem("user", JSON.stringify(action.payload.user));
+			localStorage.setItem("token", action.payload.token);
 		},
 		logout: (state) => {
 			state.user = null;
 			state.token = null;
 			state.isAuthenticated = false;
-			sessionStorage.removeItem("user");
-			sessionStorage.removeItem("token");
+			localStorage.removeItem("user");
+			localStorage.removeItem("token");
 		},
 	},
 });

@@ -26,7 +26,7 @@ import PostCreationAndUpdateDetails from "../../PostCreationAndUpdateDetails";
 import InfoItem from "../../InfoItem";
 import { IPostCreationDetails } from "../../../../types/postCreationDetails";
 
-const SellHouse: React.FC<{
+const HouseSell: React.FC<{
 	listing: ISellListingType;
 	userDetails: IListingUserDetails | null;
 }> = ({ listing, userDetails }) => {
@@ -38,12 +38,13 @@ const SellHouse: React.FC<{
 		propertyCategory: listing.propertyCategory,
 		intent: listing.intent,
 	};
+
 	const listingDateDetails: IPostCreationDetails = {
 		createdAt: listing.createdAt,
 		updatedAt: listing.updatedAt,
 	};
 
-	// Format price based on property type
+	// Price logic stays as-is
 	const formatPrice = () => {
 		if (listing.propertyCategory === "land") {
 			if (listing.pricePerUnit && listing.availableLandSpace) {
@@ -188,12 +189,12 @@ const SellHouse: React.FC<{
 	};
 
 	return (
-		<div className="min-h-screen bg-slate-50/50">
+		<div className="w-full min-h-screen bg-white">
 			<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
 				<div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
-					{/* Main Content - Takes 2 columns on large screens */}
+					{/* Left Section - Images & Details */}
 					<div className="lg:col-span-2 space-y-6">
-						{/* Image Gallery */}
+						{/* Images */}
 						<div className="bg-white rounded-2xl shadow-sm border border-slate-200/60 overflow-hidden">
 							<Image_UserDetails
 								listing_images={listing.pictures}
@@ -201,12 +202,12 @@ const SellHouse: React.FC<{
 							/>
 						</div>
 
-						{/* Property Details */}
+						{/* Common Property Details */}
 						<div className="bg-white rounded-2xl shadow-sm border border-slate-200/60 p-6">
 							<CommonListingDetails {...commonListingDetails} />
 						</div>
 
-						{/* Property Features */}
+						{/* Features */}
 						<div className="bg-white rounded-2xl shadow-sm border border-slate-200/60 p-6">
 							<div className="flex items-center gap-3 mb-6">
 								<div className="p-2 bg-slate-100 rounded-xl">
@@ -222,10 +223,10 @@ const SellHouse: React.FC<{
 						</div>
 					</div>
 
-					{/* Sidebar - Takes 1 column on large screens */}
+					{/* Sidebar */}
 					<div className="space-y-6">
-						{/* Price Card */}
-						<div className="bg-white rounded-2xl shadow-sm border border-slate-200/60 p-6  top-6">
+						{/* Price Card (unchanged) */}
+						<div className="bg-white rounded-2xl shadow-sm border border-slate-200/60 p-6 top-6">
 							<div className="flex items-center gap-3 mb-4">
 								<div className="p-2 bg-emerald-100 rounded-xl">
 									<IndianRupee className="w-5 h-5 text-emerald-700" />
@@ -244,7 +245,7 @@ const SellHouse: React.FC<{
 							</div>
 						</div>
 
-						{/* User Details Card */}
+						{/* Posted By */}
 						<div className="bg-white rounded-2xl shadow-sm border border-slate-200/60 p-6">
 							<div className="flex items-center gap-3 mb-4">
 								<div className="p-2 bg-blue-100 rounded-xl">
@@ -257,7 +258,7 @@ const SellHouse: React.FC<{
 							<PostedByUserDetails userDetails={userDetails} />
 						</div>
 
-						{/* Date Details Card */}
+						{/* Listing Info */}
 						<div className="bg-white rounded-2xl shadow-sm border border-slate-200/60 p-6">
 							<div className="flex items-center gap-3 mb-4">
 								<div className="p-2 bg-amber-100 rounded-xl">
@@ -278,4 +279,4 @@ const SellHouse: React.FC<{
 	);
 };
 
-export default SellHouse;
+export default HouseSell;
