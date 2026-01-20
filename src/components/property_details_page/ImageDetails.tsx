@@ -72,17 +72,17 @@ const Image_UserDetails: React.FC<{
 					</DialogTrigger>
 
 					<DialogContent
-						className="w-screen h-[97vh] rounded-none border-0 p-0 bg-black/95 backdrop-blur-sm"
+						className="w-screen h-[95vh] rounded-none border-0 p-0 bg-black/95 backdrop-blur-sm sm:max-w-[85vw]"
 						onKeyDown={handleKeyDown}
 						onClick={handleBackdropClick}
 					>
 						{/* Header with close button and image counter */}
-						<DialogHeader className="absolute top-0 left-0 right-0 z-50 p-4 bg-gradient-to-b from-black/70 to-transparent">
+						<DialogHeader className="absolute top-0 left-0 right-0 z-50 p-4 bg-gradient-to-b from-black/70 to-transparent flex-1/2">
 							<div className="flex items-center justify-between">
-								<DialogTitle className="text-white text-lg font-medium">
+								<DialogTitle className="text-white text-sm">
 									{listing_title}
 								</DialogTitle>
-								<div className="flex items-center gap-4">
+								<div className="flex items-center gap-2">
 									<span className="text-white/80 text-sm">
 										{currentImageIndex + 1} / {images.length}
 									</span>
@@ -101,7 +101,7 @@ const Image_UserDetails: React.FC<{
 							<img
 								src={images[currentImageIndex]}
 								alt={`${listing_title} - Image ${currentImageIndex + 1}`}
-								className="w-[95%] h-[95%] object-contain select-none"
+								className="w-[90vw] h-[90vh] object-contain select-none"
 								onError={(e) => {
 									const target = e.target as HTMLImageElement;
 									target.src = propertyImagePlaceholder;

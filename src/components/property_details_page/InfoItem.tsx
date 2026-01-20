@@ -32,17 +32,17 @@ const InfoItem: React.FC<InfoItemProps> = ({
 
 	return (
 		<div
-			className={`group flex items-center gap-4 p-4 ${variantClasses.bg} border ${variantClasses.border} shadow-sm`}
+			className={`group flex items-center gap-4 p-4  border ${variantClasses.border} shadow-sm`}
 		>
 			<div className="flex-shrink-0 w-11 h-11 flex items-center justify-center bg-white shadow-sm">
 				{icon}
 			</div>
 			<div className="min-w-0 flex-1">
-				<span className="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1.5">
+				<span className="block text-xs  uppercase tracking-wider text-gray-500 mb-1.5">
 					{label}
 				</span>
 				<span
-					className="font-semibold text-gray-900 text-sm sm:text-base truncate block"
+					className=" text-gray-900 text-sm sm:text-base truncate block"
 					title={String(value)}
 				>
 					{value || "-"}

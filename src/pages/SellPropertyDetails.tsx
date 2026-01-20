@@ -5,7 +5,9 @@ import { ISellListingType } from "../types/listingTypes";
 import BASE_URL from "../services";
 import { IListingUserDetails } from "../types/listingUserDetails";
 import Navbar from "../components/header_and_footer/Navbar";
-import SellHouse from "../components/property_details_page/sell/common/House";
+import HouseSell from "../components/property_details_page/sell/common/HouseSell";
+import ShopSell from "../components/property_details_page/sell/shop/ShopSell";
+import LandSell from "../components/property_details_page/sell/land/LandSell";
 
 const SellPropertyDetails: React.FC = () => {
 	const { id } = useParams();
@@ -95,15 +97,26 @@ const SellPropertyDetails: React.FC = () => {
 			</>
 		);
 	}
-
+	const renderPropertyCategory = () => {
+		switch (listing.propertyCategory) {
+			case "house":
+				return;
+			case "flat":
+				return <HouseSell listing={listing} userDetails={listingUserDetails} />;
+			case "land":
+				return <LandSell listing={listing} userDetails={listingUserDetails} />;
+			case "shop":
+				return <ShopSell listing={listing} userDetails={listingUserDetails} />;
+			default:
+				return <div>Unknown property type</div>;
+		}
+	};
 	return (
 		<>
 			<Navbar />
 
-			<div className="min-h-screen bg-gray-50 py-8">
-				<div className="container mx-auto px-4">
-					<SellHouse listing={listing} userDetails={listingUserDetails} />
-				</div>
+			<div className="flex justify-center items-center">
+				{renderPropertyCategory()}
 			</div>
 		</>
 	);

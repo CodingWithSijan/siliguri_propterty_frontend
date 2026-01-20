@@ -6,7 +6,7 @@ const BASE_URL: AxiosInstance = axios.create({
 
 BASE_URL.interceptors.request.use(
 	(config: InternalAxiosRequestConfig) => {
-		const token = sessionStorage.getItem("token");
+		const token = localStorage.getItem("token");
 
 		if (token && config.headers) {
 			config.headers.Authorization = `Bearer ${token}`;

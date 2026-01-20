@@ -49,7 +49,7 @@ const ManageUsers = () => {
 			selectedStatus === "all"
 				? fetchAllUsers()
 				: fetchUsersByVerification(selectedStatus === "verified"),
-		false
+		false,
 	);
 
 	const verifiedUsers = users?.filter((u) => u.isVerified)?.length || 0;
@@ -124,14 +124,22 @@ const ManageUsers = () => {
 							<Table>
 								<TableHeader className="bg-muted/50">
 									<TableRow>
-										<TableHead>Avatar</TableHead>
+										<TableHead className="hidden sm:table-cell">
+											Avatar
+										</TableHead>
 										<TableHead>Name</TableHead>
-										<TableHead>Email</TableHead>
-										<TableHead>Phone</TableHead>
-										<TableHead>Auth Provider</TableHead>
-										<TableHead>Role</TableHead>
+										<TableHead className="hidden md:table-cell">
+											Email
+										</TableHead>
+										<TableHead className="hidden lg:table-cell">
+											Phone
+										</TableHead>
+										<TableHead className="hidden xl:table-cell">
+											Auth Provider
+										</TableHead>
+										<TableHead className="hidden md:table-cell">Role</TableHead>
 										<TableHead>Verified</TableHead>
-										<TableHead>Actions</TableHead>
+										<TableHead className="text-right">Actions</TableHead>
 									</TableRow>
 								</TableHeader>
 								<TableBody>
@@ -151,9 +159,9 @@ const ManageUsers = () => {
 											</TableCell>
 										</TableRow>
 									) : (
-										users.map((user: any) => (
+										users.map((user) => (
 											<TableRow key={user._id}>
-												<TableCell>
+												<TableCell className="hidden sm:table-cell">
 													{user.avatar ? (
 														<img
 															src={user.avatar}
@@ -164,23 +172,31 @@ const ManageUsers = () => {
 														<div className="w-8 h-8 rounded-full bg-gray-300" />
 													)}
 												</TableCell>
-												<TableCell>{user.name || "N/A"}</TableCell>
-												<TableCell>{user.email}</TableCell>
-												<TableCell>{user.phoneNumber || "N/A"}</TableCell>
-												<TableCell>{user.authProvider}</TableCell>
-												<TableCell>
+												<TableCell className="font-medium">
+													{user.name || "N/A"}
+												</TableCell>
+												<TableCell className="hidden md:table-cell text-sm">
+													{user.email}
+												</TableCell>
+												<TableCell className="hidden lg:table-cell text-sm">
+													{user.phoneNumber || "N/A"}
+												</TableCell>
+												<TableCell className="hidden xl:table-cell text-sm">
+													{user.authProvider}
+												</TableCell>
+												<TableCell className="hidden md:table-cell">
 													<Badge>{user.role}</Badge>
 												</TableCell>
 												<TableCell>
 													<Badge
 														className={`${
 															!user.isVerified ? "bg-red-400" : "bg-green-400"
-														} font-bold`}
+														} font-bold text-xs`}
 													>
 														{user.isVerified ? "Yes" : "No"}
 													</Badge>
 												</TableCell>
-												<TableCell>
+												<TableCell className="text-right">
 													<DropdownMenu>
 														<DropdownMenuTrigger asChild>
 															<Button
@@ -194,7 +210,7 @@ const ManageUsers = () => {
 															<DropdownMenuItem
 																onClick={() =>
 																	navigate(
-																		`/admin/users/view-user/${user?._id}`
+																		`/admin/users/view-user/${user?._id}`,
 																	)
 																}
 															>

@@ -16,16 +16,16 @@ interface InfoCardProps {
 }
 
 const InfoCard: React.FC<InfoCardProps> = ({ icon: Icon, label, value }) => (
-	<div className="bg-white border border-gray-100 p-4">
-		<div className="flex items-start gap-3">
-			<div className="flex-shrink-0 w-5 h-5 flex items-center justify-center mt-0.5">
+	<div className="bg-white border border-gray-100 p-2">
+		<div className="flex items-center gap-3">
+			<div className="flex-shrink-0 w-5 h-5 flex items-center justify-center">
 				<Icon className="w-5 h-5 text-slate-600" />
 			</div>
 			<div className="flex-1 min-w-0">
-				<p className="text-xs font-medium text-slate-600 uppercase tracking-wide mb-2">
+				<p className="text-xs  text-slate-600 uppercase tracking-wide mb-2">
 					{label}
 				</p>
-				<p className="text-sm font-semibold text-slate-800 leading-relaxed line-clamp-3">
+				<p className="text-sm  text-slate-800 leading-relaxed line-clamp-3">
 					{value}
 				</p>
 			</div>
@@ -56,29 +56,23 @@ const CommonListingDetails: React.FC<ICommonListingDetailsType> = ({
 	const shouldShowReadMore = description && description.split(" ").length > 50;
 
 	return (
-		<div className="max-w-4xl mx-auto bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+		<div className="max-w-4xl mx-auto bg-white border border-gray-200 overflow-hidden">
 			{/* Header */}
-			<div className="p-6 bg-gradient-to-r from-gray-50 to-white border-b border-gray-100">
+			<div className="p-4 bg-gradient-to-r from-gray-50 to-white border-b border-gray-100">
 				<div className="flex justify-between gap-4">
 					<div className="flex-1">
-						<h1 className="text-2xl font-bold text-slate-800 leading-tight mb-2">
+						<h1 className="text-md sm:text-xl text-slate-800 leading-tight mb-2">
 							{title}
 						</h1>
 					</div>
-					<div className="flex items-center">
-						<button
-							onClick={handleShare}
-							className="p-2 rounded-lg"
-							title="Share listing"
-						>
-							<Share2 className="w-5 h-5 text-slate-600" />
-						</button>
-					</div>
+					{/* <button onClick={handleShare} className="p-2" title="Share listing">
+						<Share2 className="w-5 h-5 text-slate-600" />
+					</button> */}
 				</div>
 			</div>
 
 			{/* Content */}
-			<div className="p-6 space-y-6">
+			<div className="p-2 space-y-2">
 				{/* Property Details */}
 				<div className="flex flex-col gap-4">
 					<InfoCard icon={MapPin} label="Location" value={location} />
@@ -95,17 +89,17 @@ const CommonListingDetails: React.FC<ICommonListingDetailsType> = ({
 				</div>
 
 				{/* Description */}
-				<div className="bg-gray-50 border border-gray-100 rounded-lg p-6">
+				<div className="bg-gray-50 border border-gray-100 rounded-lg p-2 sm:p-4">
 					<div className="flex items-center gap-3 mb-4">
 						<div className="w-5 h-5 flex items-center justify-center">
 							<Info className="w-5 h-5 text-slate-600" />
 						</div>
-						<h2 className="text-sm font-medium text-slate-600 uppercase tracking-wide">
+						<h2 className="text-sm text-slate-600 uppercase tracking-wide">
 							Property Description
 						</h2>
 					</div>
 
-					<div className="prose prose-slate max-w-none">
+					<div className="max-w-none">
 						<p className="text-slate-700 leading-relaxed">
 							{description
 								? isDescriptionExpanded

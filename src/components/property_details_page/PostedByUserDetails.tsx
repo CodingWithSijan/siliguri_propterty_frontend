@@ -9,7 +9,7 @@ const PostedByUserDetails: React.FC<{
 }> = ({ userDetails, postedDate }) => {
 	if (!userDetails) {
 		return (
-			<fieldset className="relative border border-gray-200 rounded-xl shadow-sm bg-white">
+			<fieldset className="relative border border-gray-200  shadow-sm bg-white">
 				<legend className="px-3  uppercase italic text-sm font-medium text-gray-500 ml-4 -mt-2 bg-white">
 					Posted by
 				</legend>
@@ -29,13 +29,13 @@ const PostedByUserDetails: React.FC<{
 	const { name, avatar, phone } = userDetails;
 
 	return (
-		<fieldset className="relative border border-gray-200 rounded-xl shadow-sm bg-white">
+		<fieldset className="relative border border-gray-200  shadow-sm bg-white">
 			<legend className="px-3 text-sm font-medium text-gray-500 ml-4 -mt-2 bg-white  uppercase italic">
 				Posted by
 			</legend>
-			<div className="flex items-center gap-5 py-6 px-2">
+			<div className="flex items-center justify-between gap-5 py-6 px-4">
 				{/* Avatar */}
-				<div className="w-16 h-16 rounded-full overflow-hidden bg-blue-100 flex-shrink-0 flex items-center justify-center text-blue-600 font-bold text-lg shadow-sm">
+				<div className="w-10 h-10 sm:w-14 sm:h-14 rounded-full overflow-hidden bg-blue-100 flex-shrink-0 flex items-center justify-center text-blue-600 font-bold text-lg shadow-sm">
 					{avatar ? (
 						<img
 							src={avatar}

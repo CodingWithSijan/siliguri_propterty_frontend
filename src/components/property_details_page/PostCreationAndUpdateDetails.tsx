@@ -11,7 +11,7 @@ const PostCreationAndUpdateDetails: React.FC<{
 	const hasAnyDate = !!createdAt || !!updatedAt;
 
 	return (
-		<fieldset className="relative border border-gray-200 rounded-xl shadow-sm bg-white">
+		<fieldset className="relative border border-gray-200  shadow-sm bg-white">
 			<legend className="px-3 text-sm font-medium text-gray-500 ml-4 -mt-2 bg-white uppercase italic">
 				Post details
 			</legend>

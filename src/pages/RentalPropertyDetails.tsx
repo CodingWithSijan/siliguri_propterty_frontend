@@ -5,7 +5,7 @@ import { IRentListingType } from "../types/listingTypes";
 import BASE_URL from "../services";
 import { IListingUserDetails } from "../types/listingUserDetails";
 import Navbar from "../components/header_and_footer/Navbar";
-import House from "../components/property_details_page/rent/common/House";
+import HouseRent from "../components/property_details_page/rent/common/HouseRent";
 import ShopRental from "../components/property_details_page/rent/shop/ShopRental";
 
 const RentalPropertyDetails: React.FC = () => {
@@ -52,9 +52,9 @@ const RentalPropertyDetails: React.FC = () => {
 	const renderPropertyCategory = () => {
 		switch (listing.propertyCategory) {
 			case "house":
-				return <House listing={listing} userDetails={listingUserDetails} />;
+				return;
 			case "flat":
-				return <House listing={listing} userDetails={listingUserDetails} />;
+				return <HouseRent listing={listing} userDetails={listingUserDetails} />;
 			case "shop":
 				return (
 					<ShopRental listing={listing} userDetails={listingUserDetails} />
@@ -66,7 +66,7 @@ const RentalPropertyDetails: React.FC = () => {
 	return (
 		<>
 			<Navbar />
-			<div className="flex justify-center items-center my-10">
+			<div className="flex justify-center items-center">
 				{renderPropertyCategory()}
 			</div>
 		</>

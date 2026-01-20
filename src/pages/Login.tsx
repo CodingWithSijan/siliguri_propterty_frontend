@@ -90,6 +90,7 @@ const Login: React.FC = () => {
 			await BASE_URL.post("/api/auth/forgot-password", { email: forgotEmail });
 			setForgotMsg("Reset link sent! Check your email.");
 			setForgotEmail("");
+			// eslint-disable-next-line @typescript-eslint/no-unused-vars
 		} catch (err) {
 			setForgotMsg("Failed to send reset link");
 		}
