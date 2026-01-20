@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { MapPin, Home, Info, ChevronDown, Share2 } from "lucide-react";
+import { MapPin, Home, Info, ChevronDown } from "lucide-react";
 
 interface ICommonListingDetailsType {
 	title: string;
@@ -42,16 +42,6 @@ const CommonListingDetails: React.FC<ICommonListingDetailsType> = ({
 }) => {
 	const [isDescriptionExpanded, setIsDescriptionExpanded] =
 		useState<boolean>(false);
-
-	const handleShare = (): void => {
-		if (navigator.share) {
-			navigator.share({
-				title: title,
-				text: `Check out this property listing: ${title}`,
-				url: window.location.href,
-			});
-		}
-	};
 
 	const shouldShowReadMore = description && description.split(" ").length > 50;
 
