@@ -49,7 +49,7 @@ const ManageUsers = () => {
 			selectedStatus === "all"
 				? fetchAllUsers()
 				: fetchUsersByVerification(selectedStatus === "verified"),
-		false
+		false,
 	);
 
 	const verifiedUsers = users?.filter((u) => u.isVerified)?.length || 0;
@@ -210,7 +210,7 @@ const ManageUsers = () => {
 															<DropdownMenuItem
 																onClick={() =>
 																	navigate(
-																		`/admin/users/view-user/${user?._id}`
+																		`/admin/users/view-user/${user?._id}`,
 																	)
 																}
 															>
