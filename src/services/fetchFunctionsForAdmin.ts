@@ -124,7 +124,7 @@ export const fetchPostsByStatus = async (status: string): Promise<Post[]> => {
 };
 
 export const fetchUsersByVerification = async (
-	isVerified: boolean
+	isVerified: boolean,
 ): Promise<User[]> => {
 	const endpoint = `/api/admin/get-user-by-verification-status?isVerified=${isVerified}`;
 	const response = await BASE_URL.get<ApiResponse<User[]>>(endpoint);
