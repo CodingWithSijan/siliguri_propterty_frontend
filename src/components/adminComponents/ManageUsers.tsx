@@ -31,14 +31,29 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "../ui/select";
+import {
+	AlertDialog,
+	AlertDialogAction,
+	AlertDialogCancel,
+	AlertDialogContent,
+	AlertDialogDescription,
+	AlertDialogHeader,
+	AlertDialogTitle,
+} from "../ui/alert-dialog";
+
 import useFetch from "../../hooks/useFetch";
 import {
+	deleteUserById,
 	fetchAllUsers,
 	fetchUsersByVerification,
 } from "../../services/fetchFunctionsForAdmin";
 import { useNavigate } from "react-router-dom";
+import { showError, showSuccess } from "../../utils/toastUtils";
+import { getInitials } from "../../utils/getInitial";
 
 const ManageUsers = () => {
+	const [isDeleting, setIsDeleting] = useState(false);
+	const [userToDelete, setUserToDelete] = useState<string | null>(null);
 	const [selectedStatus, setSelectedStatus] = useState("all");
 	const {
 		data: users,
@@ -62,6 +77,28 @@ const ManageUsers = () => {
 
 	const handleStatusChange = (value: string) => setSelectedStatus(value);
 
+	const handleCancelDelete = () => {
+		setIsDeleting(false);
+		setUserToDelete(null);
+	};
+	// function for user deletion by id
+	const handleDeleteUser = async () => {
+		if (!userToDelete) return;
+		try {
+			setIsDeleting(true);
+			await deleteUserById(userToDelete);
+			showSuccess("User Deleted");
+			setUserToDelete(null);
+			// Refresh the users list after deletion
+			await refetchUsers();
+		} catch (error) {
+			showError(
+				error instanceof Error ? error.message : "Failed to delete user",
+			);
+		} finally {
+			setIsDeleting(false);
+		}
+	};
 	const StatsCard = ({ title, value, icon: Icon, color }: any) => (
 		<Card className="hover:border-primary/50 transition-colors">
 			<CardHeader className="flex justify-between items-center pb-2">
@@ -82,6 +119,41 @@ const ManageUsers = () => {
 
 	return (
 		<>
+			{/* Delete User confirmation dialog */}
+			<AlertDialog
+				open={!!userToDelete}
+				onOpenChange={(open) => {
+					if (!open && !isDeleting) {
+						handleCancelDelete();
+					}
+				}}
+			>
+				<AlertDialogContent>
+					<AlertDialogHeader>
+						<AlertDialogTitle>Delete User</AlertDialogTitle>
+						<AlertDialogDescription>
+							Are you sure you want to delete this user? This action cannot be
+							undone and will permanently remove the user from the system.
+						</AlertDialogDescription>
+					</AlertDialogHeader>
+					<div className="flex gap-3 justify-end">
+						<AlertDialogCancel
+							onClick={handleCancelDelete}
+							disabled={isDeleting}
+						>
+							Cancel
+						</AlertDialogCancel>
+						<AlertDialogAction
+							onClick={handleDeleteUser}
+							disabled={isDeleting}
+							className="bg-red-600 hover:bg-red-700"
+						>
+							{isDeleting ? "Deleting..." : "Delete"}
+						</AlertDialogAction>
+					</div>
+				</AlertDialogContent>
+			</AlertDialog>
+			{/* Delete User confirmation dialog */}
 			<div className="h-auto w-auto ">
 				<div className="space-y-8 p-4 md:p-8 max-w-[1600px] mx-auto">
 					<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
@@ -164,12 +236,14 @@ const ManageUsers = () => {
 												<TableCell className="hidden sm:table-cell">
 													{user.avatar ? (
 														<img
+															className="w-9 h-9 rounded-full border border-gray-300"
 															src={user.avatar}
-															alt="avatar"
-															className="w-8 h-8 rounded-full"
+															alt={user.name}
 														/>
 													) : (
-														<div className="w-8 h-8 rounded-full bg-gray-300" />
+														<div className="w-9 h-9 rounded-full bg-blue-400 text-white flex items-center justify-center font-bold">
+															{getInitials(user?.name ?? "")}
+														</div>
 													)}
 												</TableCell>
 												<TableCell className="font-medium">
@@ -185,13 +259,15 @@ const ManageUsers = () => {
 													{user.authProvider}
 												</TableCell>
 												<TableCell className="hidden md:table-cell">
-													<Badge>{user.role}</Badge>
+													<Badge variant="outline">{user.role}</Badge>
 												</TableCell>
 												<TableCell>
 													<Badge
 														className={`${
-															!user.isVerified ? "bg-red-400" : "bg-green-400"
-														} font-bold text-xs`}
+															user.isVerified
+																? "bg-green-100 text-green-800"
+																: "bg-red-100 text-red-800"
+														}`}
 													>
 														{user.isVerified ? "Yes" : "No"}
 													</Badge>
@@ -224,7 +300,7 @@ const ManageUsers = () => {
 																Reset Password
 															</DropdownMenuItem>
 															<DropdownMenuItem
-																onClick={() => console.log("Delete", user._id)}
+																onClick={() => setUserToDelete(user._id)}
 																className="text-red-600"
 															>
 																Delete User

@@ -73,7 +73,7 @@ const StepPropertyType = () => {
 												type: "Point",
 												coordinates: [coords.lng, coords.lat],
 											},
-											{ shouldValidate: true, shouldDirty: true }
+											{ shouldValidate: true, shouldDirty: true },
 										);
 									}
 								}}

@@ -15,7 +15,7 @@ export interface FormErrors {
 }
 
 export const validateForm = (
-	formData: FormData
+	formData: FormData,
 ): { isValid: boolean; errors: FormErrors } => {
 	const errors: FormErrors = {
 		email: "",
@@ -48,7 +48,10 @@ export const validateForm = (
 	if (formData.name.trim() === "") {
 		errors.name = "Name is required.";
 		isValid = false;
-	} else if (formData.name.length < 3) {
+	} else if (!/^[a-zA-Z\s]+$/.test(formData.name.trim())) {
+		errors.name = "Name must contain only alphabets.";
+		isValid = false;
+	} else if (formData.name.trim().length < 3) {
 		errors.name = "Name must be at least 3 characters long.";
 		isValid = false;
 	}

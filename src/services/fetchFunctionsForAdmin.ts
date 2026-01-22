@@ -124,7 +124,7 @@ export const fetchPostsByStatus = async (status: string): Promise<Post[]> => {
 };
 
 export const fetchUsersByVerification = async (
-	isVerified: boolean
+	isVerified: boolean,
 ): Promise<User[]> => {
 	const endpoint = `/api/admin/get-user-by-verification-status?isVerified=${isVerified}`;
 	const response = await BASE_URL.get<ApiResponse<User[]>>(endpoint);
@@ -163,6 +163,16 @@ export const rejectPost = async (id: string) => {
 
 	if (!response.data.success) {
 		throw new Error(response.data.message || "Failed to approve post");
+	}
+	return response.data.result;
+};
+
+export const deletePost = async (id: string) => {
+	const endpoint = `/api/admin/delete-post/${id}`;
+	const response = await BASE_URL.delete(endpoint);
+
+	if (!response.data.success) {
+		throw new Error(response.data.message || "Failed to delete post");
 	}
 	return response.data.result;
 };

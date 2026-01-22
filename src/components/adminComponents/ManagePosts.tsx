@@ -34,6 +34,7 @@ import { Button } from "../ui/button";
 import useFetch from "../../hooks/useFetch";
 import {
 	approvePost,
+	deletePost,
 	fetchAllPosts,
 	fetchAnalytics,
 	fetchPostsByStatus,
@@ -63,11 +64,11 @@ const ManagePosts = () => {
 			selectedStatus === "all"
 				? fetchAllPosts()
 				: fetchPostsByStatus(selectedStatus),
-		false
+		false,
 	);
 
 	const { data: analytics, loading: isLoadingAnalytics } = useFetch(() =>
-		fetchAnalytics()
+		fetchAnalytics(),
 	);
 
 	useEffect(() => {
@@ -120,6 +121,18 @@ const ManagePosts = () => {
 		}
 	};
 
+	const handleDeletePost = async (postId: string) => {
+		try {
+			setIsActionLoading(postId);
+			await deletePost(postId);
+			await refetchPosts();
+		} catch (err) {
+			console.error("Error deleting:", err);
+		} finally {
+			setIsActionLoading(null);
+		}
+	};
+
 	const formatPrice = (post: Post) => {
 		const isRent = post.postType === "rent" || post.intent === "rent";
 
@@ -130,10 +143,10 @@ const ManagePosts = () => {
 					post.frequency === "day"
 						? "day"
 						: post.frequency === "week"
-						? "week"
-						: post.frequency === "month"
-						? "month"
-						: "year";
+							? "week"
+							: post.frequency === "month"
+								? "month"
+								: "year";
 				return `₹${post.pricePerFrequency.toLocaleString()}/${frequencyText}`;
 			}
 			// Fallback to legacy price field
@@ -457,6 +470,14 @@ const ManagePosts = () => {
 															className="text-red-600"
 														>
 															Reject
+														</DropdownMenuItem>
+														<br />
+														<DropdownMenuItem
+															disabled={isActionLoading === post._id}
+															onClick={() => handleDeletePost(post._id)}
+															className="text-red-500 font-bold hover:text-red-200"
+														>
+															Delete Post
 														</DropdownMenuItem>
 													</DropdownMenuContent>
 												</DropdownMenu>
