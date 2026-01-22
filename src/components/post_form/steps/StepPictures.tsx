@@ -49,7 +49,12 @@ const StepPictures = () => {
 
 	return (
 		<div className="space-y-4">
-			<label className="block font-medium mb-1">Pictures</label>
+			<label className="block font-medium mb-1">
+				Pictures{" "}
+				<span className="text-sm text-blue-900">
+					(You can upload upto 6 images)
+				</span>
+			</label>
 			<Input
 				type="file"
 				multiple

@@ -166,3 +166,13 @@ export const rejectPost = async (id: string) => {
 	}
 	return response.data.result;
 };
+
+export const deletePost = async (id: string) => {
+	const endpoint = `/api/admin/delete-post/${id}`;
+	const response = await BASE_URL.delete(endpoint);
+
+	if (!response.data.success) {
+		throw new Error(response.data.message || "Failed to delete post");
+	}
+	return response.data.result;
+};

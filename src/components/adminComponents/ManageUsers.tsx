@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import {
 	Table,
 	TableBody,
@@ -48,10 +48,8 @@ import {
 	fetchUsersByVerification,
 } from "../../services/fetchFunctionsForAdmin";
 import { useNavigate } from "react-router-dom";
-import { AlertMessage } from "../../lib/AlertMessage";
 import { showError, showSuccess } from "../../utils/toastUtils";
 import { getInitials } from "../../utils/getInitial";
-import { formatFullName } from "../../utils/capitalizeName";
 
 const ManageUsers = () => {
 	const [isDeleting, setIsDeleting] = useState(false);
@@ -79,24 +77,28 @@ const ManageUsers = () => {
 
 	const handleStatusChange = (value: string) => setSelectedStatus(value);
 
+	const handleCancelDelete = () => {
+		setIsDeleting(false);
+		setUserToDelete(null);
+	};
 	// function for user deletion by id
-	const handleDeleteUser = useCallback(async () => {
+	const handleDeleteUser = async () => {
 		if (!userToDelete) return;
 		try {
 			setIsDeleting(true);
 			await deleteUserById(userToDelete);
-			showSuccess("User deleted successfully");
+			showSuccess("User Deleted");
 			setUserToDelete(null);
-			setIsDeleting(false);
-			// Refresh after state updates complete
+			// Refresh the users list after deletion
 			await refetchUsers();
 		} catch (error) {
 			showError(
 				error instanceof Error ? error.message : "Failed to delete user",
 			);
+		} finally {
 			setIsDeleting(false);
 		}
-	}, [userToDelete, refetchUsers]);
+	};
 	const StatsCard = ({ title, value, icon: Icon, color }: any) => (
 		<Card className="hover:border-primary/50 transition-colors">
 			<CardHeader className="flex justify-between items-center pb-2">
@@ -121,9 +123,8 @@ const ManageUsers = () => {
 			<AlertDialog
 				open={!!userToDelete}
 				onOpenChange={(open) => {
-					// Only allow closing if not deleting
 					if (!open && !isDeleting) {
-						setUserToDelete(null);
+						handleCancelDelete();
 					}
 				}}
 			>
@@ -137,10 +138,7 @@ const ManageUsers = () => {
 					</AlertDialogHeader>
 					<div className="flex gap-3 justify-end">
 						<AlertDialogCancel
-							onClick={() => {
-								setUserToDelete(null);
-								setIsDeleting(false);
-							}}
+							onClick={handleCancelDelete}
 							disabled={isDeleting}
 						>
 							Cancel
