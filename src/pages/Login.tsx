@@ -29,7 +29,7 @@ const Login: React.FC = () => {
 	const dispatch = useDispatch<AppDispatch>();
 
 	const { isAuthenticated, user } = useSelector(
-		(state: RootState) => state.auth
+		(state: RootState) => state.auth,
 	);
 
 	const [formData, setFormData] = useState<UserFormDataTypes>({

@@ -31,7 +31,7 @@ const PostedByUserDetails: React.FC<{
 	return (
 		<fieldset className="relative border border-gray-200  shadow-sm bg-white">
 			<legend className="px-3 text-sm font-medium text-gray-500 ml-4 -mt-2 bg-white  uppercase italic">
-				Posted by
+				Contact
 			</legend>
 			<div className="flex items-center justify-between gap-5 py-6 px-4">
 				{/* Avatar */}

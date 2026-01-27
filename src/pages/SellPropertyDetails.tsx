@@ -25,8 +25,6 @@ const SellPropertyDetails: React.FC = () => {
 				const res = await BASE_URL.get(`/api/user/post/listingDetails/${id}`);
 				setListing(res.data.listingDetails);
 				setListingUserDetails(res.data.listingUser);
-				console.log("listing:", res.data.listingDetails);
-				console.log("user:", res.data.listingUser);
 			} catch {
 				console.error("Failed to fetch listing");
 				setError("Failed to fetch listing details. Please try again.");
@@ -100,7 +98,7 @@ const SellPropertyDetails: React.FC = () => {
 	const renderPropertyCategory = () => {
 		switch (listing.propertyCategory) {
 			case "house":
-				return;
+				return <HouseSell listing={listing} userDetails={listingUserDetails} />;
 			case "flat":
 				return <HouseSell listing={listing} userDetails={listingUserDetails} />;
 			case "land":

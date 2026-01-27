@@ -13,6 +13,7 @@ const AddressInput: React.FC<AddressInputProps> = ({
 	onSelect,
 }) => {
 	const inputRef = useRef<HTMLInputElement | null>(null);
+	const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(null);
 
 	useEffect(() => {
 		const loader = new Loader({
@@ -20,46 +21,46 @@ const AddressInput: React.FC<AddressInputProps> = ({
 			libraries: ["places"],
 		});
 
-		let autocomplete: google.maps.places.Autocomplete;
-		let listener: google.maps.MapsEventListener;
-
 		loader.load().then(() => {
 			if (!window.google || !inputRef.current) return;
 
-			autocomplete = new window.google.maps.places.Autocomplete(
+			autocompleteRef.current = new window.google.maps.places.Autocomplete(
 				inputRef.current,
 				{
 					types: ["geocode"],
 					componentRestrictions: { country: "IN" },
-				}
+				},
 			);
 
-			listener = autocomplete.addListener("place_changed", () => {
-				const place = autocomplete.getPlace();
-				if (!place) return;
+			const listener = autocompleteRef.current.addListener(
+				"place_changed",
+				() => {
+					const place = autocompleteRef.current?.getPlace();
+					if (!place) return;
 
-				const formattedAddress = place.formatted_address || place.name || "";
-				onChange(formattedAddress);
+					const formattedAddress = place.formatted_address || place.name || "";
+					onChange(formattedAddress);
 
-				if (onSelect && place.geometry?.location) {
-					const lat = place.geometry.location.lat();
-					const lng = place.geometry.location.lng();
-					onSelect(formattedAddress, { lat, lng });
-				}
-			});
+					if (onSelect && place.geometry?.location) {
+						const lat = place.geometry.location.lat();
+						const lng = place.geometry.location.lng();
+						onSelect(formattedAddress, { lat, lng });
+					}
+				},
+			);
+
+			return () => {
+				if (listener) window.google.maps.event.removeListener(listener);
+			};
 		});
-
-		return () => {
-			if (listener) window.google.maps.event.removeListener(listener);
-		};
-	}, [onChange, onSelect]);
+	}, []);
 
 	return (
 		<input
 			ref={inputRef}
 			type="text"
 			value={value}
-			onChange={(e) => onChange(e.target.value)} // no onSelect here
+			onChange={(e) => onChange(e.target.value)}
 			placeholder="Enter your address"
 			className="w-full px-4 py-2 mt-1 border rounded-md focus:ring-sky-500 focus:border-sky-500"
 		/>
