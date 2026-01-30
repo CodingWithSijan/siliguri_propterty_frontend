@@ -161,7 +161,7 @@ const HouseSell: React.FC<{
 								listing.availableLandSpace
 									? `${listing.availableLandSpace} ${
 											listing.availableLandSpaceUnit || ""
-									  }`
+										}`
 									: undefined
 							}
 							variant="primary"

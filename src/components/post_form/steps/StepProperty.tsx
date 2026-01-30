@@ -4,8 +4,9 @@
 import { useFormContext, Controller } from "react-hook-form";
 import AddressInput from "../../../services/AddressInput";
 import { Input } from "../../ui/input";
-import { Textarea } from "../../ui/textarea";
+// import { Textarea } from "../../ui/textarea";
 import { useEffect } from "react";
+import RichTextEditor from "../../common/RichTextEditor";
 
 const StepPropertyType = () => {
 	const {
@@ -118,7 +119,26 @@ const StepPropertyType = () => {
 				<label htmlFor="title" className="block font-medium mb-1">
 					Description
 				</label>
-				<Textarea
+				<Controller
+					name="description"
+					control={control}
+					rules={{
+						required: "Description is required",
+						minLength: {
+							value: 10,
+							message: "Description must be atleast 10 characters",
+						},
+					}}
+					render={({ field }) => (
+						<RichTextEditor
+							value={field.value || ""}
+							onChange={field.onChange}
+							placeholder="Enter detailed property description..."
+							disabled={false}
+						/>
+					)}
+				/>
+				{/* <Textarea
 					placeholder="Enter description for your post..."
 					{...register("description", {
 						required: "Description is required",
@@ -127,7 +147,7 @@ const StepPropertyType = () => {
 							message: "description must be atleast 10 characters",
 						},
 					})}
-				/>
+				/> */}
 				{errors.description && (
 					<p className="text-red-500 text-sm">
 						{String(errors.description.message)}

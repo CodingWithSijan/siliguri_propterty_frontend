@@ -8,6 +8,7 @@ import Navbar from "../components/header_and_footer/Navbar";
 import HouseSell from "../components/property_details_page/sell/common/HouseSell";
 import ShopSell from "../components/property_details_page/sell/shop/ShopSell";
 import LandSell from "../components/property_details_page/sell/land/LandSell";
+import Breadcrumb from "../lib/Breadcrumb";
 
 const SellPropertyDetails: React.FC = () => {
 	const { id } = useParams();
@@ -25,8 +26,6 @@ const SellPropertyDetails: React.FC = () => {
 				const res = await BASE_URL.get(`/api/user/post/listingDetails/${id}`);
 				setListing(res.data.listingDetails);
 				setListingUserDetails(res.data.listingUser);
-				console.log("listing:", res.data.listingDetails);
-				console.log("user:", res.data.listingUser);
 			} catch {
 				console.error("Failed to fetch listing");
 				setError("Failed to fetch listing details. Please try again.");
@@ -37,6 +36,27 @@ const SellPropertyDetails: React.FC = () => {
 
 		if (id) fetchListing();
 	}, [id]);
+
+	// Generate breadcrumb items
+	const getBreadcrumbItems = () => {
+		if (!listing) return [];
+
+		const propertyTypeLabel =
+			listing.propertyCategory.charAt(0).toUpperCase() +
+			listing.propertyCategory.slice(1);
+
+		return [
+			{ label: "For Sale", path: "/buys" },
+			{
+				label: propertyTypeLabel,
+				path: `/buys/${listing.propertyCategory}`,
+			},
+			{
+				label: listing.title.slice(0, 25) + "...",
+				path: `/buys/${listing.propertyCategory}/${id}`,
+			},
+		];
+	};
 
 	if (loading) {
 		return (
@@ -100,7 +120,7 @@ const SellPropertyDetails: React.FC = () => {
 	const renderPropertyCategory = () => {
 		switch (listing.propertyCategory) {
 			case "house":
-				return;
+				return <HouseSell listing={listing} userDetails={listingUserDetails} />;
 			case "flat":
 				return <HouseSell listing={listing} userDetails={listingUserDetails} />;
 			case "land":
@@ -114,8 +134,8 @@ const SellPropertyDetails: React.FC = () => {
 	return (
 		<>
 			<Navbar />
-
-			<div className="flex justify-center items-center">
+			<Breadcrumb items={getBreadcrumbItems()} />
+			<div className=" min-w-[100vw] min-h-[100%] bg-slate-500">
 				{renderPropertyCategory()}
 			</div>
 		</>

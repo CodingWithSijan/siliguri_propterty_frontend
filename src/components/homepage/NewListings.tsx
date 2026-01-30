@@ -15,13 +15,11 @@ import {
 } from "../../types/listingTypes";
 import RentListingCard from "../card/RentListingCard";
 import SellListingCard from "../card/SellListingCard";
-import { useNavigate } from "react-router-dom";
 import Autoplay from "embla-carousel-autoplay";
 import { FaHome } from "react-icons/fa";
 
 const NewListings: React.FC = () => {
 	const [latestPosts, setLatestPosts] = useState<IUniversalListingType[]>([]);
-	const navigate = useNavigate();
 
 	useEffect(() => {
 		const fetchLatest = async () => {
@@ -33,7 +31,7 @@ const NewListings: React.FC = () => {
 					console.error(
 						"Error fetching latest posts:",
 						error.response?.status,
-						error.response?.data || error.message
+						error.response?.data || error.message,
 					);
 				} else {
 					console.error("Unexpected Error:", (error as Error).message);
@@ -43,16 +41,8 @@ const NewListings: React.FC = () => {
 		fetchLatest();
 	}, []);
 
-	const handleCardClick = (postId: string, intent: "rent" | "sell") => {
-		if (intent === "rent") {
-			navigate(`/rentals/${postId}`);
-		} else {
-			navigate(`/buys/${postId}`);
-		}
-	};
-
 	const plugin = React.useRef(
-		Autoplay({ delay: 4000, stopOnInteraction: true })
+		Autoplay({ delay: 4000, stopOnInteraction: true }),
 	);
 
 	return (
@@ -105,7 +95,6 @@ const NewListings: React.FC = () => {
 											) : (
 												<SellListingCard
 													listing={item as ISellListingType}
-													onClick={() => handleCardClick(item._id, "sell")}
 													userOrGlobal="global"
 												/>
 											)}

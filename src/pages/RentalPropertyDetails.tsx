@@ -7,6 +7,7 @@ import { IListingUserDetails } from "../types/listingUserDetails";
 import Navbar from "../components/header_and_footer/Navbar";
 import HouseRent from "../components/property_details_page/rent/common/HouseRent";
 import ShopRental from "../components/property_details_page/rent/shop/ShopRental";
+import Breadcrumb from "../lib/Breadcrumb";
 
 const RentalPropertyDetails: React.FC = () => {
 	const { id } = useParams();
@@ -20,8 +21,6 @@ const RentalPropertyDetails: React.FC = () => {
 				const res = await BASE_URL.get(`/api/user/post/listingDetails/${id}`);
 				setListing(res.data.listingDetails);
 				setListingUserDetails(res.data.listingUser);
-				console.log("listing:", res.data.listingDetails);
-				console.log("user:", res.data.listingUser);
 			} catch (error) {
 				console.error("Failed to fetch listing", error);
 			}
@@ -29,6 +28,27 @@ const RentalPropertyDetails: React.FC = () => {
 
 		if (id) fetchListing();
 	}, [id]);
+
+	// Generate breadcrumb items
+	const getBreadcrumbItems = () => {
+		if (!listing) return [];
+
+		const propertyTypeLabel =
+			listing.propertyCategory.charAt(0).toUpperCase() +
+			listing.propertyCategory.slice(1);
+
+		return [
+			{ label: "For Rent", path: "/rentals" },
+			{
+				label: propertyTypeLabel,
+				path: `/rentals/${listing.propertyCategory}`,
+			},
+			{
+				label: listing.title.slice(0, 25) + "...",
+				path: `/rentals/${listing.propertyCategory}/${id}`,
+			},
+		];
+	};
 
 	if (!listing)
 		return (
@@ -52,7 +72,7 @@ const RentalPropertyDetails: React.FC = () => {
 	const renderPropertyCategory = () => {
 		switch (listing.propertyCategory) {
 			case "house":
-				return;
+				return <HouseRent listing={listing} userDetails={listingUserDetails} />;
 			case "flat":
 				return <HouseRent listing={listing} userDetails={listingUserDetails} />;
 			case "shop":
@@ -66,7 +86,8 @@ const RentalPropertyDetails: React.FC = () => {
 	return (
 		<>
 			<Navbar />
-			<div className="flex justify-center items-center">
+			<Breadcrumb items={getBreadcrumbItems()} />
+			<div className="flex justify-center items-center min-w-[100vw] min-h-[100%] bg-slate-500">
 				{renderPropertyCategory()}
 			</div>
 		</>

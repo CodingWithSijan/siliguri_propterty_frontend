@@ -3,9 +3,11 @@ import HeroSectionImage1Background from "../../assets/image1_hero_section.jpg";
 import HeroSectionImage2Background from "../../assets/image2_hero_section.jpg";
 import { motion, AnimatePresence } from "framer-motion";
 import HomepagePropertySearchFilter from "./HomepagePropertySearchFilter";
+import { useSiteStats } from "../../hooks/use-SiteStats";
 
 const HeroSection: React.FC = () => {
 	const [currentSlide, setCurrentSlide] = useState(0);
+	const { stats } = useSiteStats();
 	const slides = [
 		{
 			image: HeroSectionImage1Background,
@@ -94,13 +96,17 @@ const HeroSection: React.FC = () => {
 				>
 					<div className="bg-white/10 backdrop-blur-md rounded-xl px-6 py-3 border border-white/20">
 						<div className="text-center">
-							<div className="text-2xl font-bold text-white">10+</div>
+							<div className="text-2xl font-bold text-white">
+								{stats.propertiesListed}+
+							</div>
 							<div className="text-sm text-gray-200">Properties Listed</div>
 						</div>
 					</div>
 					<div className="bg-white/10 backdrop-blur-md rounded-xl px-6 py-3 border border-white/20">
 						<div className="text-center">
-							<div className="text-2xl font-bold text-white">10+</div>
+							<div className="text-2xl font-bold text-white">
+								{stats.happyCustomers}+
+							</div>
 							<div className="text-sm text-gray-200">Happy Customers</div>
 						</div>
 					</div>

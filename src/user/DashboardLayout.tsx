@@ -26,12 +26,12 @@ const DashboardLayout: React.FC = () => {
 	const { user } = useSelector((state: RootState) => state.auth);
 	const dispatch = useDispatch<AppDispatch>();
 	return (
-		<div className="flex flex-col h-screen bg-gray-50">
+		<div className="flex flex-col h-screen bg-background">
 			{/* Fixed Mobile Top Bar */}
-			<div className="md:hidden fixed top-0 left-0 right-0 bg-white shadow-md z-50 flex items-center justify-between px-4 py-3">
+			<div className="md:hidden fixed top-0 left-0 right-0 bg-card border-b border-border shadow-sm z-50 flex items-center justify-between px-4 py-3">
 				<button
 					onClick={() => setSidebarOpen(!sidebarOpen)}
-					className="p-2 bg-primary text-primary-foreground rounded-md shadow hover:bg-primary/90 transition-colors flex items-center space-x-2"
+					className="p-2 bg-primary text-primary-foreground rounded-lg shadow-sm hover:bg-primary/90 transition-all flex items-center space-x-2"
 					aria-label="Toggle menu"
 				>
 					<Bars3Icon className="h-6 w-6" />
@@ -85,7 +85,7 @@ const DashboardLayout: React.FC = () => {
 				{/* Overlay */}
 				{sidebarOpen && (
 					<div
-						className="fixed inset-0 bg-black/40 backdrop-blur-sm z-30 md:hidden transition-opacity"
+						className="fixed inset-0 bg-black/50 backdrop-blur-sm z-30 md:hidden transition-all"
 						onClick={() => setSidebarOpen(false)}
 					></div>
 				)}
@@ -108,9 +108,9 @@ const DashboardLayout: React.FC = () => {
 				</div>
 
 				{/* Main Content */}
-				<main className="flex-1 overflow-scroll">
+				<main className="flex-1 overflow-auto bg-muted/30">
 					<ProtectedRoute allowedRoles={["user"]}>
-						<div className="h-full bg-white">
+						<div className="h-full">
 							<Outlet />
 						</div>
 					</ProtectedRoute>

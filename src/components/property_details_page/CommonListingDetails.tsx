@@ -1,5 +1,9 @@
 import React, { useState } from "react";
 import { MapPin, Home, Info, ChevronDown } from "lucide-react";
+import {
+	processDescription,
+	getTruncatedHTML,
+} from "../../utils/descriptionUtils";
 
 interface ICommonListingDetailsType {
 	title: string;
@@ -8,30 +12,6 @@ interface ICommonListingDetailsType {
 	alternateLocation: string;
 	propertyCategory: string;
 }
-
-interface InfoCardProps {
-	icon: React.ElementType;
-	label: string;
-	value: string;
-}
-
-const InfoCard: React.FC<InfoCardProps> = ({ icon: Icon, label, value }) => (
-	<div className="bg-white border border-gray-100 p-2">
-		<div className="flex items-center gap-3">
-			<div className="flex-shrink-0 w-5 h-5 flex items-center justify-center">
-				<Icon className="w-5 h-5 text-slate-600" />
-			</div>
-			<div className="flex-1 min-w-0">
-				<p className="text-xs  text-slate-600 uppercase tracking-wide mb-2">
-					{label}
-				</p>
-				<p className="text-sm  text-slate-800 leading-relaxed line-clamp-3">
-					{value}
-				</p>
-			</div>
-		</div>
-	</div>
-);
 
 const CommonListingDetails: React.FC<ICommonListingDetailsType> = ({
 	title,
@@ -43,76 +23,124 @@ const CommonListingDetails: React.FC<ICommonListingDetailsType> = ({
 	const [isDescriptionExpanded, setIsDescriptionExpanded] =
 		useState<boolean>(false);
 
-	const shouldShowReadMore = description && description.split(" ").length > 50;
+	// Process description using utility
+	const { sanitizedHTML, shouldTruncate } = processDescription(
+		description,
+		100,
+	);
 
 	return (
-		<div className="max-w-4xl mx-auto bg-white border border-gray-200 overflow-hidden">
+		<div className="max-w-4xl mx-auto">
 			{/* Header */}
-			<div className="p-4 bg-gradient-to-r from-gray-50 to-white border-b border-gray-100">
-				<div className="flex justify-between gap-4">
-					<div className="flex-1">
-						<h1 className="text-md sm:text-xl text-slate-800 leading-tight mb-2">
-							{title}
-						</h1>
-					</div>
-					{/* <button onClick={handleShare} className="p-2" title="Share listing">
-						<Share2 className="w-5 h-5 text-slate-600" />
-					</button> */}
-				</div>
+			<div className="p-6 bg-gradient-to-r from-slate-50 to-white border-b border-gray-200">
+				<h1 className="text-md sm:text-xl text-slate-800 leading-tight">
+					{title}
+				</h1>
 			</div>
 
 			{/* Content */}
-			<div className="p-2 space-y-2">
-				{/* Property Details */}
-				<div className="flex flex-col gap-4">
-					<InfoCard icon={MapPin} label="Location" value={location} />
-					<InfoCard
-						icon={Home}
-						label="Property Type"
-						value={propertyCategory}
-					/>
-					<InfoCard
-						icon={MapPin}
-						label="Full Address"
-						value={alternateLocation}
-					/>
-				</div>
-
-				{/* Description */}
-				<div className="bg-gray-50 border border-gray-100 rounded-lg p-2 sm:p-4">
-					<div className="flex items-center gap-3 mb-4">
-						<div className="w-5 h-5 flex items-center justify-center">
-							<Info className="w-5 h-5 text-slate-600" />
+			<div className="p-6 space-y-4">
+				{/* Property Details Grid */}
+				<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+					{/* Location Card */}
+					<div className="bg-white border border-gray-100 rounded-lg p-4 hover:shadow-sm transition-shadow">
+						<div className="flex items-center gap-3">
+							<div className="flex-shrink-0 w-10 h-10 bg-slate-50 rounded-full flex items-center justify-center">
+								<MapPin className="w-5 h-5 text-red-600 " />
+							</div>
+							<div className="flex-1 min-w-0">
+								<p className="text-xs font-medium text-slate-500 uppercase tracking-wide mb-1">
+									Location
+								</p>
+								<p className="text-sm font-medium text-slate-800 leading-relaxed">
+									{location.charAt(0).toUpperCase() + location.slice(1)}
+								</p>
+							</div>
 						</div>
-						<h2 className="text-sm text-slate-600 uppercase tracking-wide">
-							Property Description
-						</h2>
 					</div>
 
-					<div className="max-w-none">
-						<p className="text-slate-700 leading-relaxed">
-							{description
-								? isDescriptionExpanded
-									? description
-									: description.split(" ").slice(0, 50).join(" ")
-								: "No description available for this property."}
+					{/* Property Type Card */}
+					<div className="bg-white border border-gray-100 rounded-lg p-4 hover:shadow-sm transition-shadow">
+						<div className="flex items-center gap-3">
+							<div className="flex-shrink-0 w-10 h-10 bg-slate-50 rounded-full flex items-center justify-center">
+								<Home className="w-5 h-5 text-yellow-600" />
+							</div>
+							<div className="flex-1 min-w-0">
+								<p className="text-xs font-medium text-slate-500 uppercase tracking-wide mb-1">
+									Property Type
+								</p>
+								<p className="text-sm font-medium text-slate-800 leading-relaxed">
+									{propertyCategory.toUpperCase()}
+								</p>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				{/* Full Address Card */}
+				<div className="bg-white border border-gray-100 rounded-lg p-4 hover:shadow-sm transition-shadow">
+					<div className="flex items-center gap-3">
+						<div className="flex-shrink-0 w-10 h-10 bg-slate-50 rounded-full flex items-center justify-center">
+							<MapPin className="w-5 h-5 text-blue-600" />
+						</div>
+						<div className="flex-1 min-w-0">
+							<p className="text-xs font-medium text-slate-500 uppercase tracking-wide mb-1">
+								Full Address
+							</p>
+							<p className="text-sm font-medium text-slate-800 leading-relaxed">
+								{alternateLocation.charAt(0).toUpperCase() +
+									alternateLocation.slice(1)}
+							</p>
+						</div>
+					</div>
+				</div>
+
+				{/* Description Section */}
+				{sanitizedHTML && (
+					<div className="bg-slate-50 border border-gray-200 rounded-lg p-6">
+						<div className="flex items-center gap-3 mb-4">
+							<div className="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-sm">
+								<Info className="w-5 h-5 text-yellow-600" />
+							</div>
+							<h2 className="text-base font-semibold text-slate-700 uppercase tracking-wide">
+								Property Description
+							</h2>
+						</div>
+
+						<div
+							className="property-description text-slate-700 leading-relaxed"
+							dangerouslySetInnerHTML={{
+								__html: isDescriptionExpanded
+									? sanitizedHTML
+									: shouldTruncate
+										? getTruncatedHTML(sanitizedHTML, 100)
+										: sanitizedHTML,
+							}}
+						/>
+
+						{shouldTruncate && (
+							<button
+								onClick={() => setIsDescriptionExpanded(!isDescriptionExpanded)}
+								className="mt-4 inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-gray-300 rounded-lg hover:bg-slate-50 transition-colors"
+							>
+								{isDescriptionExpanded ? "Show Less" : "Read More"}
+								<ChevronDown
+									className={`w-4 h-4 transition-transform ${
+										isDescriptionExpanded ? "rotate-180" : ""
+									}`}
+								/>
+							</button>
+						)}
+					</div>
+				)}
+
+				{!sanitizedHTML && (
+					<div className="bg-slate-50 border border-gray-200 rounded-lg p-6">
+						<p className="text-slate-500 text-center italic">
+							No description available for this property.
 						</p>
 					</div>
-
-					{shouldShowReadMore && (
-						<button
-							onClick={() => setIsDescriptionExpanded(!isDescriptionExpanded)}
-							className="mt-4 inline-flex items-center gap-2 text-sm font-medium text-slate-600"
-						>
-							{isDescriptionExpanded ? "Show Less" : "Read More"}
-							<ChevronDown
-								className={`w-4 h-4 ${
-									isDescriptionExpanded ? "rotate-180" : ""
-								}`}
-							/>
-						</button>
-					)}
-				</div>
+				)}
 			</div>
 		</div>
 	);

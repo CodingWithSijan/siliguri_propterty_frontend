@@ -23,6 +23,8 @@ import YourProfile from "./user/dashboard/YourProfile";
 import EditPostPage from "./pages/EditPostPage";
 import RentalProperties from "./pages/RentalProperties";
 import SaleProperties from "./pages/SaleProperties";
+import RentalPropertyByCategory from "./pages/RentalPropertyByCategory";
+import SellPropertyByCategory from "./pages/SellPropertyByCategory";
 import RentalPropertyDetails from "./pages/RentalPropertyDetails";
 import SellPropertyDetails from "./pages/SellPropertyDetails";
 import AllListings from "./pages/AllListings";
@@ -40,22 +42,46 @@ const App: React.FC = () => {
 	return (
 		<Router>
 			<ScrollToTopButton />
+			<ToastContainer
+				position="top-center"
+				autoClose={2000}
+				newestOnTop
+				pauseOnHover
+				theme="light"
+			/>
 
 			<Routes>
+				{/* ============================================
+				    PUBLIC ROUTES
+				    ============================================ */}
+
 				{/* Homepage & Info */}
 				<Route path="/" element={<Homepage />} />
 				<Route path="/about" element={<AboutUs />} />
 				<Route path="/privacy" element={<PrivacyPolicy />} />
+
 				{/* Rental Property Routes */}
 				<Route path="/rentals" element={<RentalProperties />} />
-				<Route path="/rentals/:id" element={<RentalPropertyDetails />} />
+				<Route
+					path="/rentals/:category"
+					element={<RentalPropertyByCategory />}
+				/>
+				<Route
+					path="/rentals/:category/:id"
+					element={<RentalPropertyDetails />}
+				/>
 
 				{/* Sale Property Routes */}
 				<Route path="/buys" element={<SaleProperties />} />
-				<Route path="/buys/:id" element={<SellPropertyDetails />} />
+				<Route path="/buys/:category" element={<SellPropertyByCategory />} />
+				<Route path="/buys/:category/:id" element={<SellPropertyDetails />} />
 
 				{/* All Properties Route */}
 				<Route path="/properties" element={<AllListings />} />
+
+				{/* ============================================
+				    AUTHENTICATION ROUTES
+				    ============================================ */}
 
 				{/* Auth & Account */}
 				<Route path="/signup" element={<Signup />} />
@@ -67,7 +93,9 @@ const App: React.FC = () => {
 				<Route path="/reset-password/:token" element={<ResetPassword />} />
 				<Route path="/verify-email" element={<VerifyEmail />} />
 
-				{/* User Dashboard (Protected) */}
+				{/* ============================================
+				    USER DASHBOARD (Protected)
+				    ============================================ */}
 				<Route
 					path="/dashboard"
 					element={
@@ -94,16 +122,18 @@ const App: React.FC = () => {
 					/>
 				</Route>
 
-				{/* Admin Dashboard (Protected) */}
+				{/* ============================================
+				    ADMIN DASHBOARD (Protected)
+				    ============================================ */}
 				<Route
-					path="/admin/*"
+					path="/admin"
 					element={
 						<ProtectedRoute allowedRoles={["admin"]}>
 							<AdminDashboardPage />
 						</ProtectedRoute>
 					}
 				>
-					<Route index element={<Navigate to="/admin/home" replace />} />
+					<Route index element={<Navigate to="home" replace />} />
 					<Route path="home" element={<HomeTab />} />
 					<Route path="posts" element={<ManagePosts />} />
 					<Route path="posts/view-post/:id" element={<ViewPost />} />
@@ -111,10 +141,14 @@ const App: React.FC = () => {
 					<Route path="users/view-user/:id" element={<ViewUser />} />
 				</Route>
 
-				{/* Utility & Error Pages */}
+				{/* ============================================
+				    ERROR & UTILITY ROUTES
+				    ============================================ */}
 				<Route path="/access-denied" element={<NotFound404 />} />
+
+				{/* Catch-all 404 - Must be last */}
+				<Route path="*" element={<NotFound404 />} />
 			</Routes>
-			<ToastContainer position="top-center" autoClose={2000} newestOnTop />
 		</Router>
 	);
 };

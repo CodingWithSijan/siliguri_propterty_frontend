@@ -1,0 +1,4 @@
+/* 
+    Sanitize user input to prevent XSS attacks
+   Escapes HTML special characters to their entity equivalents
+*/

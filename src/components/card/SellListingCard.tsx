@@ -9,15 +9,16 @@ import { BiRupee } from "react-icons/bi";
 import ActionButtons from "./ActionButtons";
 import { getDaysAgoTextFromObjectId } from "../../utils/getDaysAgo";
 import RenderListingFeaturesSell from "./RenderListingFeaturesSell";
+import { useNavigate } from "react-router-dom";
 
 const capitalize = (str: string | undefined) =>
 	str ? str.charAt(0).toUpperCase() + str.slice(1) : "";
 
 const SellListingCard: React.FC<{
 	listing: ISellListingType;
-	onClick: () => void;
+	onClick?: () => void;
 	userOrGlobal?: string;
-}> = ({ listing, onClick, userOrGlobal }) => {
+}> = ({ listing, userOrGlobal, onClick }) => {
 	const formatPrice = () => {
 		if (listing.totalPrice) {
 			return formatIndianCurrency(listing.totalPrice);
@@ -28,13 +29,24 @@ const SellListingCard: React.FC<{
 		}
 		return "Price on request";
 	};
-
+	const navigate = useNavigate();
+	const handleClick = () => {
+		if (onClick) {
+			onClick();
+		} else {
+			const path =
+				userOrGlobal === "global"
+					? `/buys/${listing.propertyCategory}/${listing._id}`
+					: `/buys`;
+			navigate(path);
+		}
+	};
 	const postedAgoText = getDaysAgoTextFromObjectId(listing._id);
 
 	return (
 		<motion.div
 			transition={{ type: "spring", stiffness: 100, damping: 18 }}
-			onClick={onClick}
+			onClick={handleClick}
 			className="relative bg-white rounded-md shadow-md hover:shadow-lg border border-gray-200/60 group w-full max-w-sm mx-auto cursor-pointer flex flex-col overflow-hidden"
 			style={{ minHeight: 420 }}
 		>
@@ -60,8 +72,8 @@ const SellListingCard: React.FC<{
 									listing.approvalStatus === "approved"
 										? "text-green-600"
 										: listing.approvalStatus === "pending"
-										? "text-yellow-600"
-										: "text-red-600"
+											? "text-yellow-600"
+											: "text-red-600"
 								}`}
 							>
 								{capitalize(listing.approvalStatus)}

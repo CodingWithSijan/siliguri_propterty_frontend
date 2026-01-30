@@ -21,6 +21,7 @@ import PostedByUserDetails from "../../PostedByUserDetails";
 import PostCreationAndUpdateDetails from "../../PostCreationAndUpdateDetails";
 import { IPostCreationDetails } from "../../../../types/postCreationDetails";
 import InfoItem from "../../InfoItem";
+import { formatIndianCurrency } from "../../../../utils/priceFormatHelper";
 
 const House: React.FC<{
 	listing: IRentListingType;
@@ -41,15 +42,9 @@ const House: React.FC<{
 	};
 
 	// Format rental price
-	const formatIndianCurrency = (amount: number) => {
-		return new Intl.NumberFormat("en-IN", {
-			maximumFractionDigits: 0, // no decimals for rental prices
-		}).format(amount);
-	};
-
 	const formatRentalPrice = () => {
 		if (listing.pricePerFrequency && listing.frequency) {
-			return `₹${formatIndianCurrency(listing.pricePerFrequency)} / ${
+			return `${formatIndianCurrency(listing.pricePerFrequency)} / ${
 				listing.frequency
 			}`;
 		}
@@ -83,7 +78,8 @@ const House: React.FC<{
 									Rental Price
 								</h3>
 							</div>
-							<p className="text-2xl font-bold text-amber-700 mb-1">
+							<p className="text-2xl font-bold text-amber-700 mb-1 flex items-center gap-1">
+								<IndianRupee className="w-6 h-6" />
 								{formatRentalPrice()}
 							</p>
 							{listing.availableForDuration &&

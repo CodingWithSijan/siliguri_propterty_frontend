@@ -2,7 +2,7 @@ import React, { useState } from "react";
 // import { useAuth } from "../contextAPI/UserAuthContext";
 import { showSuccess, showError } from "../utils/toastUtils";
 import BASE_URL from "../services";
-import { motion, AnimatePresence } from "framer-motion"; // 👈 Import
+import { motion, AnimatePresence } from "framer-motion";
 
 const ChangePassword: React.FC<{ onClose: () => void }> = ({ onClose }) => {
 	const [currentPassword, setCurrentPassword] = useState("");
@@ -49,25 +49,27 @@ const ChangePassword: React.FC<{ onClose: () => void }> = ({ onClose }) => {
 	return (
 		<AnimatePresence>
 			<motion.div
-				className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
+				className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
 				initial={{ opacity: 0 }}
 				animate={{ opacity: 1 }}
 				exit={{ opacity: 0 }}
 			>
 				<motion.div
-					className="bg-white rounded-lg shadow-lg w-full max-w-md p-6"
+					className="bg-card rounded-2xl shadow-2xl w-full max-w-md p-8 border border-border"
 					initial={{ scale: 0.8, opacity: 0 }}
 					animate={{ scale: 1, opacity: 1 }}
 					exit={{ scale: 0.8, opacity: 0 }}
 					transition={{ type: "spring", stiffness: 300, damping: 20 }}
 				>
-					<h2 className="text-xl font-bold mb-4">Change Password</h2>
-					<form onSubmit={handleSubmit} className="space-y-4">
+					<h2 className="text-2xl font-bold mb-6 text-foreground">
+						Change Password
+					</h2>
+					<form onSubmit={handleSubmit} className="space-y-5">
 						{/* form inputs same as before */}
 						<div>
 							<label
 								htmlFor="currentPassword"
-								className="block text-sm font-medium text-gray-700"
+								className="block text-sm font-medium text-muted-foreground mb-2"
 							>
 								Current Password
 							</label>
@@ -77,7 +79,7 @@ const ChangePassword: React.FC<{ onClose: () => void }> = ({ onClose }) => {
 								value={currentPassword}
 								onChange={(e) => setCurrentPassword(e.target.value)}
 								required
-								className="w-full px-4 py-2 mt-1 text-sm border text-gray-700 rounded-md border-gray-300 focus:ring-blue-500 focus:border-blue-500"
+								className="w-full px-4 py-3 text-sm border text-foreground bg-muted/50 rounded-lg border-input focus:ring-2 focus:ring-ring focus:border-transparent transition-all"
 								placeholder="Enter your current password"
 							/>
 						</div>
@@ -85,7 +87,7 @@ const ChangePassword: React.FC<{ onClose: () => void }> = ({ onClose }) => {
 						<div>
 							<label
 								htmlFor="newPassword"
-								className="block text-sm font-medium text-gray-700"
+								className="block text-sm font-medium text-muted-foreground mb-2"
 							>
 								New Password
 							</label>
@@ -95,7 +97,7 @@ const ChangePassword: React.FC<{ onClose: () => void }> = ({ onClose }) => {
 								value={newPassword}
 								onChange={(e) => setNewPassword(e.target.value)}
 								required
-								className="w-full px-4 py-2 mt-1 text-sm border text-gray-700 rounded-md border-gray-300 focus:ring-blue-500 focus:border-blue-500"
+								className="w-full px-4 py-3 text-sm border text-foreground bg-muted/50 rounded-lg border-input focus:ring-2 focus:ring-ring focus:border-transparent transition-all"
 								placeholder="Enter your new password"
 							/>
 						</div>
@@ -103,7 +105,7 @@ const ChangePassword: React.FC<{ onClose: () => void }> = ({ onClose }) => {
 						<div>
 							<label
 								htmlFor="confirmPassword"
-								className="block text-sm font-medium text-gray-700"
+								className="block text-sm font-medium text-muted-foreground mb-2"
 							>
 								Confirm New Password
 							</label>
@@ -113,23 +115,23 @@ const ChangePassword: React.FC<{ onClose: () => void }> = ({ onClose }) => {
 								value={confirmPassword}
 								onChange={(e) => setConfirmPassword(e.target.value)}
 								required
-								className="w-full px-4 py-2 mt-1 text-sm border rounded-md text-gray-700 border-gray-300 focus:ring-blue-500 focus:border-blue-500"
+								className="w-full px-4 py-3 text-sm border rounded-lg text-foreground bg-muted/50 border-input focus:ring-2 focus:ring-ring focus:border-transparent transition-all"
 								placeholder="Confirm your new password"
 							/>
 						</div>
 
-						<div className="flex justify-end space-x-2">
+						<div className="flex justify-end space-x-3 pt-2">
 							<button
 								type="button"
 								onClick={onClose}
-								className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300"
+								className="px-5 py-2.5 text-sm font-medium text-muted-foreground bg-secondary hover:bg-secondary/80 rounded-lg transition-all"
 							>
 								Cancel
 							</button>
 							<button
 								type="submit"
 								disabled={loading}
-								className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+								className="px-5 py-2.5 text-sm font-medium text-primary-foreground bg-primary rounded-lg hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-sm"
 							>
 								{loading ? "Changing..." : "Change Password"}
 							</button>

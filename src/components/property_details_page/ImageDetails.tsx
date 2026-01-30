@@ -54,15 +54,15 @@ const Image_UserDetails: React.FC<{
 		}
 	};
 	return (
-		<div className="w-full overflow-hidden border border-gray-200/60 shadow-sm bg-white">
+		<div className="w-full overflow-hidden border border-slate-200 bg-white">
 			{/* Listing Image */}
-			<div className="relative w-full h-56 sm:h-64 md:h-72 lg:h-80 bg-gray-100">
+			<div className="relative w-full h-56 sm:h-64 md:h-72 lg:h-80 bg-gray-100 group cursor-pointer">
 				<Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
 					<DialogTrigger asChild>
 						<img
 							src={images[0]}
 							alt={listing_title}
-							className="w-full h-full object-cover cursor-pointer"
+							className="w-full h-full object-cover cursor-pointer transition-opacity group-hover:opacity-80"
 							onClick={() => handleImageClick(0)}
 							onError={(e) => {
 								const target = e.target as HTMLImageElement;
@@ -167,9 +167,12 @@ const Image_UserDetails: React.FC<{
 				)}
 
 				{/* Hover effect overlay */}
-				<div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 pointer-events-none flex items-center justify-center">
-					<div className="bg-white/20 backdrop-blur-sm rounded-full p-3">
-						<FaExpand className="text-white w-6 h-6" />
+				<div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center pointer-events-none">
+					<div className="text-center">
+						<FaExpand className="text-white w-10 h-10 mx-auto mb-3" />
+						<p className="text-white text-2xl font-semibold tracking-wide">
+							Click to view pictures
+						</p>
 					</div>
 				</div>
 			</div>

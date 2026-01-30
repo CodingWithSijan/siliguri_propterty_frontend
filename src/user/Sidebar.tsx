@@ -64,7 +64,7 @@ const Sidebar: React.FC<SidebarProps> = ({ setActiveMenu, setSidebarOpen }) => {
 			className=" h-full w-full flex flex-col  border-r border-gray-200 shadow-sm bg-gray-100"
 		>
 			<div className="flex flex-col flex-1">
-				<div className=" border-b border-gray-100 block">
+				<div className="border-b border-border bg-background/50 block">
 					<NavLink to="/" className="block">
 						<img
 							src={siliguri_property_logo_noBG}
@@ -77,19 +77,19 @@ const Sidebar: React.FC<SidebarProps> = ({ setActiveMenu, setSidebarOpen }) => {
 				<DropdownMenu>
 					<DropdownMenuTrigger>
 						{" "}
-						<div className="flex items-center space-x-3 p-4 border-y-2 border-gray-200">
+						<div className="flex items-center space-x-3 p-4 border-y border-border bg-muted/30 hover:bg-muted/50 transition-all cursor-pointer">
 							{user?.avatar ? (
 								<img
-									className="w-8 h-8 rounded-full border-2 border-blue-500"
+									className="w-10 h-10 rounded-full border-2 border-primary shadow-sm"
 									src={user.avatar}
 									alt={user.name}
 								/>
 							) : (
-								<div className="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold">
+								<div className="w-10 h-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold shadow-sm">
 									{getInitials(user?.name ?? "")}
 								</div>
 							)}
-							<span className="text-blue-900 font-medium">
+							<span className="text-foreground font-semibold text-sm">
 								{formatFullName(user?.name)}
 							</span>
 						</div>
@@ -98,11 +98,11 @@ const Sidebar: React.FC<SidebarProps> = ({ setActiveMenu, setSidebarOpen }) => {
 						<DropdownMenuLabel>My Account</DropdownMenuLabel>
 						<DropdownMenuSeparator />
 						<DropdownMenuItem>
-							<div className="p-2 border-t border-gray-100">
+							<div className="p-2 border-t border-border">
 								<motion.button
 									whileHover={{ scale: 1.02 }}
 									whileTap={{ scale: 0.98 }}
-									className="w-full flex items-center gap-3  text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-200"
+									className="w-full flex items-center gap-3 text-destructive hover:bg-destructive/10 rounded-lg transition-all duration-200 p-2"
 								>
 									<FiLogOut className="text-lg" />
 									<button
@@ -118,22 +118,22 @@ const Sidebar: React.FC<SidebarProps> = ({ setActiveMenu, setSidebarOpen }) => {
 				</DropdownMenu>
 
 				{/* user profile and name display */}
-				<nav className="flex-1 p-4">
-					<ul className="space-y-1">
+				<nav className="flex-1 p-4 overflow-y-auto">
+					<ul className="space-y-2">
 						{menuItems.map((item) => {
 							const isActive = location.pathname === item.path;
 							return (
 								<motion.li
 									key={item.label}
-									whileHover={{ scale: 1.02 }}
+									whileHover={{ scale: 1.02, x: 4 }}
 									whileTap={{ scale: 0.98 }}
 									className={`
-                                        flex items-center gap-3 px-4 py-3 rounded-lg cursor-pointer
-                                        transition-all duration-200 ease-in-out 
+                                        flex items-center gap-3 px-4 py-3.5 rounded-xl cursor-pointer
+                                        transition-all duration-200 ease-in-out font-medium
                                         ${
 																					isActive
-																						? "bg-primary text-primary-foreground shadow-sm"
-																						: "text-gray-700 hover:bg-gray-50"
+																						? "bg-primary text-primary-foreground shadow-md"
+																						: "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
 																				}
                                     `}
 									onClick={() => {
@@ -142,14 +142,8 @@ const Sidebar: React.FC<SidebarProps> = ({ setActiveMenu, setSidebarOpen }) => {
 										navigate(item.path);
 									}}
 								>
-									<span
-										className={`text-lg ${
-											isActive ? "text-primary-foreground" : "text-gray-500"
-										}`}
-									>
-										{item.icon}
-									</span>
-									<span className="font-medium">{item.label}</span>
+									<span className="text-xl">{item.icon}</span>
+									<span>{item.label}</span>
 								</motion.li>
 							);
 						})}
