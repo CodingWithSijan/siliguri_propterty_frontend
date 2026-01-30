@@ -96,7 +96,7 @@ const Navbar: React.FC = () => {
 							}
 						>
 							<Building className="h-4 w-4" />
-							<span>Available Properties</span>
+							<span>Available Property</span>
 						</NavLink>
 						<NavLink
 							to="/rentals"

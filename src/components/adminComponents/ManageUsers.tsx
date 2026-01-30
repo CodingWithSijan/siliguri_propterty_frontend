@@ -33,8 +33,6 @@ import {
 } from "../ui/select";
 import {
 	AlertDialog,
-	AlertDialogAction,
-	AlertDialogCancel,
 	AlertDialogContent,
 	AlertDialogDescription,
 	AlertDialogHeader,
@@ -123,7 +121,7 @@ const ManageUsers = () => {
 			<AlertDialog
 				open={!!userToDelete}
 				onOpenChange={(open) => {
-					if (!open && !isDeleting) {
+					if (!open) {
 						handleCancelDelete();
 					}
 				}}
@@ -137,19 +135,16 @@ const ManageUsers = () => {
 						</AlertDialogDescription>
 					</AlertDialogHeader>
 					<div className="flex gap-3 justify-end">
-						<AlertDialogCancel
-							onClick={handleCancelDelete}
-							disabled={isDeleting}
-						>
+						<Button onClick={handleCancelDelete} disabled={isDeleting}>
 							Cancel
-						</AlertDialogCancel>
-						<AlertDialogAction
+						</Button>
+						<Button
 							onClick={handleDeleteUser}
 							disabled={isDeleting}
 							className="bg-red-600 hover:bg-red-700"
 						>
 							{isDeleting ? "Deleting..." : "Delete"}
-						</AlertDialogAction>
+						</Button>
 					</div>
 				</AlertDialogContent>
 			</AlertDialog>
