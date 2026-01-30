@@ -14,7 +14,6 @@ import { useSearchParams, useParams, useNavigate } from "react-router-dom";
 import { ISellListingType } from "../types/listingTypes";
 import BASE_URL from "../services";
 import Breadcrumb from "../lib/Breadcrumb";
-import { capitalize_first_letter_text } from "../utils/Capitalize_first_letter_text";
 
 const SellPropertyByCategory: React.FC = () => {
 	const [posts, setPosts] = useState<ISellListingType[]>([]);
@@ -32,7 +31,7 @@ const SellPropertyByCategory: React.FC = () => {
 		return [
 			{ label: "For Sale", path: "/buys" },
 			{
-				label: capitalize_first_letter_text(category),
+				label: category?.toUpperCase() || "",
 				path: `/buys/${category}`,
 			},
 		];

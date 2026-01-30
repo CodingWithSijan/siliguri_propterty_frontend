@@ -14,7 +14,6 @@ import { useSearchParams, useParams } from "react-router-dom";
 import { IRentListingType } from "../types/listingTypes";
 import BASE_URL from "../services";
 import Breadcrumb from "../lib/Breadcrumb";
-import { capitalize_first_letter_text } from "../utils/Capitalize_first_letter_text";
 
 const RentalPropertyByCategory: React.FC = () => {
 	const [posts, setPosts] = useState<IRentListingType[]>([]);
@@ -30,7 +29,7 @@ const RentalPropertyByCategory: React.FC = () => {
 		return [
 			{ label: "For Rent", path: "/rentals" },
 			{
-				label: capitalize_first_letter_text(category),
+				label: category?.toUpperCase() || "",
 				path: `/rentals/${category}`,
 			},
 		];
