@@ -24,7 +24,9 @@ const RentListingCard: React.FC<{
 			onClick();
 		} else {
 			const path =
-				userOrGlobal === "global" ? `/rentals/${listing._id}` : `/rentals`;
+				userOrGlobal === "global"
+					? `/rentals/${listing.propertyCategory}/${listing._id}`
+					: `/rentals`;
 			navigate(path);
 		}
 	};
@@ -60,8 +62,8 @@ const RentListingCard: React.FC<{
 									listing.approvalStatus === "approved"
 										? "text-green-600"
 										: listing.approvalStatus === "pending"
-										? "text-yellow-600"
-										: "text-red-600"
+											? "text-yellow-600"
+											: "text-red-600"
 								}`}
 							>
 								{capitalize(listing.approvalStatus)}

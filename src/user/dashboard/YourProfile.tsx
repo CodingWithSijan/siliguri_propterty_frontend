@@ -62,12 +62,12 @@ const YourProfile: React.FC = () => {
 			setUploading(true);
 			const response = await BASE_URL.post(
 				`${import.meta.env.VITE_BACKEND_URL}/api/users/upload-profile-picture`,
-				formData
+				formData,
 			);
 			const updatedUser = response.data.user;
 			showSuccess("Profile Picture updated successfully!");
 			dispatch(
-				login({ user: updatedUser, token: sessionStorage.getItem("token")! })
+				login({ user: updatedUser, token: sessionStorage.getItem("token")! }),
 			);
 			setSelectedFile(null);
 		} catch (error) {
@@ -91,7 +91,7 @@ const YourProfile: React.FC = () => {
 			const updatedUser = res.data.user;
 
 			dispatch(
-				login({ user: updatedUser, token: sessionStorage.getItem("token")! })
+				login({ user: updatedUser, token: sessionStorage.getItem("token")! }),
 			);
 		} catch (error) {
 			if (axios.isAxiosError(error)) {
@@ -102,34 +102,34 @@ const YourProfile: React.FC = () => {
 		}
 	};
 	return (
-		<div className="flex justify-center items-start min-h-screen pt-24 px-4 bg-gradient-to-br from-slate-100 to-slate-200">
-			<div className="w-full max-w-xl bg-white rounded-2xl shadow-lg p-6 sm:p-8 border border-gray-200">
+		<div className="flex justify-center items-start min-h-screen py-8 px-4">
+			<div className="w-full max-w-2xl bg-card rounded-2xl shadow-xl p-8 border border-border">
 				{/* Header */}
-				<div className="text-center mb-6">
-					<h2 className="text-2xl sm:text-3xl font-bold text-gray-800">
+				<div className="text-center mb-8">
+					<h2 className="text-3xl font-bold text-foreground mb-2">
 						Your Profile
 					</h2>
-					<p className="text-sm text-gray-500">
+					<p className="text-sm text-muted-foreground">
 						Manage your personal information
 					</p>
 				</div>
 
 				{/* Avatar */}
-				<div className="flex flex-col items-center gap-3 mb-8">
+				<div className="flex flex-col items-center gap-4 mb-8 pb-8 border-b border-border">
 					{user?.avatar || preview ? (
 						<img
 							src={preview || user?.avatar}
 							alt="Profile"
-							className="w-24 h-24 sm:w-28 sm:h-28 rounded-full object-cover border-4 border-primary shadow"
+							className="w-32 h-32 rounded-full object-cover border-4 border-primary shadow-lg"
 						/>
 					) : (
-						<div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-blue-600 text-white flex items-center justify-center text-3xl font-bold shadow">
+						<div className="w-32 h-32 rounded-full bg-gradient-to-br from-primary to-primary/60 text-primary-foreground flex items-center justify-center text-4xl font-bold shadow-lg">
 							{getInitials(user?.name)}
 						</div>
 					)}
 
-					<label className="bg-primary hover:bg-primary/90 text-white px-4 py-2 rounded-md text-sm shadow cursor-pointer flex items-center gap-2 transition">
-						<FiCamera /> Change Picture
+					<label className="bg-primary hover:bg-primary/90 text-primary-foreground px-5 py-2.5 rounded-lg text-sm font-medium shadow-md cursor-pointer flex items-center gap-2 transition-all hover:shadow-lg">
+						<FiCamera className="text-lg" /> Change Picture
 						<input
 							type="file"
 							accept="image/*"
@@ -142,7 +142,7 @@ const YourProfile: React.FC = () => {
 						<button
 							onClick={handleUpload}
 							disabled={uploading}
-							className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md text-sm shadow transition"
+							className="flex items-center gap-2 bg-green-600 hover:bg-green-700 disabled:bg-green-400 text-white px-5 py-2.5 rounded-lg text-sm font-medium shadow-md transition-all hover:shadow-lg"
 						>
 							<FiSave className="text-lg" />
 							{uploading ? "Saving..." : "Save Picture"}
@@ -151,72 +151,91 @@ const YourProfile: React.FC = () => {
 				</div>
 
 				{/* Form */}
-				<div className="space-y-5">
+				<div className="space-y-6">
 					{/* Name */}
-					<div className="relative">
-						<FiUser className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-						<input
-							className="w-full pl-10 pr-4 py-2 bg-gray-100 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary"
-							type="text"
-							value={user?.name || ""}
-							readOnly
-						/>
+					<div>
+						<label className="block text-sm font-medium text-muted-foreground mb-2">
+							Full Name
+						</label>
+						<div className="relative">
+							<FiUser className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" />
+							<input
+								className="w-full pl-12 pr-4 py-3 bg-muted/50 border border-input rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-all"
+								type="text"
+								value={user?.name || ""}
+								readOnly
+							/>
+						</div>
 					</div>
 
 					{/* Email */}
-					<div className="relative">
-						<FiMail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-						<input
-							className={`w-full pl-10 pr-4 py-2 rounded-md border text-sm focus:outline-none ${
-								user?.isVerified
-									? "bg-gray-100 border-gray-300 focus:ring-primary"
-									: "bg-red-100 border-red-500 focus:ring-red-400"
-							}`}
-							type="email"
-							value={user?.email || ""}
-							readOnly
-						/>
+					<div>
+						<label className="block text-sm font-medium text-muted-foreground mb-2">
+							Email Address
+						</label>
+						<div className="relative">
+							<FiMail className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" />
+							<input
+								className={`w-full pl-12 pr-4 py-3 rounded-lg border text-sm focus:outline-none transition-all ${
+									user?.isVerified
+										? "bg-muted/50 border-input focus:ring-2 focus:ring-ring"
+										: "bg-destructive/10 border-destructive focus:ring-2 focus:ring-destructive"
+								}`}
+								type="email"
+								value={user?.email || ""}
+								readOnly
+							/>
+						</div>
+						{user?.isVerified !== true && (
+							<p className="text-xs text-destructive mt-2 flex justify-between items-center">
+								<span>Email not verified</span>
+								<button
+									onClick={handleSendVerificationEmail}
+									className="text-primary hover:underline font-medium"
+								>
+									Resend Link
+								</button>
+							</p>
+						)}
 					</div>
-
-					{user?.isVerified !== true && (
-						<p className="text-xs text-red-500 mt-1 flex justify-between items-center">
-							<span>Email not verified</span>
-							<button
-								onClick={handleSendVerificationEmail}
-								className="text-blue-600 hover:underline ml-2"
-							>
-								Resend Link
-							</button>
-						</p>
-					)}
 					{/* Phone */}
-					<div className="relative">
-						<FiPhone className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-						<input
-							className="w-full pl-10 pr-4 py-2 bg-gray-100 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary"
-							type="text"
-							value={user?.phone || ""}
-							readOnly
-						/>
+					<div>
+						<label className="block text-sm font-medium text-muted-foreground mb-2">
+							Phone Number
+						</label>
+						<div className="relative">
+							<FiPhone className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" />
+							<input
+								className="w-full pl-12 pr-4 py-3 bg-muted/50 border border-input rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-ring transition-all"
+								type="text"
+								value={user?.phone || ""}
+								readOnly
+							/>
+						</div>
 					</div>
 
 					{/* Password */}
-					<div className="relative">
-						<FiLock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-						<input
-							className="w-full pl-10 pr-4 py-2 bg-gray-100 border border-gray-300 rounded-md text-sm"
-							type="password"
-							value="*********"
-							readOnly
-						/>
+					<div>
+						<label className="block text-sm font-medium text-muted-foreground mb-2">
+							Password
+						</label>
+						<div className="relative">
+							<FiLock className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" />
+							<input
+								className="w-full pl-12 pr-4 py-3 bg-muted/50 border border-input rounded-lg text-sm"
+								type="password"
+								value="*********"
+								readOnly
+							/>
+						</div>
 					</div>
 
 					{/* Change Password */}
-					<div className="flex justify-end">
+					<div className="flex justify-end pt-2">
 						<button
 							type="button"
 							onClick={() => setIsChangePasswordOpen(true)}
-							className="text-sm text-blue-600 hover:underline"
+							className="text-sm text-primary hover:underline font-medium transition-all"
 						>
 							Change Password
 						</button>

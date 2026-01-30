@@ -23,6 +23,8 @@ import YourProfile from "./user/dashboard/YourProfile";
 import EditPostPage from "./pages/EditPostPage";
 import RentalProperties from "./pages/RentalProperties";
 import SaleProperties from "./pages/SaleProperties";
+import RentalPropertyByCategory from "./pages/RentalPropertyByCategory";
+import SellPropertyByCategory from "./pages/SellPropertyByCategory";
 import RentalPropertyDetails from "./pages/RentalPropertyDetails";
 import SellPropertyDetails from "./pages/SellPropertyDetails";
 import AllListings from "./pages/AllListings";
@@ -60,11 +62,19 @@ const App: React.FC = () => {
 
 				{/* Rental Property Routes */}
 				<Route path="/rentals" element={<RentalProperties />} />
-				<Route path="/rentals/:id" element={<RentalPropertyDetails />} />
+				<Route
+					path="/rentals/:category"
+					element={<RentalPropertyByCategory />}
+				/>
+				<Route
+					path="/rentals/:category/:id"
+					element={<RentalPropertyDetails />}
+				/>
 
 				{/* Sale Property Routes */}
 				<Route path="/buys" element={<SaleProperties />} />
-				<Route path="/buys/:id" element={<SellPropertyDetails />} />
+				<Route path="/buys/:category" element={<SellPropertyByCategory />} />
+				<Route path="/buys/:category/:id" element={<SellPropertyDetails />} />
 
 				{/* All Properties Route */}
 				<Route path="/properties" element={<AllListings />} />

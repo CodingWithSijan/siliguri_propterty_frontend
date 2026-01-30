@@ -93,45 +93,47 @@ const ViewYourListings = () => {
 		(tab: ListingStatus): IUniversalListingType[] => {
 			return filteredListings[tab] || [];
 		},
-		[filteredListings]
+		[filteredListings],
 	);
 
 	const currentTabConfig = TAB_CONFIG.find((tab) => tab.value === activeTab);
 	const currentListings = getListingsForTab(activeTab);
 
 	return (
-		<div className="max-w-7xl mx-auto px-4 py-10 rounded-xl">
-			<header className="mb-8">
-				<h1 className="text-3xl font-bold text-center text-gray-800 tracking-tight">
+		<div className="max-w-7xl mx-auto px-4 py-8">
+			<header className="mb-8 text-center">
+				<h1 className="text-4xl font-bold text-foreground tracking-tight mb-2">
 					Your Property Listings
 				</h1>
-				<p className="text-center text-gray-600 mt-2">
+				<p className="text-muted-foreground">
 					Manage and track all your property listings
 				</p>
 			</header>
 
 			{/* Filter Dropdown */}
 			<div className="flex justify-center mb-8">
-				<div className="w-full max-w-xs">
+				<div className="w-full max-w-md">
 					<Select
 						value={activeTab}
 						onValueChange={(value) => setActiveTab(value as ListingStatus)}
 					>
-						<SelectTrigger className="w-full h-11 text-base font-semibold border-2 border-gray-300 hover:border-gray-400 transition-colors rounded-lg shadow-sm">
+						<SelectTrigger className="w-full h-12 text-base font-semibold border-2 border-border hover:border-primary/50 transition-all rounded-xl shadow-sm bg-card">
 							<SelectValue />
 						</SelectTrigger>
 
-						<SelectContent className="w-full">
+						<SelectContent className="w-full bg-card border-border">
 							{TAB_CONFIG.map((tab) => (
 								<SelectItem
 									key={tab.value}
 									value={tab.value}
-									className="text-base cursor-pointer"
+									className="text-base cursor-pointer hover:bg-accent"
 								>
 									<div className="flex items-center justify-between gap-4 w-full">
-										<span className="font-medium">{tab.label}</span>
+										<span className="font-medium text-foreground">
+											{tab.label}
+										</span>
 										{tab.value !== "all" && (
-											<span className="text-xs font-bold bg-gray-200 text-gray-700 px-3 py-1 rounded-full whitespace-nowrap">
+											<span className="text-xs font-bold bg-primary/20 text-primary px-3 py-1 rounded-full whitespace-nowrap">
 												{getListingsForTab(tab.value).length}
 											</span>
 										)}
@@ -173,8 +175,8 @@ const EmptyState = ({ status }: { status: ListingStatus }) => {
 	};
 
 	return (
-		<div className="flex flex-col items-center justify-center py-12 text-center">
-			<p className="text-lg text-gray-500">{messages[status]}</p>
+		<div className="flex flex-col items-center justify-center py-16 text-center bg-card rounded-xl border border-border shadow-sm mx-4">
+			<p className="text-lg text-muted-foreground">{messages[status]}</p>
 		</div>
 	);
 };

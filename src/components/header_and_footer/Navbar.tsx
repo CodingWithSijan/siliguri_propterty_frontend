@@ -26,6 +26,8 @@ const Navbar: React.FC = () => {
 
 	const [isOpen, setIsOpen] = useState<boolean>(false);
 	const [dropdownOpen, setDropdownOpen] = useState<boolean>(false);
+	const [rentDropdownOpen, setRentDropdownOpen] = useState<boolean>(false);
+	const [buyDropdownOpen, setBuyDropdownOpen] = useState<boolean>(false);
 	const { user } = useSelector((state: RootState) => state.auth);
 	const dispatch = useDispatch<AppDispatch>();
 	const navigate = useNavigate();
@@ -37,7 +39,8 @@ const Navbar: React.FC = () => {
 				!mobileMenuRef.current.contains(event.target as Node)
 			) {
 				setIsOpen(false);
-				setDropdownOpen(false);
+				setRentDropdownOpen(false);
+				setBuyDropdownOpen(false);
 			}
 		};
 
@@ -67,9 +70,39 @@ const Navbar: React.FC = () => {
 		};
 	}, [dropdownOpen]);
 
+	useEffect(() => {
+		const handleClickOutside = (event: MouseEvent) => {
+			const target = event.target as Node;
+			const rentDropdown = document.querySelector(".rent-dropdown-container");
+			const buyDropdown = document.querySelector(".buy-dropdown-container");
+
+			if (rentDropdown && !rentDropdown.contains(target)) {
+				setRentDropdownOpen(false);
+			}
+			if (buyDropdown && !buyDropdown.contains(target)) {
+				setBuyDropdownOpen(false);
+			}
+		};
+
+		if (rentDropdownOpen || buyDropdownOpen) {
+			document.addEventListener("mousedown", handleClickOutside);
+		}
+		return () => {
+			document.removeEventListener("mousedown", handleClickOutside);
+		};
+	}, [rentDropdownOpen, buyDropdownOpen]);
+
 	const handleLogout = () => {
 		dispatch(logout());
 		navigate("/login");
+	};
+
+	// Close mobile menu and navigate
+	const handleMobileNavClick = (path: string) => {
+		setIsOpen(false);
+		setRentDropdownOpen(false);
+		setBuyDropdownOpen(false);
+		navigate(path);
 	};
 
 	return (
@@ -98,28 +131,116 @@ const Navbar: React.FC = () => {
 							<Building className="h-4 w-4" />
 							<span>Available Property</span>
 						</NavLink>
-						<NavLink
-							to="/rentals"
-							className={({ isActive }) =>
-								isActive
-									? "flex items-center space-x-2 text-blue-600 font-semibold border-b-2 border-blue-600 pb-1"
-									: "flex items-center space-x-2 text-gray-700 hover:text-blue-600 font-medium transition-colors duration-200"
-							}
-						>
-							<Home className="h-4 w-4" />
-							<span>Rent</span>
-						</NavLink>
-						<NavLink
-							to="/buys"
-							className={({ isActive }) =>
-								isActive
-									? "flex items-center space-x-2 text-blue-600 font-semibold border-b-2 border-blue-600 pb-1"
-									: "flex items-center space-x-2 text-gray-700 hover:text-blue-600 font-medium transition-colors duration-200"
-							}
-						>
-							<Building2 className="h-4 w-4" />
-							<span>Buy</span>
-						</NavLink>
+
+						{/* Rent Dropdown */}
+						<div className="relative rent-dropdown-container">
+							<button
+								onClick={() => setRentDropdownOpen(!rentDropdownOpen)}
+								className="flex items-center space-x-2 text-gray-700 hover:text-blue-600 font-medium transition-colors duration-200"
+							>
+								<Home className="h-4 w-4" />
+								<span>Rent</span>
+								<svg
+									className="w-4 h-4"
+									fill="none"
+									stroke="currentColor"
+									viewBox="0 0 24 24"
+								>
+									<path
+										strokeLinecap="round"
+										strokeLinejoin="round"
+										strokeWidth={2}
+										d="M19 9l-7 7-7-7"
+									/>
+								</svg>
+							</button>
+							{rentDropdownOpen && (
+								<div className="absolute left-0 top-full mt-1 w-48 bg-white rounded-lg shadow-xl py-2 z-50 border border-gray-200">
+									<NavLink
+										to="/rentals"
+										className="block px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors"
+									>
+										All Rentals
+									</NavLink>
+									<NavLink
+										to="/rentals/house"
+										className="block px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors"
+									>
+										House for Rent
+									</NavLink>
+									<NavLink
+										to="/rentals/flat"
+										className="block px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors"
+									>
+										Flat for Rent
+									</NavLink>
+									<NavLink
+										to="/rentals/shop"
+										className="block px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors"
+									>
+										Shop for Rent
+									</NavLink>
+								</div>
+							)}
+						</div>
+
+						{/* Buy Dropdown */}
+						<div className="relative buy-dropdown-container">
+							<button
+								onClick={() => setBuyDropdownOpen(!buyDropdownOpen)}
+								className="flex items-center space-x-2 text-gray-700 hover:text-blue-600 font-medium transition-colors duration-200"
+							>
+								<Building2 className="h-4 w-4" />
+								<span>Buy</span>
+								<svg
+									className="w-4 h-4"
+									fill="none"
+									stroke="currentColor"
+									viewBox="0 0 24 24"
+								>
+									<path
+										strokeLinecap="round"
+										strokeLinejoin="round"
+										strokeWidth={2}
+										d="M19 9l-7 7-7-7"
+									/>
+								</svg>
+							</button>
+							{buyDropdownOpen && (
+								<div className="absolute left-0 top-full mt-1 w-48 bg-white rounded-lg shadow-xl py-2 z-50 border border-gray-200">
+									<NavLink
+										to="/buys"
+										className="block px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors"
+									>
+										All For Sale
+									</NavLink>
+									<NavLink
+										to="/buys/house"
+										className="block px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors"
+									>
+										House for Sale
+									</NavLink>
+									<NavLink
+										to="/buys/flat"
+										className="block px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors"
+									>
+										Flat for Sale
+									</NavLink>
+									<NavLink
+										to="/buys/land"
+										className="block px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors"
+									>
+										Land for Sale
+									</NavLink>
+									<NavLink
+										to="/buys/shop"
+										className="block px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors"
+									>
+										Shop for Sale
+									</NavLink>
+								</div>
+							)}
+						</div>
 						<NavLink
 							to="/about"
 							className={({ isActive }) =>
@@ -281,34 +402,139 @@ const Navbar: React.FC = () => {
 									Navigation
 								</p>
 								<div className="space-y-1">
-									<NavLink
-										to="/properties"
-										className="flex items-center space-x-3 px-4 py-3 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+									<button
+										onClick={() => handleMobileNavClick("/properties")}
+										className="flex items-center space-x-3 px-4 py-3 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors w-full text-left"
 									>
 										<Building className="h-5 w-5" />
 										<span className="font-medium">Available Properties</span>
-									</NavLink>
-									<NavLink
-										to="/rentals"
-										className="flex items-center space-x-3 px-4 py-3 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-									>
-										<Home className="h-5 w-5" />
-										<span className="font-medium">Rent</span>
-									</NavLink>
-									<NavLink
-										to="/buys"
-										className="flex items-center space-x-3 px-4 py-3 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-									>
-										<Building2 className="h-5 w-5" />
-										<span className="font-medium">Buy</span>
-									</NavLink>
-									<NavLink
-										to="/about"
-										className="flex items-center space-x-3 px-4 py-3 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+									</button>
+
+									{/* Rent Expandable Menu */}
+									<div>
+										<button
+											onClick={() => setRentDropdownOpen(!rentDropdownOpen)}
+											className="flex items-center justify-between w-full px-4 py-3 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+										>
+											<div className="flex items-center space-x-3">
+												<Home className="h-5 w-5" />
+												<span className="font-medium">Rent</span>
+											</div>
+											<svg
+												className={`w-4 h-4 transition-transform duration-200 ${
+													rentDropdownOpen ? "rotate-180" : ""
+												}`}
+												fill="none"
+												stroke="currentColor"
+												viewBox="0 0 24 24"
+											>
+												<path
+													strokeLinecap="round"
+													strokeLinejoin="round"
+													strokeWidth={2}
+													d="M19 9l-7 7-7-7"
+												/>
+											</svg>
+										</button>
+										{rentDropdownOpen && (
+											<div className="ml-8 mt-1 space-y-1">
+												<button
+													onClick={() => handleMobileNavClick("/rentals")}
+													className="block w-full text-left px-4 py-2 text-sm text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+												>
+													All Rentals
+												</button>
+												<button
+													onClick={() => handleMobileNavClick("/rentals/house")}
+													className="block w-full text-left px-4 py-2 text-sm text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+												>
+													House for Rent
+												</button>
+												<button
+													onClick={() => handleMobileNavClick("/rentals/flat")}
+													className="block w-full text-left px-4 py-2 text-sm text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+												>
+													Flat for Rent
+												</button>
+												<button
+													onClick={() => handleMobileNavClick("/rentals/shop")}
+													className="block w-full text-left px-4 py-2 text-sm text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+												>
+													Shop for Rent
+												</button>
+											</div>
+										)}
+									</div>
+
+									{/* Buy Expandable Menu */}
+									<div>
+										<button
+											onClick={() => setBuyDropdownOpen(!buyDropdownOpen)}
+											className="flex items-center justify-between w-full px-4 py-3 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+										>
+											<div className="flex items-center space-x-3">
+												<Building2 className="h-5 w-5" />
+												<span className="font-medium">Buy</span>
+											</div>
+											<svg
+												className={`w-4 h-4 transition-transform duration-200 ${
+													buyDropdownOpen ? "rotate-180" : ""
+												}`}
+												fill="none"
+												stroke="currentColor"
+												viewBox="0 0 24 24"
+											>
+												<path
+													strokeLinecap="round"
+													strokeLinejoin="round"
+													strokeWidth={2}
+													d="M19 9l-7 7-7-7"
+												/>
+											</svg>
+										</button>
+										{buyDropdownOpen && (
+											<div className="ml-8 mt-1 space-y-1">
+												<button
+													onClick={() => handleMobileNavClick("/buys")}
+													className="block w-full text-left px-4 py-2 text-sm text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+												>
+													All For Sale
+												</button>
+												<button
+													onClick={() => handleMobileNavClick("/buys/house")}
+													className="block w-full text-left px-4 py-2 text-sm text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+												>
+													House for Sale
+												</button>
+												<button
+													onClick={() => handleMobileNavClick("/buys/flat")}
+													className="block w-full text-left px-4 py-2 text-sm text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+												>
+													Flat for Sale
+												</button>
+												<button
+													onClick={() => handleMobileNavClick("/buys/land")}
+													className="block w-full text-left px-4 py-2 text-sm text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+												>
+													Land for Sale
+												</button>
+												<button
+													onClick={() => handleMobileNavClick("/buys/shop")}
+													className="block w-full text-left px-4 py-2 text-sm text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+												>
+													Shop for Sale
+												</button>
+											</div>
+										)}
+									</div>
+
+									<button
+										onClick={() => handleMobileNavClick("/about")}
+										className="flex items-center space-x-3 px-4 py-3 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors w-full text-left"
 									>
 										<Info className="h-5 w-5" />
 										<span className="font-medium">About Us</span>
-									</NavLink>
+									</button>
 								</div>
 							</div>
 							<div className="pt-2 border-t border-gray-200">
@@ -342,15 +568,19 @@ const Navbar: React.FC = () => {
 											</div>
 										</div>
 									</div>
-									<NavLink
-										to={user.role === "user" ? "/dashboard" : "/admin"}
-										className="group flex items-center justify-center space-x-2 px-3 py-2.5 text-gray-700 hover:text-blue-600 bg-gray-50 hover:bg-blue-50 rounded-lg transition-all duration-200 border border-gray-200 hover:border-blue-300 shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 font-medium cursor-pointer"
+									<button
+										onClick={() =>
+											handleMobileNavClick(
+												user.role === "user" ? "/dashboard" : "/admin",
+											)
+										}
+										className="group flex items-center justify-center space-x-2 px-3 py-2.5 text-gray-700 hover:text-blue-600 bg-gray-50 hover:bg-blue-50 rounded-lg transition-all duration-200 border border-gray-200 hover:border-blue-300 shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 font-medium cursor-pointer w-full"
 									>
 										<User className="h-4 w-4 group-hover:scale-110 transition-transform duration-200" />
 										<span>
 											{user.role === "user" ? "My Account" : "Admin Dashboard"}
 										</span>
-									</NavLink>
+									</button>
 									<button
 										onClick={handleLogout}
 										className="group flex items-center justify-center space-x-2 w-full px-2 py-1 mt-2 text-red-700 hover:text-red-800 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50 font-medium cursor-pointer"
@@ -368,34 +598,139 @@ const Navbar: React.FC = () => {
 									Navigation
 								</p>
 								<div className="space-y-1">
-									<NavLink
-										to="/properties"
-										className="flex items-center space-x-3 px-4 py-3 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+									<button
+										onClick={() => handleMobileNavClick("/properties")}
+										className="flex items-center space-x-3 px-4 py-3 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors w-full text-left"
 									>
 										<Building className="h-5 w-5" />
 										<span className="font-medium">Available Properties</span>
-									</NavLink>
-									<NavLink
-										to="/rentals"
-										className="flex items-center space-x-3 px-4 py-3 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-									>
-										<Home className="h-5 w-5" />
-										<span className="font-medium">Rent</span>
-									</NavLink>
-									<NavLink
-										to="/buys"
-										className="flex items-center space-x-3 px-4 py-3 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-									>
-										<Building2 className="h-5 w-5" />
-										<span className="font-medium">Buy</span>
-									</NavLink>
-									<NavLink
-										to="/about"
-										className="flex items-center space-x-3 px-4 py-3 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+									</button>
+
+									{/* Rent Expandable Menu */}
+									<div>
+										<button
+											onClick={() => setRentDropdownOpen(!rentDropdownOpen)}
+											className="flex items-center justify-between w-full px-4 py-3 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+										>
+											<div className="flex items-center space-x-3">
+												<Home className="h-5 w-5" />
+												<span className="font-medium">Rent</span>
+											</div>
+											<svg
+												className={`w-4 h-4 transition-transform duration-200 ${
+													rentDropdownOpen ? "rotate-180" : ""
+												}`}
+												fill="none"
+												stroke="currentColor"
+												viewBox="0 0 24 24"
+											>
+												<path
+													strokeLinecap="round"
+													strokeLinejoin="round"
+													strokeWidth={2}
+													d="M19 9l-7 7-7-7"
+												/>
+											</svg>
+										</button>
+										{rentDropdownOpen && (
+											<div className="ml-8 mt-1 space-y-1">
+												<button
+													onClick={() => handleMobileNavClick("/rentals")}
+													className="block w-full text-left px-4 py-2 text-sm text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+												>
+													All Rentals
+												</button>
+												<button
+													onClick={() => handleMobileNavClick("/rentals/house")}
+													className="block w-full text-left px-4 py-2 text-sm text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+												>
+													House for Rent
+												</button>
+												<button
+													onClick={() => handleMobileNavClick("/rentals/flat")}
+													className="block w-full text-left px-4 py-2 text-sm text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+												>
+													Flat for Rent
+												</button>
+												<button
+													onClick={() => handleMobileNavClick("/rentals/shop")}
+													className="block w-full text-left px-4 py-2 text-sm text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+												>
+													Shop for Rent
+												</button>
+											</div>
+										)}
+									</div>
+
+									{/* Buy Expandable Menu */}
+									<div>
+										<button
+											onClick={() => setBuyDropdownOpen(!buyDropdownOpen)}
+											className="flex items-center justify-between w-full px-4 py-3 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+										>
+											<div className="flex items-center space-x-3">
+												<Building2 className="h-5 w-5" />
+												<span className="font-medium">Buy</span>
+											</div>
+											<svg
+												className={`w-4 h-4 transition-transform duration-200 ${
+													buyDropdownOpen ? "rotate-180" : ""
+												}`}
+												fill="none"
+												stroke="currentColor"
+												viewBox="0 0 24 24"
+											>
+												<path
+													strokeLinecap="round"
+													strokeLinejoin="round"
+													strokeWidth={2}
+													d="M19 9l-7 7-7-7"
+												/>
+											</svg>
+										</button>
+										{buyDropdownOpen && (
+											<div className="ml-8 mt-1 space-y-1">
+												<button
+													onClick={() => handleMobileNavClick("/buys")}
+													className="block w-full text-left px-4 py-2 text-sm text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+												>
+													All For Sale
+												</button>
+												<button
+													onClick={() => handleMobileNavClick("/buys/house")}
+													className="block w-full text-left px-4 py-2 text-sm text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+												>
+													House for Sale
+												</button>
+												<button
+													onClick={() => handleMobileNavClick("/buys/flat")}
+													className="block w-full text-left px-4 py-2 text-sm text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+												>
+													Flat for Sale
+												</button>
+												<button
+													onClick={() => handleMobileNavClick("/buys/land")}
+													className="block w-full text-left px-4 py-2 text-sm text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+												>
+													Land for Sale
+												</button>
+												<button
+													onClick={() => handleMobileNavClick("/buys/shop")}
+													className="block w-full text-left px-4 py-2 text-sm text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+												>
+													Shop for Sale
+												</button>
+											</div>
+										)}
+									</div>
+
+									<button
+										onClick={() => handleMobileNavClick("/about")}
+										className="flex items-center space-x-3 px-4 py-3 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors w-full text-left"
 									>
 										<Info className="h-5 w-5" />
 										<span className="font-medium">About Us</span>
-									</NavLink>
+									</button>
 								</div>
 							</div>
 							<div className="pt-2 border-t border-gray-200">
@@ -403,18 +738,18 @@ const Navbar: React.FC = () => {
 									Account
 								</p>
 								<div className="space-y-3">
-									<NavLink
-										to="/login"
-										className="flex items-center justify-center px-4 py-3 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors font-medium"
+									<button
+										onClick={() => handleMobileNavClick("/login")}
+										className="flex items-center justify-center px-4 py-3 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors font-medium w-full"
 									>
 										Login
-									</NavLink>
-									<NavLink
-										to="/signup"
-										className="flex items-center justify-center px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+									</button>
+									<button
+										onClick={() => handleMobileNavClick("/signup")}
+										className="flex items-center justify-center px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium w-full"
 									>
 										Sign Up
-									</NavLink>
+									</button>
 								</div>
 							</div>
 						</div>

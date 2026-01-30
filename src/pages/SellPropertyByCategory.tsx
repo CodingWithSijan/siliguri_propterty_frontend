@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import Navbar from "../components/header_and_footer/Navbar";
-import RentListingCard from "../components/card/RentListingCard";
 import SellListingCard from "../components/card/SellListingCard";
 import {
 	Pagination,
@@ -11,40 +10,48 @@ import {
 	PaginationNext,
 	PaginationPrevious,
 } from "../components/ui/pagination";
-import { useSearchParams, useNavigate } from "react-router-dom";
-import {
-	IUniversalListingType,
-	IRentListingType,
-	ISellListingType,
-} from "../types/listingTypes";
+import { useSearchParams, useParams, useNavigate } from "react-router-dom";
+import { ISellListingType } from "../types/listingTypes";
 import BASE_URL from "../services";
+import Breadcrumb from "../lib/Breadcrumb";
+import { capitalize_first_letter_text } from "../utils/Capitalize_first_letter_text";
 
-const AllListings: React.FC = () => {
-	const [posts, setPosts] = useState<IUniversalListingType[]>([]);
+const SellPropertyByCategory: React.FC = () => {
+	const [posts, setPosts] = useState<ISellListingType[]>([]);
 	const [totalPages, setTotalPages] = useState(1);
 	const [loading, setLoading] = useState(false);
 	const [searchParams, setSearchParams] = useSearchParams();
+	const { category } = useParams<{ category: string }>();
 	const navigate = useNavigate();
 
 	const currentPage = parseInt(searchParams.get("page") || "1");
 
-	const handleCardClick = (post: IUniversalListingType) => {
-		if (post.intent === "rent") {
-			navigate(`/rentals/${post.propertyCategory}/${post._id}`);
-		} else {
-			navigate(`/buys/${post.propertyCategory}/${post._id}`);
-		}
+	const getBreadcrumbItems = () => {
+		if (!posts) return [];
+
+		return [
+			{ label: "For Sale", path: "/buys" },
+			{
+				label: capitalize_first_letter_text(category),
+				path: `/buys/${category}`,
+			},
+		];
 	};
 
 	useEffect(() => {
 		const fetchPosts = async () => {
+			if (!category) return;
+
 			setLoading(true);
 			try {
-				const res = await BASE_URL.get("api/user/post/rent-sell-listings", {
-					params: { page: currentPage, limit: 8 },
-				});
+				const res = await BASE_URL.get(
+					"api/user/post/sell-property-by-category",
+					{
+						params: { category, page: currentPage, limit: 8 },
+					},
+				);
 
-				setPosts(res.data.listings || []);
+				setPosts(res.data.sellListingsByCategory || []);
 				setTotalPages(res.data.totalPages || 1);
 			} catch (err) {
 				console.error("Error fetching posts", err);
@@ -53,7 +60,7 @@ const AllListings: React.FC = () => {
 			}
 		};
 		fetchPosts();
-	}, [currentPage]);
+	}, [currentPage, category]);
 
 	const goToPage = (page: number) => {
 		if (page >= 1 && page <= totalPages) {
@@ -102,23 +109,26 @@ const AllListings: React.FC = () => {
 		});
 	};
 
+	const getCategoryTitle = () => {
+		if (!category) return "Properties for Sale";
+		return `${category.charAt(0).toUpperCase() + category.slice(1)} for Sale`;
+	};
+
 	return (
 		<>
 			<Navbar />
-			<div className="max-w-7xl mx-auto px-4 py-8">
-				<h1 className="text-2xl font-bold mb-6 text-gray-800">
-					All Properties
-				</h1>
 
+			<Breadcrumb items={getBreadcrumbItems()} />
+			<div className="max-w-7xl mx-auto px-4 pb-8">
+				<h1 className="text-2xl font-bold mb-6 text-gray-800">
+					{getCategoryTitle()}
+				</h1>
 				{loading ? (
-					<div className="container mx-auto px-4 py-12">
-						<div className="space-y-4">
-							<div className="h-8 bg-gray-200 rounded w-1/2 animate-pulse"></div>
-							<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-								<div className="h-56 bg-gray-200 rounded animate-pulse"></div>
-								<div className="h-56 bg-gray-200 rounded animate-pulse"></div>
-								<div className="h-56 bg-gray-200 rounded animate-pulse"></div>
-							</div>
+					<div className="animate-pulse space-y-4">
+						<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+							{Array.from({ length: 8 }).map((_, i) => (
+								<div key={i} className="h-56 bg-gray-200 rounded-md" />
+							))}
 						</div>
 					</div>
 				) : (
@@ -126,56 +136,48 @@ const AllListings: React.FC = () => {
 						<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-8">
 							{posts.length === 0 ? (
 								<div className="col-span-full text-center text-gray-500">
-									No listing found.
+									No {category || "sale"} properties found.
 								</div>
 							) : (
 								posts.map((post) => (
-									<div key={post._id} className="h-full flex">
-										{post.intent === "rent" ? (
-											<div className="w-full">
-												<RentListingCard
-													listing={post as IRentListingType}
-													userOrGlobal="global"
-												/>
-											</div>
-										) : (
-											<div className="w-full">
-												<SellListingCard
-													listing={post as ISellListingType}
-													onClick={() => handleCardClick(post)}
-													userOrGlobal="global"
-												/>
-											</div>
-										)}
-									</div>
+									<SellListingCard
+										key={post._id}
+										listing={post}
+										onClick={() =>
+											navigate(`/sell/${post.propertyCategory}/${post._id}`)
+										}
+										userOrGlobal="global"
+									/>
 								))
 							)}
 						</div>
-						<Pagination>
-							<PaginationContent>
-								<PaginationItem>
-									<PaginationPrevious
-										href={`?page=${currentPage - 1}`}
-										size="default"
-										onClick={(e) => {
-											e.preventDefault();
-											goToPage(currentPage - 1);
-										}}
-									/>
-								</PaginationItem>
-								{renderPageLinks()}
-								<PaginationItem>
-									<PaginationNext
-										href={`?page=${currentPage + 1}`}
-										size="default"
-										onClick={(e) => {
-											e.preventDefault();
-											goToPage(currentPage + 1);
-										}}
-									/>
-								</PaginationItem>
-							</PaginationContent>
-						</Pagination>
+						{totalPages >= 1 && (
+							<Pagination>
+								<PaginationContent>
+									<PaginationItem>
+										<PaginationPrevious
+											href={`?page=${currentPage - 1}`}
+											size="default"
+											onClick={(e) => {
+												e.preventDefault();
+												goToPage(currentPage - 1);
+											}}
+										/>
+									</PaginationItem>
+									{renderPageLinks()}
+									<PaginationItem>
+										<PaginationNext
+											href={`?page=${currentPage + 1}`}
+											size="default"
+											onClick={(e) => {
+												e.preventDefault();
+												goToPage(currentPage + 1);
+											}}
+										/>
+									</PaginationItem>
+								</PaginationContent>
+							</Pagination>
+						)}
 					</>
 				)}
 			</div>
@@ -183,4 +185,4 @@ const AllListings: React.FC = () => {
 	);
 };
 
-export default AllListings;
+export default SellPropertyByCategory;

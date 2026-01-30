@@ -29,7 +29,6 @@ const RentalProperties: React.FC = () => {
 				const res = await BASE_URL.get("api/user/post/rental-properties", {
 					params: { page: currentPage, limit: 8 },
 				});
-
 				setPosts(res.data.rentals || []);
 				setTotalPages(res.data.totalPages || 1);
 			} catch (err) {
