@@ -22,7 +22,8 @@ export interface BasePostFormInputs {
 	};
 	alternateLocation?: string;
 	propertyCategory: PropertyCategory;
-	pictures?: FileList;
+	pictures?: File[];
+	videos?: File[];
 	availableFrom?: string; // ISO date string
 }
 

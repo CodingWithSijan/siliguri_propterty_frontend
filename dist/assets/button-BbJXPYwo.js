@@ -1,0 +1,1 @@
+import{j as n}from"./react-vendor-5GclGPpt.js";import{j as i}from"./ui-vendor-CxD7d30i.js";import{c as p}from"./utils-WWHqK3AD.js";import{b as u}from"./button-variants-Biu2SJnX.js";function j({className:t,variant:o,size:s,asChild:r=!1,...a}){const m=r?i:"button";return n.jsx(m,{"data-slot":"button",className:p(u({variant:o,size:s,className:t})),...a})}export{j as B};

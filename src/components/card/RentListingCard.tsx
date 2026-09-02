@@ -13,6 +13,13 @@ import { formatIndianCurrency } from "../../utils/priceFormatHelper";
 const capitalize = (str: string | undefined) =>
 	str ? str.charAt(0).toUpperCase() + str.slice(1) : "";
 
+const isImageUrl = (url: string): boolean => {
+	const lower = url.toLowerCase();
+	if (lower.includes("/image/upload/")) return true;
+	if (lower.includes("/video/upload/")) return false;
+	return /\.(jpg|jpeg|png|webp|gif|avif)(\?|$)/i.test(lower);
+};
+
 const RentListingCard: React.FC<{
 	listing: IRentListingType;
 	userOrGlobal: string;
@@ -31,6 +38,7 @@ const RentListingCard: React.FC<{
 		}
 	};
 	const postedAgoText = getDaysAgoTextFromObjectId(listing._id);
+	const thumbnail = listing.pictures?.find((url) => isImageUrl(url));
 
 	return (
 		<motion.div
@@ -76,7 +84,7 @@ const RentListingCard: React.FC<{
 			{/* Image */}
 			<div className="w-full overflow-hidden relative" style={{ height: 240 }}>
 				<img
-					src={listing.pictures?.[0] || propertyImagePlaceholder}
+					src={thumbnail || propertyImagePlaceholder}
 					alt={listing.title}
 					className="w-full h-full object-cover mx-auto"
 				/>
