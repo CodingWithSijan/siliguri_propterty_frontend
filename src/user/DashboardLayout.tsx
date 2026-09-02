@@ -1,15 +1,14 @@
 import React, { useState } from "react";
 import Sidebar from "./Sidebar";
 import { Bars3Icon } from "@heroicons/react/24/outline";
-import ProtectedRoute from "../route/ProtectedRoute";
 import { AnimatePresence } from "framer-motion";
 import { Outlet } from "react-router-dom";
-import { motion } from "framer-motion";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../app/store";
 import { getInitials } from "../utils/getInitial";
 import { formatFullName } from "../utils/capitalizeName";
 import {
+	DropdownMenuGroup,
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuItem,
@@ -25,6 +24,12 @@ const DashboardLayout: React.FC = () => {
 	const [sidebarOpen, setSidebarOpen] = useState(false);
 	const { user } = useSelector((state: RootState) => state.auth);
 	const dispatch = useDispatch<AppDispatch>();
+
+	const handleLogout = () => {
+		dispatch(logout());
+		setSidebarOpen(false);
+	};
+
 	return (
 		<div className="flex flex-col h-screen bg-background">
 			{/* Fixed Mobile Top Bar */}
@@ -38,9 +43,8 @@ const DashboardLayout: React.FC = () => {
 					<span className="text-sm font-semibold">Menu</span>
 				</button>
 				<DropdownMenu>
-					<DropdownMenuTrigger>
-						{" "}
-						<div className="flex items-center gap-2">
+					<DropdownMenuTrigger asChild>
+						<button className="flex items-center gap-2" type="button">
 							{user?.avatar ? (
 								<img
 									className="w-8 h-8 rounded-full border-2 border-blue-500"
@@ -55,28 +59,20 @@ const DashboardLayout: React.FC = () => {
 							<span className="text-blue-900 font-medium">
 								{formatFullName(user?.name)}
 							</span>
-						</div>
+						</button>
 					</DropdownMenuTrigger>
 					<DropdownMenuContent className="w-[250px]">
 						<DropdownMenuLabel>My Account</DropdownMenuLabel>
 						<DropdownMenuSeparator />
-						<DropdownMenuItem>
-							<div className="p-2 border-t border-gray-100">
-								<motion.button
-									whileHover={{ scale: 1.02 }}
-									whileTap={{ scale: 0.98 }}
-									className="w-full flex items-center gap-3  text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-200"
-								>
-									<FiLogOut className="text-lg" />
-									<button
-										className="font-medium"
-										onClick={() => dispatch(logout())}
-									>
-										Logout
-									</button>
-								</motion.button>
-							</div>
-						</DropdownMenuItem>
+						<DropdownMenuGroup>
+							<DropdownMenuItem
+								onSelect={handleLogout}
+								className="text-red-600 cursor-pointer"
+							>
+								<FiLogOut className="text-lg" />
+								<span className="font-medium">Logout</span>
+							</DropdownMenuItem>
+						</DropdownMenuGroup>
 					</DropdownMenuContent>
 				</DropdownMenu>
 			</div>
@@ -108,12 +104,10 @@ const DashboardLayout: React.FC = () => {
 				</div>
 
 				{/* Main Content */}
-				<main className="flex-1 overflow-auto bg-muted/30">
-					<ProtectedRoute allowedRoles={["user"]}>
-						<div className="h-full">
-							<Outlet />
-						</div>
-					</ProtectedRoute>
+				<main className="flex-1 overflow-auto bg-muted/30 px-3 py-3 md:px-4 md:py-4">
+					<div className="h-full">
+						<Outlet />
+					</div>
 				</main>
 			</div>
 		</div>

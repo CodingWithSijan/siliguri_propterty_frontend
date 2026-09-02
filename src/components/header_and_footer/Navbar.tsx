@@ -10,7 +10,7 @@ import {
 	User,
 	LogOut,
 } from "lucide-react";
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import siliguri_property_logo_noBG from "../../assets/logo_siliguri_property.png";
 import { getInitials } from "../../utils/getInitial";
 import { motion } from "framer-motion";
@@ -31,6 +31,7 @@ const Navbar: React.FC = () => {
 	const { user } = useSelector((state: RootState) => state.auth);
 	const dispatch = useDispatch<AppDispatch>();
 	const navigate = useNavigate();
+	const location = useLocation();
 
 	useEffect(() => {
 		const handleClickOutside = (event: MouseEvent) => {
@@ -102,7 +103,9 @@ const Navbar: React.FC = () => {
 		setIsOpen(false);
 		setRentDropdownOpen(false);
 		setBuyDropdownOpen(false);
-		navigate(path);
+		if (location.pathname !== path) {
+			navigate(path);
+		}
 	};
 
 	return (
@@ -134,48 +137,69 @@ const Navbar: React.FC = () => {
 
 						{/* Rent Dropdown */}
 						<div className="relative rent-dropdown-container">
-							<button
-								onClick={() => setRentDropdownOpen(!rentDropdownOpen)}
-								className="flex items-center space-x-2 text-gray-700 hover:text-blue-600 font-medium transition-colors duration-200"
-							>
-								<Home className="h-4 w-4" />
-								<span>Rent</span>
-								<svg
-									className="w-4 h-4"
-									fill="none"
-									stroke="currentColor"
-									viewBox="0 0 24 24"
+							<div className="flex items-center gap-1">
+								<NavLink
+									to="/rentals"
+									onClick={() => {
+										setRentDropdownOpen(false);
+										setBuyDropdownOpen(false);
+									}}
+									className={({ isActive }) =>
+										isActive
+											? "flex items-center space-x-2 text-blue-600 font-semibold"
+											: "flex items-center space-x-2 text-gray-700 hover:text-blue-600 font-medium transition-colors duration-200"
+									}
 								>
-									<path
-										strokeLinecap="round"
-										strokeLinejoin="round"
-										strokeWidth={2}
-										d="M19 9l-7 7-7-7"
-									/>
-								</svg>
-							</button>
+									<Home className="h-4 w-4" />
+									<span>Rent</span>
+								</NavLink>
+								<button
+									type="button"
+									onClick={() => setRentDropdownOpen(!rentDropdownOpen)}
+									className="rounded p-1 text-gray-600 hover:bg-blue-50 hover:text-blue-600"
+									aria-label="Open rent categories"
+								>
+									<svg
+										className={`h-4 w-4 transition-transform ${rentDropdownOpen ? "rotate-180" : ""}`}
+										fill="none"
+										stroke="currentColor"
+										viewBox="0 0 24 24"
+									>
+										<path
+											strokeLinecap="round"
+											strokeLinejoin="round"
+											strokeWidth={2}
+											d="M19 9l-7 7-7-7"
+										/>
+									</svg>
+								</button>
+							</div>
 							{rentDropdownOpen && (
 								<div className="absolute left-0 top-full mt-1 w-48 bg-white rounded-lg shadow-xl py-2 z-50 border border-gray-200">
 									<NavLink
 										to="/rentals"
+										onClick={() => setRentDropdownOpen(false)}
 										className="block px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors"
 									>
 										All Rentals
 									</NavLink>
 									<NavLink
 										to="/rentals/house"
+										onClick={() => setRentDropdownOpen(false)}
 										className="block px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors"
 									>
 										House for Rent
 									</NavLink>
 									<NavLink
 										to="/rentals/flat"
+										onClick={() => setRentDropdownOpen(false)}
 										className="block px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors"
 									>
 										Flat for Rent
 									</NavLink>
 									<NavLink
 										to="/rentals/shop"
+										onClick={() => setRentDropdownOpen(false)}
 										className="block px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors"
 									>
 										Shop for Rent
@@ -186,54 +210,76 @@ const Navbar: React.FC = () => {
 
 						{/* Buy Dropdown */}
 						<div className="relative buy-dropdown-container">
-							<button
-								onClick={() => setBuyDropdownOpen(!buyDropdownOpen)}
-								className="flex items-center space-x-2 text-gray-700 hover:text-blue-600 font-medium transition-colors duration-200"
-							>
-								<Building2 className="h-4 w-4" />
-								<span>Buy</span>
-								<svg
-									className="w-4 h-4"
-									fill="none"
-									stroke="currentColor"
-									viewBox="0 0 24 24"
+							<div className="flex items-center gap-1">
+								<NavLink
+									to="/buys"
+									onClick={() => {
+										setBuyDropdownOpen(false);
+										setRentDropdownOpen(false);
+									}}
+									className={({ isActive }) =>
+										isActive
+											? "flex items-center space-x-2 text-blue-600 font-semibold"
+											: "flex items-center space-x-2 text-gray-700 hover:text-blue-600 font-medium transition-colors duration-200"
+									}
 								>
-									<path
-										strokeLinecap="round"
-										strokeLinejoin="round"
-										strokeWidth={2}
-										d="M19 9l-7 7-7-7"
-									/>
-								</svg>
-							</button>
+									<Building2 className="h-4 w-4" />
+									<span>Buy</span>
+								</NavLink>
+								<button
+									type="button"
+									onClick={() => setBuyDropdownOpen(!buyDropdownOpen)}
+									className="rounded p-1 text-gray-600 hover:bg-blue-50 hover:text-blue-600"
+									aria-label="Open buy categories"
+								>
+									<svg
+										className={`h-4 w-4 transition-transform ${buyDropdownOpen ? "rotate-180" : ""}`}
+										fill="none"
+										stroke="currentColor"
+										viewBox="0 0 24 24"
+									>
+										<path
+											strokeLinecap="round"
+											strokeLinejoin="round"
+											strokeWidth={2}
+											d="M19 9l-7 7-7-7"
+										/>
+									</svg>
+								</button>
+							</div>
 							{buyDropdownOpen && (
 								<div className="absolute left-0 top-full mt-1 w-48 bg-white rounded-lg shadow-xl py-2 z-50 border border-gray-200">
 									<NavLink
 										to="/buys"
+										onClick={() => setBuyDropdownOpen(false)}
 										className="block px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors"
 									>
 										All For Sale
 									</NavLink>
 									<NavLink
 										to="/buys/house"
+										onClick={() => setBuyDropdownOpen(false)}
 										className="block px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors"
 									>
 										House for Sale
 									</NavLink>
 									<NavLink
 										to="/buys/flat"
+										onClick={() => setBuyDropdownOpen(false)}
 										className="block px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors"
 									>
 										Flat for Sale
 									</NavLink>
 									<NavLink
 										to="/buys/land"
+										onClick={() => setBuyDropdownOpen(false)}
 										className="block px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors"
 									>
 										Land for Sale
 									</NavLink>
 									<NavLink
 										to="/buys/shop"
+										onClick={() => setBuyDropdownOpen(false)}
 										className="block px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors"
 									>
 										Shop for Sale
@@ -325,7 +371,11 @@ const Navbar: React.FC = () => {
 										{/* Menu Items */}
 										<div className="py-1">
 											<NavLink
-												to={user.role === "user" ? "/dashboard" : "/admin"}
+												to={
+													user.role === "user"
+														? "/dashboard/your-profile"
+														: "/admin/home"
+												}
 												className="group flex items-center justify-center space-x-2 px-3 py-2.5 text-sm text-gray-700 hover:text-blue-600 bg-gray-50 hover:bg-blue-50 rounded-lg transition-all duration-200 border border-gray-200 hover:border-blue-300 shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 font-medium cursor-pointer"
 											>
 												<User className="h-4 w-4 group-hover:scale-110 transition-transform duration-200" />
@@ -571,7 +621,9 @@ const Navbar: React.FC = () => {
 									<button
 										onClick={() =>
 											handleMobileNavClick(
-												user.role === "user" ? "/dashboard" : "/admin",
+												user.role === "user"
+													? "/dashboard/your-profile"
+													: "/admin/home",
 											)
 										}
 										className="group flex items-center justify-center space-x-2 px-3 py-2.5 text-gray-700 hover:text-blue-600 bg-gray-50 hover:bg-blue-50 rounded-lg transition-all duration-200 border border-gray-200 hover:border-blue-300 shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 font-medium cursor-pointer w-full"

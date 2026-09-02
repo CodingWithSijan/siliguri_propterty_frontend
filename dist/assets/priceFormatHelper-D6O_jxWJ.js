@@ -1,0 +1,1 @@
+const e="/assets/looking_for_rent-BYykux12.png";function r(t){return t>=1e7?`${(t/1e7).toLocaleString("en-IN",{minimumFractionDigits:0,maximumFractionDigits:2})} Crore`:t>=1e5?`${(t/1e5).toLocaleString("en-IN",{minimumFractionDigits:0,maximumFractionDigits:2})} Lakh`:t.toLocaleString("en-IN")}export{r as f,e as p};

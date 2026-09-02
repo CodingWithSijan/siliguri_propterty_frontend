@@ -3,6 +3,28 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import BASE_URL from "../../services"; // Your Axios base instance (e.g., axios.create)
 import { IUniversalListingType } from "../../types/listingTypes"; // Type for post
 
+const getErrorMessage = (error: unknown): string => {
+	if (
+		typeof error === "object" &&
+		error !== null &&
+		"response" in error &&
+		typeof (error as { response?: unknown }).response === "object" &&
+		(error as { response?: { data?: unknown } }).response !== null
+	) {
+		const response = (error as { response: { data?: { message?: unknown } } })
+			.response;
+		if (typeof response.data?.message === "string") {
+			return response.data.message;
+		}
+	}
+
+	if (error instanceof Error) {
+		return error.message;
+	}
+
+	return "Failed to add new post";
+};
+
 // 2. 🔄 Async thunk action: called when you submit the form
 export const addNewPost = createAsyncThunk<
 	IUniversalListingType,
@@ -14,16 +36,14 @@ export const addNewPost = createAsyncThunk<
 		try {
 			const response = await BASE_URL.post(
 				"/api/user/post/add-new-post",
-				formData
+				formData,
 			);
 			return response.data.post as IUniversalListingType; // Success response
-		} catch (err: any) {
+		} catch (error: unknown) {
 			// On error, return a custom error message
-			return rejectWithValue(
-				err?.response?.data?.message || "Failed to add new post"
-			);
+			return rejectWithValue(getErrorMessage(error));
 		}
-	}
+	},
 );
 
 // 3. 🔐 Posts slice state structure

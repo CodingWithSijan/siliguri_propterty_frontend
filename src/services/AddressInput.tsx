@@ -16,6 +16,8 @@ const AddressInput: React.FC<AddressInputProps> = ({
 	const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(null);
 
 	useEffect(() => {
+		let placeChangedListener: google.maps.MapsEventListener | null = null;
+
 		const loader = new Loader({
 			apiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
 			libraries: ["places"],
@@ -24,15 +26,24 @@ const AddressInput: React.FC<AddressInputProps> = ({
 		loader.load().then(() => {
 			if (!window.google || !inputRef.current) return;
 
+			const westBengalBounds = {
+				north: 27.3,
+				south: 21.4,
+				east: 89.95,
+				west: 85.8,
+			};
+
 			autocompleteRef.current = new window.google.maps.places.Autocomplete(
 				inputRef.current,
 				{
 					types: ["geocode"],
 					componentRestrictions: { country: "IN" },
+					bounds: westBengalBounds,
+					strictBounds: false,
 				},
 			);
 
-			const listener = autocompleteRef.current.addListener(
+			placeChangedListener = autocompleteRef.current.addListener(
 				"place_changed",
 				() => {
 					const place = autocompleteRef.current?.getPlace();
@@ -48,12 +59,14 @@ const AddressInput: React.FC<AddressInputProps> = ({
 					}
 				},
 			);
-
-			return () => {
-				if (listener) window.google.maps.event.removeListener(listener);
-			};
 		});
-	}, []);
+
+		return () => {
+			if (placeChangedListener) {
+				window.google.maps.event.removeListener(placeChangedListener);
+			}
+		};
+	}, [onChange, onSelect]);
 
 	return (
 		<input

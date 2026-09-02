@@ -36,8 +36,8 @@ export interface Post {
 	_id: string;
 	title: string;
 	location: string;
-	propertyType: string;
-	postType: "rent" | "sell";
+	propertyType?: string;
+	postType?: "rent" | "sell";
 	intent: "rent" | "sell";
 	propertyCategory: "land" | "house" | "flat" | "shop";
 	approvalStatus: "approved" | "rejected" | "pending";
@@ -45,7 +45,7 @@ export interface Post {
 	updatedAt: string;
 
 	// Legacy price field (for backward compatibility)
-	price?: number;
+	price?: number | string;
 
 	// Sell post specific pricing
 	pricePerUnit?: number;
@@ -54,7 +54,7 @@ export interface Post {
 
 	// Rent post specific pricing
 	frequency?: "day" | "week" | "month" | "year";
-	pricePerFrequency?: number;
+	pricePerFrequency?: number | string;
 
 	user?: {
 		_id: string;

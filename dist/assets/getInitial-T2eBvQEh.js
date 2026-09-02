@@ -1,0 +1,1 @@
+const l=r=>{var e,s,n;if(!r)return"";const t=r.trim().split(/\s+/);if(t.length===0)return"";if(t.length===1)return((e=t[0][0])==null?void 0:e.toUpperCase())||"";const i=((s=t[0][0])==null?void 0:s.toUpperCase())||"",o=((n=t[t.length-1][0])==null?void 0:n.toUpperCase())||"";return i+o};export{l as g};

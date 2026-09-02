@@ -11,6 +11,7 @@ export interface User {
 	role: "user" | "admin";
 	phone: string;
 	isVerified: boolean;
+	savedPosts?: string[];
 }
 
 interface AuthState {
@@ -31,9 +32,25 @@ if (storedToken && isTokenExpired(storedToken)) {
 	localStorage.removeItem("token");
 	showError("Session expired. Please log in again.");
 } else if (storedToken && storedUser) {
-	initialUser = JSON.parse(storedUser);
-	initialToken = storedToken;
-	isAuthenticated = true;
+	try {
+		const parsedUser = JSON.parse(storedUser) as Partial<User>;
+		const hasRequiredUserFields =
+			typeof parsedUser.id === "string" &&
+			typeof parsedUser.email === "string" &&
+			(parsedUser.role === "user" || parsedUser.role === "admin");
+
+		if (hasRequiredUserFields) {
+			initialUser = parsedUser as User;
+			initialToken = storedToken;
+			isAuthenticated = true;
+		} else {
+			localStorage.removeItem("user");
+			localStorage.removeItem("token");
+		}
+	} catch {
+		localStorage.removeItem("user");
+		localStorage.removeItem("token");
+	}
 }
 const initialState: AuthState = {
 	user: initialUser,
@@ -58,8 +75,13 @@ const authSlice = createSlice({
 			localStorage.removeItem("user");
 			localStorage.removeItem("token");
 		},
+		setSavedPosts: (state, action: PayloadAction<string[]>) => {
+			if (!state.user) return;
+			state.user.savedPosts = action.payload;
+			localStorage.setItem("user", JSON.stringify(state.user));
+		},
 	},
 });
 
-export const { login, logout } = authSlice.actions;
+export const { login, logout, setSavedPosts } = authSlice.actions;
 export default authSlice.reducer;

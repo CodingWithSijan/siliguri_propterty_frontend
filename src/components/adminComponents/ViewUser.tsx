@@ -30,7 +30,7 @@ const UserProfileCard = () => {
 
 	useEffect(() => {
 		refetchUser();
-	}, []);
+	}, [refetchUser]);
 
 	if (isLoadingUser) {
 		return (

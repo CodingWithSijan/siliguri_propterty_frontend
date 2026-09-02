@@ -22,6 +22,20 @@ import { RootState, AppDispatch } from "../../app/store";
 import { addNewPost } from "../../app/slices/postSlice";
 import { useNavigate } from "react-router-dom";
 import { showError, showSuccess } from "../../utils/toastUtils";
+
+const getErrorMessage = (error: unknown): string => {
+	if (
+		typeof error === "object" &&
+		error !== null &&
+		"message" in error &&
+		typeof (error as { message?: unknown }).message === "string"
+	) {
+		return (error as { message: string }).message;
+	}
+
+	return "Post Submission Failed";
+};
+
 // Types
 export type UniversalPostFormInputs = RentPostFormInputs | SellPostFormInputs;
 interface PostStepperFormProps {
@@ -114,9 +128,8 @@ const PostStepperForm: React.FC<PostStepperFormProps> = ({ intent }) => {
 			showSuccess("Post submitted successfully");
 			methods.reset();
 			navigate("/dashboard/view-your-listings");
-		} catch (error: any) {
-			showError("Post Submission Failed");
-			console.log(error?.data?.message);
+		} catch (error: unknown) {
+			showError(getErrorMessage(error));
 		}
 	});
 

@@ -6,9 +6,16 @@ import { showInfo } from "../../utils/toastUtils";
 
 export const PostYourPropertyButton: React.FC = (): React.ReactNode => {
 	const navigate = useNavigate();
-	const { isAuthenticated } = useSelector((state: RootState) => state.auth);
+	const { isAuthenticated, user } = useSelector(
+		(state: RootState) => state.auth,
+	);
 	const redirectUser = () => {
 		if (isAuthenticated) {
+			if (user?.role === "admin") {
+				navigate("/admin/home");
+				showInfo("Use user account to post properties");
+				return;
+			}
 			navigate("/dashboard/new-post");
 		} else {
 			navigate("/login");

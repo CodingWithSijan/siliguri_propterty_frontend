@@ -76,6 +76,7 @@ const EditPostStepperForm: React.FC<EditPostStepperFormProps> = ({
 			description: initialData.description,
 			location: initialData.location,
 			alternateLocation: initialData.alternateLocation,
+			coordinates: initialData.coordinates,
 		};
 
 		// Add intent-specific fields with type checking
@@ -186,14 +187,14 @@ const EditPostStepperForm: React.FC<EditPostStepperFormProps> = ({
 					// Handle new pictures - these are File objects
 					if (value instanceof FileList) {
 						Array.from(value).forEach((file) =>
-							formData.append("pictures", file)
+							formData.append("pictures", file),
 						);
 					}
 				} else if (key === "existingPictures") {
 					// Handle existing pictures - these are URLs to keep
 					if (Array.isArray(value)) {
 						value.forEach((imageUrl) =>
-							formData.append("existingPictures", imageUrl)
+							formData.append("existingPictures", imageUrl),
 						);
 					}
 				} else if (value !== undefined && value !== null && value !== "") {

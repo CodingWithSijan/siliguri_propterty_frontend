@@ -4,6 +4,28 @@ import { showSuccess, showError } from "../utils/toastUtils";
 import BASE_URL from "../services";
 import { motion, AnimatePresence } from "framer-motion";
 
+const getErrorMessage = (error: unknown): string => {
+	if (
+		typeof error === "object" &&
+		error !== null &&
+		"response" in error &&
+		typeof (error as { response?: unknown }).response === "object" &&
+		(error as { response?: { data?: unknown } }).response !== null
+	) {
+		const response = (error as { response: { data?: { message?: unknown } } })
+			.response;
+		if (typeof response.data?.message === "string") {
+			return response.data.message;
+		}
+	}
+
+	if (error instanceof Error) {
+		return error.message;
+	}
+
+	return "An error occured while changing the password.";
+};
+
 const ChangePassword: React.FC<{ onClose: () => void }> = ({ onClose }) => {
 	const [currentPassword, setCurrentPassword] = useState("");
 	const [newPassword, setNewPassword] = useState("");
@@ -33,14 +55,8 @@ const ChangePassword: React.FC<{ onClose: () => void }> = ({ onClose }) => {
 			} else {
 				showError(response.data.message || "Failed to change password.");
 			}
-		} catch (error: any) {
-			let message = "An error occured while changing the password.";
-			if (error.response && error.response.data?.message) {
-				message = error.response.data.message;
-			} else if (error.message) {
-				message = error.message;
-			}
-			showError(message);
+		} catch (error: unknown) {
+			showError(getErrorMessage(error));
 		} finally {
 			setLoading(false);
 		}

@@ -3,8 +3,8 @@ import {
 	FiUser,
 	FiPlusCircle,
 	FiList,
-	FiTrendingUp,
-	FiMessageCircle,
+	FiCompass,
+	FiHeart,
 	FiLogOut,
 } from "react-icons/fi";
 import { motion } from "framer-motion";
@@ -15,6 +15,7 @@ import siliguri_property_logo_noBG from "../assets/logo_siliguri_property.png";
 import { getInitials } from "../utils/getInitial";
 import { formatFullName } from "../utils/capitalizeName";
 import {
+	DropdownMenuGroup,
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuItem,
@@ -42,11 +43,15 @@ const menuItems = [
 		path: "/dashboard/view-your-listings",
 	},
 	{
-		label: "Promote Your listings",
-		icon: <FiTrendingUp />,
-		path: "/dashboard/promote",
+		label: "Saved Posts",
+		icon: <FiHeart />,
+		path: "/dashboard/saved-posts",
 	},
-	{ label: "Messages", icon: <FiMessageCircle />, path: "/dashboard/messages" },
+	{
+		label: "Browse Properties",
+		icon: <FiCompass />,
+		path: "/properties",
+	},
 ];
 
 const Sidebar: React.FC<SidebarProps> = ({ setActiveMenu, setSidebarOpen }) => {
@@ -54,6 +59,11 @@ const Sidebar: React.FC<SidebarProps> = ({ setActiveMenu, setSidebarOpen }) => {
 	const location = useLocation();
 	const dispatch = useDispatch<AppDispatch>();
 	const { user } = useSelector((state: RootState) => state.auth);
+
+	const handleLogout = () => {
+		dispatch(logout());
+		setSidebarOpen(false);
+	};
 
 	return (
 		<motion.div
@@ -75,9 +85,11 @@ const Sidebar: React.FC<SidebarProps> = ({ setActiveMenu, setSidebarOpen }) => {
 				</div>
 				{/* user profile and name display */}
 				<DropdownMenu>
-					<DropdownMenuTrigger>
-						{" "}
-						<div className="flex items-center space-x-3 p-4 border-y border-border bg-muted/30 hover:bg-muted/50 transition-all cursor-pointer">
+					<DropdownMenuTrigger asChild>
+						<button
+							type="button"
+							className="w-full flex items-center space-x-3 p-4 border-y border-border bg-muted/30 hover:bg-muted/50 transition-all cursor-pointer"
+						>
 							{user?.avatar ? (
 								<img
 									className="w-10 h-10 rounded-full border-2 border-primary shadow-sm"
@@ -92,28 +104,20 @@ const Sidebar: React.FC<SidebarProps> = ({ setActiveMenu, setSidebarOpen }) => {
 							<span className="text-foreground font-semibold text-sm">
 								{formatFullName(user?.name)}
 							</span>
-						</div>
+						</button>
 					</DropdownMenuTrigger>
 					<DropdownMenuContent className="w-[250px]">
 						<DropdownMenuLabel>My Account</DropdownMenuLabel>
 						<DropdownMenuSeparator />
-						<DropdownMenuItem>
-							<div className="p-2 border-t border-border">
-								<motion.button
-									whileHover={{ scale: 1.02 }}
-									whileTap={{ scale: 0.98 }}
-									className="w-full flex items-center gap-3 text-destructive hover:bg-destructive/10 rounded-lg transition-all duration-200 p-2"
-								>
-									<FiLogOut className="text-lg" />
-									<button
-										className="font-medium"
-										onClick={() => dispatch(logout())}
-									>
-										Logout
-									</button>
-								</motion.button>
-							</div>
-						</DropdownMenuItem>
+						<DropdownMenuGroup>
+							<DropdownMenuItem
+								onSelect={handleLogout}
+								className="text-destructive cursor-pointer"
+							>
+								<FiLogOut className="text-lg" />
+								<span className="font-medium">Logout</span>
+							</DropdownMenuItem>
+						</DropdownMenuGroup>
 					</DropdownMenuContent>
 				</DropdownMenu>
 
@@ -139,7 +143,9 @@ const Sidebar: React.FC<SidebarProps> = ({ setActiveMenu, setSidebarOpen }) => {
 									onClick={() => {
 										setActiveMenu(item.label);
 										setSidebarOpen(false);
-										navigate(item.path);
+										if (location.pathname !== item.path) {
+											navigate(item.path);
+										}
 									}}
 								>
 									<span className="text-xl">{item.icon}</span>

@@ -18,25 +18,14 @@ import {
 	SidebarFooter,
 	SidebarHeader,
 } from "../ui/sidebar";
-import {
-	Home,
-	Edit,
-	Settings,
-	UserPenIcon,
-	ClipboardEditIcon,
-} from "lucide-react";
+import { Home, Edit, UserPenIcon, ChartNoAxesCombined } from "lucide-react";
 import AdminProfile from "./AdminProfile";
 
 const items = [
-	{ title: "Home", url: "/admin/home", icon: Home },
-	{ title: "Manage Posts", url: "/admin/posts", icon: Edit },
-	{ title: "Manage Users", url: "/admin/users", icon: UserPenIcon },
-	{
-		title: "Manage Pending Posts",
-		url: "/admin/pending-posts",
-		icon: ClipboardEditIcon,
-	},
-	{ title: "Settings", url: "/admin/settings", icon: Settings },
+	{ title: "Overview", url: "/admin/home", icon: ChartNoAxesCombined },
+	{ title: "Post Moderation", url: "/admin/posts", icon: Edit },
+	{ title: "User Management", url: "/admin/users", icon: UserPenIcon },
+	{ title: "Back To Site", url: "/", icon: Home },
 ];
 interface Props {
 	activeMenu: number;

@@ -46,7 +46,7 @@ const NewListings: React.FC = () => {
 	);
 
 	return (
-		<section className="py-16 bg-gradient-to-br from-gray-50 via-white to-blue-50">
+		<section className="py-16 bg-gradient-to-br from-slate-50 via-white to-cyan-50">
 			<div className="w-full max-w-7xl mx-auto px-4 sm:px-4 lg:px-8">
 				{/* Enhanced Header */}
 				<div className="text-center mb-12">
@@ -59,7 +59,7 @@ const NewListings: React.FC = () => {
 
 					<h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
 						Newest{" "}
-						<span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+						<span className="bg-gradient-to-r from-blue-700 to-cyan-600 bg-clip-text text-transparent">
 							Properties
 						</span>
 					</h2>

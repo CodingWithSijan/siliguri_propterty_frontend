@@ -10,6 +10,14 @@ import BooleanInput from "../reusable_input_fields/BooleanInput";
 import InputDate from "../reusable_input_fields/InputDate";
 import { useEffect } from "react";
 
+const UNIT_CONVERSION_RATES: Record<string, number> = {
+	katha: 1,
+	bigha: 20,
+	decimal: 0.8,
+	acre: 66.67,
+	"sq foot": 0.000367,
+};
+
 const StepDetailsSell = () => {
 	const {
 		register,
@@ -23,14 +31,6 @@ const StepDetailsSell = () => {
 	const landSpace = watch("availableLandSpace");
 	const landSpaceUnit = watch("availableLandSpaceUnit");
 
-	const unitConversionRates: Record<string, number> = {
-		katha: 1,
-		bigha: 20, // 1 bigha = 20 katha
-		decimal: 0.8, // 1 katha = 1.25 decimal → 1 decimal = 0.8 katha
-		acre: 66.67, // 1 acre = 66.67 katha
-		"sq foot": 0.000367, // 1 sq foot ≈ 0.000367 katha
-	};
-
 	useEffect(() => {
 		if (
 			pricePerUnit &&
@@ -40,8 +40,8 @@ const StepDetailsSell = () => {
 			!isNaN(Number(landSpace))
 		) {
 			const landSpaceNum = parseFloat(landSpace);
-			const unitRate = unitConversionRates[unit];
-			const landUnitRate = unitConversionRates[landSpaceUnit];
+			const unitRate = UNIT_CONVERSION_RATES[unit];
+			const landUnitRate = UNIT_CONVERSION_RATES[landSpaceUnit];
 
 			if (unitRate && landUnitRate) {
 				const landInPriceUnit = (landSpaceNum * landUnitRate) / unitRate;

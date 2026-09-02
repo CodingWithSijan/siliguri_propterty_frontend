@@ -2,10 +2,38 @@
 import { useFormContext } from "react-hook-form";
 import { useEffect, useState } from "react";
 import { CheckCircle, XCircle, MinusCircle } from "lucide-react";
+import type { ReactNode } from "react";
+
+interface PreviewFormData {
+	propertyCategory?: "house" | "flat" | "land" | "shop" | string;
+	title?: string;
+	description?: string;
+	location?: string;
+	alternateLocation?: string;
+	bedrooms?: string | number;
+	bathrooms?: string | number;
+	builtUpArea?: string | number;
+	furnishing?: string;
+	attachedBathroom?: boolean;
+	parking?: boolean;
+	availableFrom?: string;
+	availableLandSpace?: string | number;
+	availableLandSpaceUnit?: string;
+	unit?: string;
+	pricePerUnit?: string | number;
+	totalPrice?: string | number;
+	shopArea?: string | number;
+	hasShutter?: boolean;
+	price?: string | number;
+	pricePerFrequency?: string | number;
+	duration?: string;
+	pictures?: FileList;
+	[key: string]: unknown;
+}
 
 const StepPreview = () => {
-	const { getValues } = useFormContext();
-	const [previewData, setPreviewData] = useState<any>({});
+	const { getValues } = useFormContext<PreviewFormData>();
+	const [previewData, setPreviewData] = useState<PreviewFormData>({});
 	const [previews, setPreviews] = useState<string[]>([]);
 
 	useEffect(() => {
@@ -26,8 +54,8 @@ const StepPreview = () => {
 					val === true
 						? "bg-green-100 text-green-600"
 						: val === false
-						? "bg-red-100 text-red-600"
-						: "bg-gray-100 text-gray-500"
+							? "bg-red-100 text-red-600"
+							: "bg-gray-100 text-gray-500"
 				}`}
 		>
 			{val === true ? (
@@ -47,17 +75,33 @@ const StepPreview = () => {
 		return isNaN(d.getTime()) ? String(val) : d.toLocaleDateString();
 	};
 
+	const toDisplayValue = (value: unknown): ReactNode => {
+		if (value === undefined || value === null || value === "") {
+			return "-";
+		}
+
+		if (typeof value === "string" || typeof value === "number") {
+			return value;
+		}
+
+		if (typeof value === "boolean") {
+			return value ? "Yes" : "No";
+		}
+
+		return String(value);
+	};
+
 	const propertyCategory = previewData.propertyCategory;
 	const isHouseOrFlat =
 		propertyCategory === "house" || propertyCategory === "flat";
 	const isLand = propertyCategory === "land";
 	const isShop = propertyCategory === "shop";
 
-	const InfoRow = ({ label, value }: { label: string; value: any }) => (
+	const InfoRow = ({ label, value }: { label: string; value: ReactNode }) => (
 		<div className="flex flex-col">
 			<span className="text-gray-500 text-sm">{label}</span>
-			<span className="text-gray-900 font-semibold capitalize">
-				{value || "-"}
+			<span className="text-gray-900 font-semibold capitalize break-words">
+				{value ?? "-"}
 			</span>
 		</div>
 	);
@@ -65,7 +109,7 @@ const StepPreview = () => {
 	return (
 		<div className="space-y-10 p-6 bg-white rounded-2xl shadow-md border border-gray-200 max-w-5xl mx-auto">
 			<h2 className="text-3xl font-bold text-center text-blue-700 tracking-tight">
-				🎯 Review Your Post
+				Review Your Post
 			</h2>
 			<p className="text-center text-gray-500">
 				Please confirm all details before publishing
@@ -76,6 +120,10 @@ const StepPreview = () => {
 				<InfoRow label="Title" value={previewData.title} />
 				<InfoRow label="Description" value={previewData.description} />
 				<InfoRow label="Location" value={previewData.location} />
+				<InfoRow
+					label="Alternate Location"
+					value={toDisplayValue(previewData.alternateLocation)}
+				/>
 				<InfoRow label="Property Type" value={propertyCategory} />
 			</div>
 
@@ -83,13 +131,17 @@ const StepPreview = () => {
 			{isHouseOrFlat && (
 				<div className="bg-gray-50 p-6 rounded-xl border border-gray-200 space-y-4">
 					<h3 className="text-lg font-semibold text-blue-600">
-						🏠 {propertyCategory} Details
+						{propertyCategory} Details
 					</h3>
 					<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
 						{["bedrooms", "bathrooms", "builtUpArea", "furnishing"].map(
 							(field) => (
-								<InfoRow key={field} label={field} value={previewData[field]} />
-							)
+								<InfoRow
+									key={field}
+									label={field}
+									value={toDisplayValue(previewData[field])}
+								/>
+							),
 						)}
 						<InfoRow
 							label="Attached Bathroom"
@@ -109,9 +161,7 @@ const StepPreview = () => {
 
 			{isLand && (
 				<div className="bg-gray-50 p-6 rounded-xl border border-gray-200 space-y-4">
-					<h3 className="text-lg font-semibold text-blue-600">
-						🌾 Land Details
-					</h3>
+					<h3 className="text-lg font-semibold text-blue-600">Land Details</h3>
 					<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
 						{[
 							"availableLandSpace",
@@ -120,7 +170,11 @@ const StepPreview = () => {
 							"pricePerUnit",
 							"totalPrice",
 						].map((field) => (
-							<InfoRow key={field} label={field} value={previewData[field]} />
+							<InfoRow
+								key={field}
+								label={field}
+								value={toDisplayValue(previewData[field])}
+							/>
 						))}
 					</div>
 				</div>
@@ -128,9 +182,7 @@ const StepPreview = () => {
 
 			{isShop && (
 				<div className="bg-gray-50 p-6 rounded-xl border border-gray-200 space-y-4">
-					<h3 className="text-lg font-semibold text-blue-600">
-						🏪 Shop Details
-					</h3>
+					<h3 className="text-lg font-semibold text-blue-600">Shop Details</h3>
 					<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
 						<InfoRow label="Shop Area (sq ft)" value={previewData.shopArea} />
 						<InfoRow
@@ -143,7 +195,7 @@ const StepPreview = () => {
 
 			{/* Price Section */}
 			<div className="bg-gray-50 p-6 rounded-xl border border-gray-200 space-y-2">
-				<h3 className="text-lg font-semibold text-blue-600">💰 Pricing</h3>
+				<h3 className="text-lg font-semibold text-blue-600">Pricing</h3>
 				<InfoRow
 					label="Price (INR)"
 					value={
@@ -161,7 +213,7 @@ const StepPreview = () => {
 			{previews.length > 0 && (
 				<div className="bg-gray-50 p-6 rounded-xl border border-gray-200">
 					<h3 className="text-lg font-semibold text-blue-600 mb-3">
-						📷 Uploaded Pictures
+						Uploaded Pictures
 					</h3>
 					<div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
 						{previews.map((src, idx) => (

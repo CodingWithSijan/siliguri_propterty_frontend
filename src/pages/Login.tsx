@@ -53,8 +53,14 @@ const Login: React.FC = () => {
 
 	// Auto-redirect if already logged in
 	useEffect(() => {
-		if (isAuthenticated && user?.role === "user") navigate("/");
-		else if (isAuthenticated && user?.role === "admin") navigate("/admin");
+		const persistedToken = localStorage.getItem("token");
+		if (!persistedToken) return;
+
+		if (isAuthenticated && user?.role === "user") {
+			navigate("/dashboard/your-profile", { replace: true });
+		} else if (isAuthenticated && user?.role === "admin") {
+			navigate("/admin/home", { replace: true });
+		}
 	}, [isAuthenticated, navigate, user?.role]);
 
 	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -72,7 +78,10 @@ const Login: React.FC = () => {
 
 			dispatch(login({ user, token }));
 
-			navigate(user?.role === "admin" ? "/admin" : "/");
+			navigate(
+				user?.role === "admin" ? "/admin/home" : "/dashboard/your-profile",
+				{ replace: true },
+			);
 		} catch (error) {
 			const err = error as AxiosError<{ message: string }>;
 			showError(err.response?.data?.message || "Login failed.");

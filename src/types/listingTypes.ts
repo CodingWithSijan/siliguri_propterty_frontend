@@ -15,6 +15,10 @@ export interface IBaseListingType {
 	pictures?: string[];
 	location: string;
 	alternateLocation: string;
+	coordinates?: {
+		type: "Point";
+		coordinates: [number, number];
+	};
 	propertyCategory: PropertyCategory;
 	approvalStatus: "approved" | "pending" | "rejected";
 }

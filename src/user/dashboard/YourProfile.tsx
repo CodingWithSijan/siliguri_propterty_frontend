@@ -66,10 +66,12 @@ const YourProfile: React.FC = () => {
 			);
 			const updatedUser = response.data.user;
 			showSuccess("Profile Picture updated successfully!");
-			dispatch(
-				login({ user: updatedUser, token: sessionStorage.getItem("token")! }),
-			);
+			const token = localStorage.getItem("token");
+			if (token) {
+				dispatch(login({ user: updatedUser, token }));
+			}
 			setSelectedFile(null);
+			setPreview(null);
 		} catch (error) {
 			if (axios.isAxiosError(error)) showError(error.response?.data?.message);
 			else showError("Upload Failed! Please Try again");
@@ -87,12 +89,6 @@ const YourProfile: React.FC = () => {
 				email: user?.email,
 			});
 			showInfo(res.data.message);
-
-			const updatedUser = res.data.user;
-
-			dispatch(
-				login({ user: updatedUser, token: sessionStorage.getItem("token")! }),
-			);
 		} catch (error) {
 			if (axios.isAxiosError(error)) {
 				showError(`${error.response?.data?.message}`);

@@ -50,7 +50,7 @@ const StepDetailsRent = () => {
 			{/* Price and rental frequency fields */}
 			<div className="flex flex-col sm:flex-row gap-4">
 				<div className="flex-1">
-					<label className="block font-medium mb-1">"Price (INR)"</label>
+					<label className="block font-medium mb-1">Price (INR)</label>
 					<input
 						type="number"
 						step="100"

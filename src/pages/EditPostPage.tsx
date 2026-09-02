@@ -56,6 +56,9 @@ const EditPostPage = () => {
 
 	// Check if post can be edited (only pending posts)
 	if (post.approvalStatus !== "pending") {
+		const statusClass =
+			post.approvalStatus === "approved" ? "text-green-600" : "text-red-600";
+
 		return (
 			<div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
 				<div className="text-center max-w-md mx-auto p-8">
@@ -65,7 +68,7 @@ const EditPostPage = () => {
 					<div className="bg-white rounded-lg p-6 shadow-lg">
 						<p className="text-gray-600 mb-4">
 							This post has been{" "}
-							<span className="font-semibold text-{post.approvalStatus === 'approved' ? 'green' : 'red'}-600">
+							<span className={`font-semibold ${statusClass}`}>
 								{post.approvalStatus.toUpperCase()}
 							</span>{" "}
 							and cannot be edited.

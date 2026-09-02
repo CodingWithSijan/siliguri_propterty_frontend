@@ -34,7 +34,7 @@ const HeroSection: React.FC = () => {
 	}, [slides.length]);
 
 	return (
-		<div className="relative h-screen w-full overflow- bg-gray-900">
+		<div className="relative min-h-[88vh] w-full overflow-hidden bg-slate-900">
 			{/* Carousel */}
 			<div className="absolute inset-0">
 				<AnimatePresence initial={false}>
@@ -57,18 +57,18 @@ const HeroSection: React.FC = () => {
 			</div>
 
 			{/* Content */}
-			<div className="relative z-20 h-full flex flex-col items-center justify-center px-4">
+			<div className="relative z-20 min-h-[88vh] flex flex-col items-center justify-center px-4 py-12">
 				{/* Hero Text */}
 				<motion.div
 					initial={{ opacity: 0, y: 20 }}
 					animate={{ opacity: 1, y: 0 }}
 					transition={{ duration: 0.5, delay: 0.2 }}
-					className="text-center mb-12 hidden sm:block"
+					className="text-center mb-12 hidden sm:block max-w-4xl"
 				>
-					<h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 drop-shadow-lg">
+					<h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-white mb-4 drop-shadow-lg tracking-tight">
 						{slides[currentSlide].text}
 					</h1>
-					<p className="text-xl text-gray-200 drop-shadow-md">
+					<p className="text-lg md:text-xl text-slate-100/95 drop-shadow-md">
 						{slides[currentSlide].subtext}
 					</p>
 				</motion.div>
@@ -78,10 +78,10 @@ const HeroSection: React.FC = () => {
 					initial={{ opacity: 0, y: 30 }}
 					animate={{ opacity: 1, y: 0 }}
 					transition={{ duration: 0.6, delay: 0.4 }}
-					className="w-full max-w-6xl px-4 pt-15 sm:pt-0"
+					className="w-full max-w-6xl px-2 sm:px-4 pt-12 sm:pt-0"
 				>
-					<div className="backdrop-blur-md bg-white/10 rounded-2xl border border-white/20 shadow-2xl p-1">
-						<div className="bg-white/95 backdrop-blur-sm rounded-xl shadow-lg">
+					<div className="backdrop-blur-md bg-white/10 rounded-2xl border border-white/25 shadow-2xl p-1">
+						<div className="bg-white/95 backdrop-blur-sm rounded-xl shadow-xl">
 							<HomepagePropertySearchFilter />
 						</div>
 					</div>
@@ -92,28 +92,28 @@ const HeroSection: React.FC = () => {
 					initial={{ opacity: 0, y: 20 }}
 					animate={{ opacity: 1, y: 0 }}
 					transition={{ duration: 0.5, delay: 0.6 }}
-					className="mt-8 flex flex-wrap justify-center gap-6"
+					className="mt-8 flex flex-wrap justify-center gap-4 sm:gap-6"
 				>
-					<div className="bg-white/10 backdrop-blur-md rounded-xl px-6 py-3 border border-white/20">
+					<div className="bg-white/12 backdrop-blur-md rounded-xl px-6 py-3 border border-white/20 shadow-lg">
 						<div className="text-center">
 							<div className="text-2xl font-bold text-white">
 								{stats.propertiesListed}+
 							</div>
-							<div className="text-sm text-gray-200">Properties Listed</div>
+							<div className="text-sm text-slate-100/95">Properties Listed</div>
 						</div>
 					</div>
-					<div className="bg-white/10 backdrop-blur-md rounded-xl px-6 py-3 border border-white/20">
+					<div className="bg-white/12 backdrop-blur-md rounded-xl px-6 py-3 border border-white/20 shadow-lg">
 						<div className="text-center">
 							<div className="text-2xl font-bold text-white">
 								{stats.happyCustomers}+
 							</div>
-							<div className="text-sm text-gray-200">Happy Customers</div>
+							<div className="text-sm text-slate-100/95">Happy Customers</div>
 						</div>
 					</div>
-					<div className="bg-white/10 backdrop-blur-md rounded-xl px-6 py-3 border border-white/20">
+					<div className="bg-white/12 backdrop-blur-md rounded-xl px-6 py-3 border border-white/20 shadow-lg">
 						<div className="text-center">
 							<div className="text-2xl font-bold text-white">20+</div>
-							<div className="text-sm text-gray-200">Areas Covered</div>
+							<div className="text-sm text-slate-100/95">Areas Covered</div>
 						</div>
 					</div>
 				</motion.div>

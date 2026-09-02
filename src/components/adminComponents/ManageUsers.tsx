@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
+import type { ComponentType } from "react";
 import {
 	Table,
 	TableBody,
@@ -44,26 +45,43 @@ import {
 	deleteUserById,
 	fetchAllUsers,
 	fetchUsersByVerification,
+	User,
 } from "../../services/fetchFunctionsForAdmin";
 import { useNavigate } from "react-router-dom";
 import { showError, showSuccess } from "../../utils/toastUtils";
 import { getInitials } from "../../utils/getInitial";
 
+interface StatsCardProps {
+	title: string;
+	value: number;
+	icon: ComponentType<{ className?: string }>;
+	color: "blue" | "green" | "red";
+}
+
+const STATS_CARD_STYLES: Record<
+	StatsCardProps["color"],
+	{ bg: string; text: string }
+> = {
+	blue: { bg: "bg-blue-100", text: "text-blue-600" },
+	green: { bg: "bg-green-100", text: "text-green-600" },
+	red: { bg: "bg-red-100", text: "text-red-600" },
+};
+
 const ManageUsers = () => {
 	const [isDeleting, setIsDeleting] = useState(false);
 	const [userToDelete, setUserToDelete] = useState<string | null>(null);
 	const [selectedStatus, setSelectedStatus] = useState("all");
+	const fetchUsersBySelectedStatus = useCallback(() => {
+		return selectedStatus === "all"
+			? fetchAllUsers()
+			: fetchUsersByVerification(selectedStatus === "verified");
+	}, [selectedStatus]);
+
 	const {
 		data: users,
 		loading: isLoadingUsers,
 		refetch: refetchUsers,
-	} = useFetch(
-		() =>
-			selectedStatus === "all"
-				? fetchAllUsers()
-				: fetchUsersByVerification(selectedStatus === "verified"),
-		false,
-	);
+	} = useFetch<User[]>(fetchUsersBySelectedStatus, false);
 
 	const verifiedUsers = users?.filter((u) => u.isVerified)?.length || 0;
 	const unverifiedUsers = users?.filter((u) => !u.isVerified)?.length || 0;
@@ -71,7 +89,7 @@ const ManageUsers = () => {
 
 	useEffect(() => {
 		refetchUsers();
-	}, [selectedStatus]);
+	}, [selectedStatus, refetchUsers]);
 
 	const handleStatusChange = (value: string) => setSelectedStatus(value);
 
@@ -97,23 +115,29 @@ const ManageUsers = () => {
 			setIsDeleting(false);
 		}
 	};
-	const StatsCard = ({ title, value, icon: Icon, color }: any) => (
-		<Card className="hover:border-primary/50 transition-colors">
-			<CardHeader className="flex justify-between items-center pb-2">
-				<CardTitle className="text-sm text-muted-foreground">{title}</CardTitle>
-				<div className={`p-2 rounded-full bg-${color}/10`}>
-					<Icon className={`w-4 h-4 text-${color}`} />
-				</div>
-			</CardHeader>
-			<CardContent>
-				{isLoadingUsers ? (
-					<Skeleton className="h-9 w-20" />
-				) : (
-					<div className="text-3xl font-bold">{value}</div>
-				)}
-			</CardContent>
-		</Card>
-	);
+	const StatsCard = ({ title, value, icon: Icon, color }: StatsCardProps) => {
+		const style = STATS_CARD_STYLES[color];
+
+		return (
+			<Card className="hover:border-primary/50 transition-colors">
+				<CardHeader className="flex justify-between items-center pb-2">
+					<CardTitle className="text-sm text-muted-foreground">
+						{title}
+					</CardTitle>
+					<div className={`p-2 rounded-full ${style.bg}`}>
+						<Icon className={`w-4 h-4 ${style.text}`} />
+					</div>
+				</CardHeader>
+				<CardContent>
+					{isLoadingUsers ? (
+						<Skeleton className="h-9 w-20" />
+					) : (
+						<div className="text-3xl font-bold">{value}</div>
+					)}
+				</CardContent>
+			</Card>
+		);
+	};
 
 	return (
 		<>
@@ -156,19 +180,19 @@ const ManageUsers = () => {
 							title="Total Users"
 							value={users?.length || 0}
 							icon={Users}
-							color="blue-500"
+							color="blue"
 						/>
 						<StatsCard
 							title="Verified Users"
 							value={verifiedUsers}
 							icon={ShieldCheck}
-							color="green-500"
+							color="green"
 						/>
 						<StatsCard
 							title="Unverified Users"
 							value={unverifiedUsers}
 							icon={ShieldX}
-							color="red-500"
+							color="red"
 						/>
 					</div>
 
@@ -289,7 +313,9 @@ const ManageUsers = () => {
 															</DropdownMenuItem>
 															<DropdownMenuItem
 																onClick={() =>
-																	console.log("Reset password", user._id)
+																	showError(
+																		"Reset password is not available yet",
+																	)
 																}
 															>
 																Reset Password
@@ -301,7 +327,9 @@ const ManageUsers = () => {
 																Delete User
 															</DropdownMenuItem>
 															<DropdownMenuItem
-																onClick={() => console.log("Ban", user._id)}
+																onClick={() =>
+																	showError("Ban user is not available yet")
+																}
 																className="text-red-600"
 															>
 																Ban User

@@ -1,0 +1,1 @@
+function e(t){return typeof t=="string"&&!isNaN(Date.parse(t))}const n=t=>e(t)?new Date(t).toLocaleDateString("en-US",{year:"numeric",month:"long",day:"numeric"}):"Invalid Date format";export{n as c};
