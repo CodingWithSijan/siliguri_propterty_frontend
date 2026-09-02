@@ -13,6 +13,7 @@ import {
 import { useSearchParams } from "react-router-dom";
 import { IRentListingType } from "../types/listingTypes";
 import BASE_URL from "../services";
+import Breadcrumb from "../lib/Breadcrumb";
 
 const RentalProperties: React.FC = () => {
 	const [posts, setPosts] = useState<IRentListingType[]>([]);
@@ -21,6 +22,12 @@ const RentalProperties: React.FC = () => {
 	const [searchParams, setSearchParams] = useSearchParams();
 
 	const currentPage = parseInt(searchParams.get("page") || "1");
+
+	const getBreadcrumbItems = () => {
+		if (!posts) return [];
+
+		return [{ label: "For Rent", path: "/rentals" }];
+	};
 
 	useEffect(() => {
 		const fetchPosts = async () => {
@@ -90,6 +97,7 @@ const RentalProperties: React.FC = () => {
 	return (
 		<>
 			<Navbar />
+			<Breadcrumb items={getBreadcrumbItems()} />
 			<div className="max-w-7xl mx-auto px-4 py-8">
 				<h1 className="text-2xl font-bold mb-6 text-gray-800">
 					Rental Properties
