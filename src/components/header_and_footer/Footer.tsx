@@ -70,10 +70,10 @@ const Footer: React.FC = () => {
 								About
 							</a>
 							<a
-								href="/contact"
+								href="/properties"
 								className="text-slate-300 hover:text-white transition-colors text-sm"
 							>
-								Contact
+								Properties
 							</a>
 							<a
 								href="/privacy"
@@ -100,12 +100,8 @@ const Footer: React.FC = () => {
 						</div>
 						<div className="flex items-center gap-2 text-slate-400 text-sm">
 							<span>Developer: </span>
-							<a
-								className="text-white font-medium"
-								target="_blank"
-								href="https://my-portfolio-murex-iota-66.vercel.app/"
-							>
-								sijan
+							<a className="text-white font-medium" href="/">
+								Buildwave solutions
 							</a>
 						</div>
 					</div>

@@ -7,10 +7,11 @@ import {
 } from "../../components/ui/dropdown-menu";
 import { formatFullName } from "../../utils/capitalizeName";
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "../ui/sidebar";
-import { ChevronUp, User2, LogOut } from "lucide-react";
+import { ChevronUp, LogOut } from "lucide-react";
 import { RootState, AppDispatch } from "../../app/store";
 import { logout } from "../../app/slices/authSlice";
 import { useNavigate } from "react-router-dom";
+import { getInitials } from "../../utils/getInitial";
 
 const AdminProfile = () => {
 	const user = useSelector((state: RootState) => state.auth.user);
@@ -29,7 +30,18 @@ const AdminProfile = () => {
 					<DropdownMenu>
 						<DropdownMenuTrigger asChild>
 							<SidebarMenuButton>
-								<User2 /> {formatFullName(user?.name)}
+								{user?.avatar ? (
+									<img
+										src={user.avatar}
+										alt={user.name}
+										className="w-7 h-7 rounded-full object-cover"
+									/>
+								) : (
+									<div className="w-7 h-7 rounded-full bg-blue-600 text-white text-xs font-bold flex items-center justify-center">
+										{getInitials(user?.name ?? "")}
+									</div>
+								)}
+								{formatFullName(user?.name)}
 								<ChevronUp className="ml-auto" />
 							</SidebarMenuButton>
 						</DropdownMenuTrigger>

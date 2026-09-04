@@ -1,6 +1,7 @@
 import React from "react";
 import SignupLocalComponent from "../components/signup/SignupLocalComponent";
 import { NavLink } from "react-router-dom";
+import SocialAuthButtons from "../components/common/SocialAuthButtons";
 
 const Signup: React.FC = () => {
 	return (
@@ -11,6 +12,9 @@ const Signup: React.FC = () => {
 				</h2>
 
 				<SignupLocalComponent />
+				<div className="mt-6">
+					<SocialAuthButtons mode="signup" />
+				</div>
 
 				<p className="mt-6 text-sm text-center text-gray-600">
 					Already have an account?{" "}

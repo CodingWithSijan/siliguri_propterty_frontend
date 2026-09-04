@@ -20,118 +20,137 @@ const StepDetailsRent = () => {
 
 	return (
 		<div className="space-y-6">
-			{/* Show house/flat-specific fields */}
-			{(propertyCategory === "house" || propertyCategory === "flat") && (
-				<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-					<InputField label="Bedrooms" name="bedrooms" />
-					<InputField label="Bathrooms" name="bathrooms" />
-					{/* Only show 'Floor' for houses */}
-					{propertyCategory === "house" && (
-						<InputField label="Floor" name="floor" />
-					)}
-					<InputField label="Built Up Area (in sq foot)" name="builtUpArea" />
-					<BooleanInput label="Attached Bathroom" name="attachedBathroom" />
-					<BooleanInput label="Parking Available" name="parking" />
-					<SelectFurnishing />
-					<InputDate label="Available From" name="availableFrom" />
-				</div>
-			)}
+			<section className="rounded-2xl border border-slate-200 bg-slate-50/70 p-4 sm:p-5">
+				<h3 className="text-base font-semibold text-slate-900">
+					Property Specifications
+				</h3>
+				<p className="mt-1 text-sm text-slate-600">
+					Add physical details and availability information for this rental
+					listing.
+				</p>
 
-			{/* Show shop-specific fields */}
-			{propertyCategory === "shop" && (
-				<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-					<InputField label="Shop Area (in sq foot)" name="shopArea" />
-					<BooleanInput label="Has Shutter" name="hasShutter" />
-					<SelectFurnishing />
-					<InputDate label="Available From" name="availableFrom" />
-				</div>
-			)}
+				{/* Show house/flat-specific fields */}
+				{(propertyCategory === "house" || propertyCategory === "flat") && (
+					<div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
+						<InputField label="Bedrooms" name="bedrooms" />
+						<InputField label="Bathrooms" name="bathrooms" />
+						{/* Only show 'Floor' for houses */}
+						{propertyCategory === "house" && (
+							<InputField label="Floor" name="floor" />
+						)}
+						<InputField label="Built Up Area (in sq foot)" name="builtUpArea" />
+						<BooleanInput label="Attached Bathroom" name="attachedBathroom" />
+						<BooleanInput label="Parking Available" name="parking" />
+						<SelectFurnishing />
+						<InputDate label="Available From" name="availableFrom" />
+					</div>
+				)}
 
-			{/* Price and rental frequency fields */}
-			<div className="flex flex-col sm:flex-row gap-4">
-				<div className="flex-1">
-					<label className="block font-medium mb-1">"Price (INR)"</label>
-					<input
-						type="number"
-						step="100"
-						{...register("pricePerFrequency", {
-							required: "Price is required",
-							valueAsNumber: true,
-						})}
-						className="w-full border rounded px-3 py-2"
-						placeholder="Enter price or budget"
-					/>
-					{errors.pricePerFrequency && (
-						<p className="text-sm text-red-500">
-							{String(errors.pricePerFrequency?.message)}
-						</p>
-					)}
+				{/* Show shop-specific fields */}
+				{propertyCategory === "shop" && (
+					<div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
+						<InputField label="Shop Area (in sq foot)" name="shopArea" />
+						<BooleanInput label="Has Shutter" name="hasShutter" />
+						<SelectFurnishing />
+						<InputDate label="Available From" name="availableFrom" />
+					</div>
+				)}
+			</section>
+
+			<section className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-5">
+				<h3 className="text-base font-semibold text-slate-900">
+					Pricing & Tenure
+				</h3>
+				<p className="mt-1 text-sm text-slate-600">
+					Set rental price, billing frequency, and expected duration.
+				</p>
+
+				{/* Price and rental frequency fields */}
+				<div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
+					<div>
+						<label className="mb-1 block font-medium">Price (INR)</label>
+						<input
+							type="number"
+							step="100"
+							{...register("pricePerFrequency", {
+								required: "Price is required",
+								valueAsNumber: true,
+							})}
+							className="w-full rounded-lg border border-slate-300 px-3 py-2"
+							placeholder="Enter price or budget"
+						/>
+						{errors.pricePerFrequency && (
+							<p className="text-sm text-red-500">
+								{String(errors.pricePerFrequency?.message)}
+							</p>
+						)}
+					</div>
+
+					<div>
+						<label className="mb-1 block font-medium">Duration</label>
+						<select
+							{...register("frequency", {
+								required: "Duration is required",
+							})}
+							className="w-full rounded-lg border border-slate-300 px-3 py-2"
+						>
+							<option value="">Select duration</option>
+							<option value="day">Per Day</option>
+							<option value="week">Per Week</option>
+							<option value="month">Per Month</option>
+							<option value="year">Per Year</option>
+						</select>
+						{errors.frequency && (
+							<p className="text-sm text-red-500">
+								{String(errors.frequency?.message)}
+							</p>
+						)}
+					</div>
 				</div>
 
-				<div className="flex-1">
-					<label className="block font-medium mb-1">Duration</label>
-					<select
-						{...register("frequency", {
-							required: "Duration is required",
-						})}
-						className="w-full border rounded px-3 py-2"
-					>
-						<option value="">Select duration</option>
-						<option value="day">Per Day</option>
-						<option value="week">Per Week</option>
-						<option value="month">Per Month</option>
-						<option value="year">Per Year</option>
-					</select>
-					{errors.frequency && (
-						<p className="text-sm text-red-500">
-							{String(errors.frequency?.message)}
-						</p>
-					)}
+				{/* Available for duration fields */}
+				<div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
+					<div>
+						<label className="mb-1 block font-medium">
+							Available For Duration
+						</label>
+						<input
+							type="number"
+							{...register("availableForDuration", {
+								valueAsNumber: true,
+								required: "Available For Duration is required",
+							})}
+							className="w-full rounded-lg border border-slate-300 px-3 py-2"
+							placeholder="e.g., 6"
+						/>
+						{errors.availableForDuration && (
+							<p className="text-sm text-red-500">
+								{String(errors.availableForDuration?.message)}
+							</p>
+						)}
+					</div>
+					<div>
+						<label className="mb-1 block font-medium">Duration Unit</label>
+						<select
+							{...register("availableForDurationUnit", {
+								required: "Duration Unit is required",
+							})}
+							className="w-full rounded-lg border border-slate-300 px-3 py-2"
+						>
+							<option value="">Select unit</option>
+							<option value="day">Days</option>
+							<option value="week">Weeks</option>
+							<option value="month">Months</option>
+							<option value="year">Years</option>
+						</select>
+						{errors.availableForDurationUnit && (
+							<p className="text-sm text-red-500">
+								{String(errors.availableForDurationUnit?.message)}
+							</p>
+						)}
+					</div>
 				</div>
-			</div>
-
-			{/* Available for duration fields */}
-			<div className="flex flex-col sm:flex-row gap-4">
-				<div className="flex-1">
-					<label className="block font-medium mb-1">
-						Available For Duration
-					</label>
-					<input
-						type="number"
-						{...register("availableForDuration", {
-							valueAsNumber: true,
-							required: "Available For Duration is required",
-						})}
-						className="w-full border rounded px-3 py-2"
-						placeholder="e.g., 6"
-					/>
-					{errors.availableForDuration && (
-						<p className="text-red-500 text-sm">
-							{String(errors.availableForDuration?.message)}
-						</p>
-					)}
-				</div>
-				<div className="flex-1">
-					<label className="block font-medium mb-1">Duration Unit</label>
-					<select
-						{...register("availableForDurationUnit", {
-							required: "Duration Unit is required",
-						})}
-						className="w-full border rounded px-3 py-2"
-					>
-						<option value="">Select unit</option>
-						<option value="day">Days</option>
-						<option value="week">Weeks</option>
-						<option value="month">Months</option>
-						<option value="year">Years</option>
-					</select>
-					{errors.availableForDurationUnit && (
-						<p className="text-red-500 text-sm">
-							{String(errors.availableForDurationUnit?.message)}
-						</p>
-					)}
-				</div>
-			</div>
+			</section>
 		</div>
 	);
 };

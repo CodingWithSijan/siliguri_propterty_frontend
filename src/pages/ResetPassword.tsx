@@ -4,6 +4,28 @@ import { FaLock, FaKey } from "react-icons/fa";
 import BASE_URL from "../services";
 import { showError, showSuccess } from "../utils/toastUtils";
 
+const getErrorMessage = (error: unknown): string => {
+	if (
+		typeof error === "object" &&
+		error !== null &&
+		"response" in error &&
+		typeof (error as { response?: unknown }).response === "object" &&
+		(error as { response?: { data?: unknown } }).response !== null
+	) {
+		const response = (error as { response: { data?: { message?: unknown } } })
+			.response;
+		if (typeof response.data?.message === "string") {
+			return response.data.message;
+		}
+	}
+
+	if (error instanceof Error) {
+		return error.message;
+	}
+
+	return "Failed to reset password.";
+};
+
 const ResetPassword: React.FC = () => {
 	const navigate = useNavigate();
 	const [password, setPassword] = useState("");
@@ -40,9 +62,10 @@ const ResetPassword: React.FC = () => {
 			setSuccess("Password reset successful! Redirecting to login...");
 			showSuccess("Password reset successful!");
 			setTimeout(() => navigate("/login"), 2000);
-		} catch (err: any) {
-			setError(err.response?.data?.message || "Failed to reset password.");
-			showError(err.response?.data?.message || "Failed to reset password.");
+		} catch (error: unknown) {
+			const message = getErrorMessage(error);
+			setError(message);
+			showError(message);
 		} finally {
 			setLoading(false);
 		}

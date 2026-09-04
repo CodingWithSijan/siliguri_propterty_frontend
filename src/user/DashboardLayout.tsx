@@ -1,121 +1,134 @@
 import React, { useState } from "react";
 import Sidebar from "./Sidebar";
 import { Bars3Icon } from "@heroicons/react/24/outline";
-import ProtectedRoute from "../route/ProtectedRoute";
 import { AnimatePresence } from "framer-motion";
-import { Outlet } from "react-router-dom";
-import { motion } from "framer-motion";
-import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch, RootState } from "../app/store";
-import { getInitials } from "../utils/getInitial";
-import { formatFullName } from "../utils/capitalizeName";
-import {
-	DropdownMenu,
-	DropdownMenuContent,
-	DropdownMenuItem,
-	DropdownMenuLabel,
-	DropdownMenuSeparator,
-	DropdownMenuTrigger,
-} from "../components/ui/dropdown-menu";
-import { FiLogOut } from "react-icons/fi";
+import { Outlet, useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "../app/store";
+import { LogOut, UserRound } from "lucide-react";
 import { logout } from "../app/slices/authSlice";
+import NotificationBell from "../components/common/NotificationBell";
+import {
+	AlertDialog,
+	AlertDialogContent,
+	AlertDialogDescription,
+	AlertDialogFooter,
+	AlertDialogHeader,
+	AlertDialogTitle,
+} from "../components/ui/alert-dialog";
+import { Button } from "../components/ui/button";
 
 const DashboardLayout: React.FC = () => {
-	const [activeMenu, setActiveMenu] = useState("Your Profile");
+	const [activeMenu, setActiveMenu] = useState("Profile");
 	const [sidebarOpen, setSidebarOpen] = useState(false);
-	const { user } = useSelector((state: RootState) => state.auth);
+	const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+	const navigate = useNavigate();
 	const dispatch = useDispatch<AppDispatch>();
+
+	const handleLogout = () => {
+		dispatch(logout());
+		setSidebarOpen(false);
+	};
+
 	return (
-		<div className="flex flex-col h-screen bg-background">
-			{/* Fixed Mobile Top Bar */}
-			<div className="md:hidden fixed top-0 left-0 right-0 bg-card border-b border-border shadow-sm z-50 flex items-center justify-between px-4 py-3">
-				<button
-					onClick={() => setSidebarOpen(!sidebarOpen)}
-					className="p-2 bg-primary text-primary-foreground rounded-lg shadow-sm hover:bg-primary/90 transition-all flex items-center space-x-2"
-					aria-label="Toggle menu"
-				>
-					<Bars3Icon className="h-6 w-6" />
-					<span className="text-sm font-semibold">Menu</span>
-				</button>
-				<DropdownMenu>
-					<DropdownMenuTrigger>
-						{" "}
-						<div className="flex items-center gap-2">
-							{user?.avatar ? (
-								<img
-									className="w-8 h-8 rounded-full border-2 border-blue-500"
-									src={user.avatar}
-									alt={user.name}
-								/>
-							) : (
-								<div className="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold">
-									{getInitials(user?.name ?? "")}
-								</div>
-							)}
-							<span className="text-blue-900 font-medium">
-								{formatFullName(user?.name)}
-							</span>
-						</div>
-					</DropdownMenuTrigger>
-					<DropdownMenuContent className="w-[250px]">
-						<DropdownMenuLabel>My Account</DropdownMenuLabel>
-						<DropdownMenuSeparator />
-						<DropdownMenuItem>
-							<div className="p-2 border-t border-gray-100">
-								<motion.button
-									whileHover={{ scale: 1.02 }}
-									whileTap={{ scale: 0.98 }}
-									className="w-full flex items-center gap-3  text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-200"
-								>
-									<FiLogOut className="text-lg" />
-									<button
-										className="font-medium"
-										onClick={() => dispatch(logout())}
-									>
-										Logout
-									</button>
-								</motion.button>
-							</div>
-						</DropdownMenuItem>
-					</DropdownMenuContent>
-				</DropdownMenu>
-			</div>
-
-			<div className="flex flex-1 pt-[60px] md:pt-0 h-screen">
-				{/* Overlay */}
-				{sidebarOpen && (
-					<div
-						className="fixed inset-0 bg-black/50 backdrop-blur-sm z-30 md:hidden transition-all"
-						onClick={() => setSidebarOpen(false)}
-					></div>
-				)}
-
-				{/* Sidebar */}
-				<div
-					className={`
-						fixed md:relative md:flex flex-shrink-0 w-64 h-full z-40
-						transition-transform duration-300 ease-in-out
-						${sidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}
-					`}
-				>
-					<AnimatePresence>
-						<Sidebar
-							activeMenu={activeMenu}
-							setActiveMenu={setActiveMenu}
-							setSidebarOpen={setSidebarOpen}
-						/>
-					</AnimatePresence>
+		<div className="min-h-screen bg-slate-50">
+			<div className="flex min-h-screen">
+				<div className="hidden md:block md:w-72 md:shrink-0 md:border-r md:border-slate-200 md:bg-white">
+					<Sidebar
+						activeMenu={activeMenu}
+						setActiveMenu={setActiveMenu}
+						setSidebarOpen={setSidebarOpen}
+					/>
 				</div>
 
-				{/* Main Content */}
-				<main className="flex-1 overflow-auto bg-muted/30">
-					<ProtectedRoute allowedRoles={["user"]}>
-						<div className="h-full">
-							<Outlet />
+				<button
+					type="button"
+					onClick={() => setSidebarOpen((prev) => !prev)}
+					className="md:hidden fixed left-3 top-3 z-50 inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-700 shadow-sm"
+					aria-label="Toggle menu"
+				>
+					<Bars3Icon className="h-5 w-5" />
+				</button>
+
+				{sidebarOpen && (
+					<>
+						<div
+							className="fixed inset-0 z-40 bg-black/35 md:hidden"
+							onClick={() => setSidebarOpen(false)}
+						/>
+						<div className="fixed inset-y-0 left-0 z-50 w-72 md:hidden">
+							<AnimatePresence>
+								<Sidebar
+									activeMenu={activeMenu}
+									setActiveMenu={setActiveMenu}
+									setSidebarOpen={setSidebarOpen}
+								/>
+							</AnimatePresence>
 						</div>
-					</ProtectedRoute>
+					</>
+				)}
+
+				<main className="relative min-w-0 flex-1 overflow-y-auto">
+					<div className="fixed right-3 top-3 z-40 flex items-center gap-2 md:right-6 md:top-5 md:gap-3">
+						<div className="rounded-full border border-slate-200 bg-white/95 p-1 shadow-sm backdrop-blur">
+							<button
+								type="button"
+								onClick={() => navigate("/dashboard/your-profile")}
+								className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-white text-slate-700 transition-colors hover:bg-sky-50 hover:text-sky-700"
+								aria-label="Open profile"
+								title="Profile"
+							>
+								<UserRound className="h-4.5 w-4.5" />
+							</button>
+						</div>
+						<div className="rounded-full border border-slate-200 bg-white/95 p-1 shadow-sm backdrop-blur">
+							<NotificationBell buttonClassName="h-9 w-9 rounded-full bg-white p-2 text-slate-700 hover:bg-sky-50 hover:text-sky-700" />
+						</div>
+						<div className="rounded-full border border-rose-200 bg-white/95 p-1 shadow-sm backdrop-blur">
+							<button
+								type="button"
+								onClick={() => setShowLogoutConfirm(true)}
+								className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-white text-rose-600 transition-colors hover:bg-rose-50 hover:text-rose-700"
+								aria-label="Sign out"
+								title="Sign out"
+							>
+								<LogOut className="h-4.5 w-4.5" />
+							</button>
+						</div>
+					</div>
+
+					<div className="px-3 pb-4 pt-16 md:px-6 md:pb-6 md:pt-20">
+						<Outlet />
+					</div>
 				</main>
 			</div>
+
+			<AlertDialog open={showLogoutConfirm} onOpenChange={setShowLogoutConfirm}>
+				<AlertDialogContent>
+					<AlertDialogHeader>
+						<AlertDialogTitle>Sign out now?</AlertDialogTitle>
+						<AlertDialogDescription>
+							You will need to log in again to access your dashboard.
+						</AlertDialogDescription>
+					</AlertDialogHeader>
+					<AlertDialogFooter>
+						<Button
+							type="button"
+							variant="outline"
+							onClick={() => setShowLogoutConfirm(false)}
+						>
+							Cancel
+						</Button>
+						<Button
+							type="button"
+							onClick={handleLogout}
+							className="bg-rose-600 hover:bg-rose-700"
+						>
+							Logout
+						</Button>
+					</AlertDialogFooter>
+				</AlertDialogContent>
+			</AlertDialog>
 		</div>
 	);
 };

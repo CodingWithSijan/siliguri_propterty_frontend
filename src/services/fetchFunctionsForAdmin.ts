@@ -5,8 +5,8 @@ interface ApiResponse<T> {
 	data: T;
 	message: string;
 }
-type Role = "user" | "admin";
-type AuthProvider = "local" | "google";
+type Role = "user" | "admin" | "superadmin";
+type AuthProvider = "local" | "google" | "facebook";
 interface AnalyticsResponse {
 	message: string;
 	result: {
@@ -36,8 +36,8 @@ export interface Post {
 	_id: string;
 	title: string;
 	location: string;
-	propertyType: string;
-	postType: "rent" | "sell";
+	propertyType?: string;
+	postType?: "rent" | "sell";
 	intent: "rent" | "sell";
 	propertyCategory: "land" | "house" | "flat" | "shop";
 	approvalStatus: "approved" | "rejected" | "pending";
@@ -45,7 +45,7 @@ export interface Post {
 	updatedAt: string;
 
 	// Legacy price field (for backward compatibility)
-	price?: number;
+	price?: number | string;
 
 	// Sell post specific pricing
 	pricePerUnit?: number;
@@ -54,7 +54,7 @@ export interface Post {
 
 	// Rent post specific pricing
 	frequency?: "day" | "week" | "month" | "year";
-	pricePerFrequency?: number;
+	pricePerFrequency?: number | string;
 
 	user?: {
 		_id: string;
@@ -80,12 +80,50 @@ export const deleteUserById = async (userId: string) => {
 		throw error;
 	}
 };
+
+export const updateUserRole = async (
+	userId: string,
+	role: Role,
+): Promise<User> => {
+	const endpoint = `/api/admin/users/${userId}/role`;
+	const response = await BASE_URL.patch<ApiResponse<User>>(endpoint, { role });
+
+	if (!response.data.success) {
+		throw new Error(response.data.message || "Failed to update user role");
+	}
+
+	return response.data.data;
+};
 export const fetchAllUsers = async (): Promise<User[]> => {
 	const endpoint = `/api/admin/get-all-users`;
 	const response = await BASE_URL.get<ApiResponse<User[]>>(endpoint);
 
 	if (!response.data.success) {
 		throw new Error(response.data.message || "Failed to fetch users");
+	}
+
+	return response.data.data;
+};
+
+export const fetchAdminUsers = async (query = ""): Promise<User[]> => {
+	const endpoint = `/api/admin/admin-users${
+		query.trim() ? `?q=${encodeURIComponent(query.trim())}` : ""
+	}`;
+	const response = await BASE_URL.get<ApiResponse<User[]>>(endpoint);
+
+	if (!response.data.success) {
+		throw new Error(response.data.message || "Failed to fetch admin users");
+	}
+
+	return response.data.data;
+};
+
+export const promoteAdminByEmail = async (email: string): Promise<User> => {
+	const endpoint = `/api/admin/promote-admin-by-email`;
+	const response = await BASE_URL.post<ApiResponse<User>>(endpoint, { email });
+
+	if (!response.data.success) {
+		throw new Error(response.data.message || "Failed to promote admin");
 	}
 
 	return response.data.data;

@@ -10,6 +10,14 @@ import BooleanInput from "../reusable_input_fields/BooleanInput";
 import InputDate from "../reusable_input_fields/InputDate";
 import { useEffect } from "react";
 
+const UNIT_CONVERSION_RATES: Record<string, number> = {
+	katha: 1,
+	bigha: 20,
+	decimal: 0.8,
+	acre: 66.67,
+	"sq foot": 0.000367,
+};
+
 const StepDetailsSell = () => {
 	const {
 		register,
@@ -23,14 +31,6 @@ const StepDetailsSell = () => {
 	const landSpace = watch("availableLandSpace");
 	const landSpaceUnit = watch("availableLandSpaceUnit");
 
-	const unitConversionRates: Record<string, number> = {
-		katha: 1,
-		bigha: 20, // 1 bigha = 20 katha
-		decimal: 0.8, // 1 katha = 1.25 decimal → 1 decimal = 0.8 katha
-		acre: 66.67, // 1 acre = 66.67 katha
-		"sq foot": 0.000367, // 1 sq foot ≈ 0.000367 katha
-	};
-
 	useEffect(() => {
 		if (
 			pricePerUnit &&
@@ -40,8 +40,8 @@ const StepDetailsSell = () => {
 			!isNaN(Number(landSpace))
 		) {
 			const landSpaceNum = parseFloat(landSpace);
-			const unitRate = unitConversionRates[unit];
-			const landUnitRate = unitConversionRates[landSpaceUnit];
+			const unitRate = UNIT_CONVERSION_RATES[unit];
+			const landUnitRate = UNIT_CONVERSION_RATES[landSpaceUnit];
 
 			if (unitRate && landUnitRate) {
 				const landInPriceUnit = (landSpaceNum * landUnitRate) / unitRate;
@@ -56,13 +56,29 @@ const StepDetailsSell = () => {
 
 	return (
 		<div className="space-y-6">
+			<section className="rounded-2xl border border-slate-200 bg-slate-50/70 p-4 sm:p-5">
+				<h3 className="text-base font-semibold text-slate-900">
+					Property Specifications
+				</h3>
+				<p className="mt-1 text-sm text-slate-600">
+					Enter complete property specifications and sale pricing details.
+				</p>
+			</section>
+
 			{/* LAND FIELDS */}
 			{propertyCategory === "land" && (
-				<>
+				<section className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-5">
+					<h4 className="text-sm font-semibold uppercase tracking-[0.08em] text-slate-700">
+						Land Pricing Setup
+					</h4>
+					<p className="mt-1 text-sm text-slate-600">
+						Set the unit rate and total area to auto-calculate total price.
+					</p>
+
 					{/* Price per unit */}
-					<div className="flex flex-col sm:flex-row gap-4">
-						<div className="flex-1">
-							<label className="block font-medium mb-1">Price (per unit)</label>
+					<div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
+						<div>
+							<label className="mb-1 block font-medium">Price (per unit)</label>
 							<Input
 								type="number"
 								step="10000"
@@ -78,13 +94,13 @@ const StepDetailsSell = () => {
 								</p>
 							)}
 						</div>
-						<div className="flex-1">
-							<label className="block font-medium mb-1">Unit</label>
+						<div>
+							<label className="mb-1 block font-medium">Unit</label>
 							<select
 								{...register("unit", {
 									required: "Unit  is required",
 								})}
-								className="w-full border rounded px-3 py-2"
+								className="w-full rounded-lg border border-slate-300 px-3 py-2"
 							>
 								<option value="">Select unit</option>
 								{unitOptions.map((unit) => (
@@ -102,9 +118,9 @@ const StepDetailsSell = () => {
 					</div>
 
 					{/* Land space */}
-					<div className="flex flex-col sm:flex-row gap-4">
-						<div className="flex-1">
-							<label className="block font-medium mb-1">Total Land Space</label>
+					<div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
+						<div>
+							<label className="mb-1 block font-medium">Total Land Space</label>
 							<Input
 								type="number"
 								{...register("availableLandSpace", {
@@ -119,15 +135,15 @@ const StepDetailsSell = () => {
 								</p>
 							)}
 						</div>
-						<div className="flex-1">
-							<label className="block font-medium mb-1">
+						<div>
+							<label className="mb-1 block font-medium">
 								Total land space unit
 							</label>
 							<select
 								{...register("availableLandSpaceUnit", {
 									required: "Unit is required",
 								})}
-								className="w-full border rounded px-3 py-2"
+								className="w-full rounded-lg border border-slate-300 px-3 py-2"
 							>
 								<option value="">Select unit</option>
 								{unitOptions.map((unit) => (
@@ -145,78 +161,88 @@ const StepDetailsSell = () => {
 					</div>
 
 					{/* Total Price */}
-					<div>
-						<label className="block font-medium mb-1 ">Total Price</label>
+					<div className="mt-4">
+						<label className="mb-1 block font-medium">Total Price</label>
 						<Input
-							className="bg-gray-100 w-1/2 "
+							className="w-full bg-slate-100 sm:w-1/2"
 							readOnly
 							type="number"
 							{...register("totalPrice", { valueAsNumber: true })}
 						/>
 					</div>
-				</>
+				</section>
 			)}
 
 			{/* HOUSE or FLAT FIELDS */}
 			{(propertyCategory === "house" || propertyCategory === "flat") && (
-				<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-					<InputField label="Bedrooms" name="bedrooms" />
-					<InputField label="Bathrooms" name="bathrooms" />
-					{propertyCategory === "house" && (
-						<InputField label="Floor" name="floor" />
-					)}
-					<InputField label="Built Up Area" name="builtUpArea" />
-					<BooleanInput label="Attached Bathroom" name="attachedBathroom" />
-					<BooleanInput label="Parking available" name="parking" />
-					<SelectFurnishing />
-					<div>
-						<label htmlFor="price" className="block font-medium mb-1">
-							Price
-						</label>
-						<Input
-							type="number"
-							step="100"
-							{...register("price", {
-								required: "Price is requried",
-								valueAsNumber: true,
-							})}
-						/>
-						{errors.price && (
-							<p className="text-red-500 text-sm">
-								{String(errors.price.message)}
-							</p>
+				<section className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-5">
+					<h4 className="text-sm font-semibold uppercase tracking-[0.08em] text-slate-700">
+						Residential Details
+					</h4>
+					<div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
+						<InputField label="Bedrooms" name="bedrooms" />
+						<InputField label="Bathrooms" name="bathrooms" />
+						{propertyCategory === "house" && (
+							<InputField label="Floor" name="floor" />
 						)}
+						<InputField label="Built Up Area" name="builtUpArea" />
+						<BooleanInput label="Attached Bathroom" name="attachedBathroom" />
+						<BooleanInput label="Parking available" name="parking" />
+						<SelectFurnishing />
+						<div>
+							<label htmlFor="price" className="block font-medium mb-1">
+								Price
+							</label>
+							<Input
+								type="number"
+								step="100"
+								{...register("price", {
+									required: "Price is requried",
+									valueAsNumber: true,
+								})}
+							/>
+							{errors.price && (
+								<p className="text-red-500 text-sm">
+									{String(errors.price.message)}
+								</p>
+							)}
+						</div>
+						<InputDate label="Available From" name="availableFrom" />
 					</div>
-					<InputDate label="Available From" name="availableFrom" />
-				</div>
+				</section>
 			)}
 
 			{/* SHOP FIELDS */}
 			{propertyCategory === "shop" && (
-				<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-					<InputField label="Shop Area (in sq foot)" name="shopArea" />
-					<BooleanInput label="Has Shutter" name="hasShutter" />
-					<SelectFurnishing />
-					<InputDate label="Available From" name="availableFrom" />
-					<div>
-						<label htmlFor="price" className="block font-medium mb-1">
-							Price (in INR)
-						</label>
-						<Input
-							type="number"
-							step="100"
-							{...register("price", {
-								required: "Price is requried",
-								valueAsNumber: true,
-							})}
-						/>
-						{errors.price && (
-							<p className="text-red-500 text-sm">
-								{String(errors.price.message)}
-							</p>
-						)}
+				<section className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-5">
+					<h4 className="text-sm font-semibold uppercase tracking-[0.08em] text-slate-700">
+						Commercial Details
+					</h4>
+					<div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
+						<InputField label="Shop Area (in sq foot)" name="shopArea" />
+						<BooleanInput label="Has Shutter" name="hasShutter" />
+						<SelectFurnishing />
+						<InputDate label="Available From" name="availableFrom" />
+						<div>
+							<label htmlFor="price" className="block font-medium mb-1">
+								Price (in INR)
+							</label>
+							<Input
+								type="number"
+								step="100"
+								{...register("price", {
+									required: "Price is requried",
+									valueAsNumber: true,
+								})}
+							/>
+							{errors.price && (
+								<p className="text-red-500 text-sm">
+									{String(errors.price.message)}
+								</p>
+							)}
+						</div>
 					</div>
-				</div>
+				</section>
 			)}
 		</div>
 	);

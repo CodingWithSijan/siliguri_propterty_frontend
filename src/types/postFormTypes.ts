@@ -16,13 +16,16 @@ export interface BasePostFormInputs {
 	title: string;
 	description: string;
 	location: string;
+	wbLocalityKey?: string;
+	wbLocalityLabel?: string;
 	coordinates?: {
 		type: "Point";
 		coordinates: [number, number];
 	};
 	alternateLocation?: string;
 	propertyCategory: PropertyCategory;
-	pictures?: FileList;
+	pictures?: File[];
+	videos?: File[];
 	availableFrom?: string; // ISO date string
 }
 

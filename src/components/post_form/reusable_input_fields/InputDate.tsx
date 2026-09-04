@@ -11,13 +11,21 @@ const InputDate = ({ label, name }: { label: string; name: string }) => {
 	} = useFormContext();
 	return (
 		<div>
-			<label className="block font-medium mb-1">{label}</label>
+			<label className="mb-1 block text-sm font-medium text-slate-800">
+				{label}
+			</label>
 			<Input
 				type="date"
 				{...register(name, { required: "Available From date is required" })}
+				className="border-slate-300 focus-visible:ring-slate-400"
 			/>
+			<p className="mt-1 text-xs text-slate-500">
+				Use the expected possession or move-in date.
+			</p>
 			{errors[name] && (
-				<p className="text-sm text-red-500">{String(errors[name]?.message)}</p>
+				<p className="mt-1 text-sm text-red-500">
+					{String(errors[name]?.message)}
+				</p>
 			)}
 		</div>
 	);

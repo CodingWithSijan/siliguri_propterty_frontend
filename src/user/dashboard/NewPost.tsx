@@ -15,6 +15,9 @@ export default function NewPost() {
 
 	const handleDialogOpenChange = (open: boolean) => {
 		setDialogOpen(open);
+		if (!open) {
+			navigate("/dashboard/your-profile", { replace: true });
+		}
 	};
 
 	return (

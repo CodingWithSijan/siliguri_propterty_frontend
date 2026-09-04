@@ -14,6 +14,13 @@ import { useNavigate } from "react-router-dom";
 const capitalize = (str: string | undefined) =>
 	str ? str.charAt(0).toUpperCase() + str.slice(1) : "";
 
+const isImageUrl = (url: string): boolean => {
+	const lower = url.toLowerCase();
+	if (lower.includes("/image/upload/")) return true;
+	if (lower.includes("/video/upload/")) return false;
+	return /\.(jpg|jpeg|png|webp|gif|avif)(\?|$)/i.test(lower);
+};
+
 const SellListingCard: React.FC<{
 	listing: ISellListingType;
 	onClick?: () => void;
@@ -42,6 +49,16 @@ const SellListingCard: React.FC<{
 		}
 	};
 	const postedAgoText = getDaysAgoTextFromObjectId(listing._id);
+	const thumbnail = listing.pictures?.find((url) => isImageUrl(url));
+	const localityText =
+		listing.wbLocalityLabel?.trim() || listing.location?.trim() || "";
+	const exactAddressText = listing.alternateLocation?.trim() || "";
+	const locationText =
+		localityText &&
+		exactAddressText &&
+		localityText.toLowerCase() !== exactAddressText.toLowerCase()
+			? `${localityText} | ${exactAddressText}`
+			: localityText || exactAddressText || "Location not provided";
 
 	return (
 		<motion.div
@@ -86,7 +103,7 @@ const SellListingCard: React.FC<{
 			{/* Image */}
 			<div className="w-full overflow-hidden relative" style={{ height: 240 }}>
 				<img
-					src={listing.pictures?.[0] || propertyImagePlaceholder}
+					src={thumbnail || propertyImagePlaceholder}
 					alt={listing.title}
 					className="w-full h-full object-cover mx-auto"
 				/>
@@ -123,7 +140,7 @@ const SellListingCard: React.FC<{
 				{/* Location */}
 				<div className="flex items-center gap-2 text-xs text-gray-600">
 					<FaMapMarkerAlt className="text-blue-500 text-sm" />
-					<span className="text-sm truncate">{listing.alternateLocation}</span>
+					<span className="text-sm truncate">{locationText}</span>
 				</div>
 
 				{/* Price moved below location */}

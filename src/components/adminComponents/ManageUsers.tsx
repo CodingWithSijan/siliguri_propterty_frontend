@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
+import type { ComponentType } from "react";
 import {
 	Table,
 	TableBody,
@@ -44,34 +45,62 @@ import {
 	deleteUserById,
 	fetchAllUsers,
 	fetchUsersByVerification,
+	updateUserRole,
+	User,
 } from "../../services/fetchFunctionsForAdmin";
 import { useNavigate } from "react-router-dom";
 import { showError, showSuccess } from "../../utils/toastUtils";
 import { getInitials } from "../../utils/getInitial";
+import { useSelector } from "react-redux";
+import { RootState } from "../../app/store";
+
+interface StatsCardProps {
+	title: string;
+	value: number;
+	icon: ComponentType<{ className?: string }>;
+	color: "blue" | "green" | "red";
+}
+
+const STATS_CARD_STYLES: Record<
+	StatsCardProps["color"],
+	{ bg: string; text: string }
+> = {
+	blue: { bg: "bg-blue-100", text: "text-blue-600" },
+	green: { bg: "bg-green-100", text: "text-green-600" },
+	red: { bg: "bg-red-100", text: "text-red-600" },
+};
 
 const ManageUsers = () => {
 	const [isDeleting, setIsDeleting] = useState(false);
+	const [roleActionUserId, setRoleActionUserId] = useState<string | null>(null);
 	const [userToDelete, setUserToDelete] = useState<string | null>(null);
 	const [selectedStatus, setSelectedStatus] = useState("all");
+	const [displayUsers, setDisplayUsers] = useState<User[]>([]);
+	const currentUser = useSelector((state: RootState) => state.auth.user);
+	const isSuperAdmin = currentUser?.role === "superadmin";
+	const fetchUsersBySelectedStatus = useCallback(() => {
+		return selectedStatus === "all"
+			? fetchAllUsers()
+			: fetchUsersByVerification(selectedStatus === "verified");
+	}, [selectedStatus]);
+
 	const {
 		data: users,
 		loading: isLoadingUsers,
 		refetch: refetchUsers,
-	} = useFetch(
-		() =>
-			selectedStatus === "all"
-				? fetchAllUsers()
-				: fetchUsersByVerification(selectedStatus === "verified"),
-		false,
-	);
+	} = useFetch<User[]>(fetchUsersBySelectedStatus, false);
 
-	const verifiedUsers = users?.filter((u) => u.isVerified)?.length || 0;
-	const unverifiedUsers = users?.filter((u) => !u.isVerified)?.length || 0;
+	const verifiedUsers = displayUsers.filter((u) => u.isVerified).length;
+	const unverifiedUsers = displayUsers.filter((u) => !u.isVerified).length;
 	const navigate = useNavigate();
 
 	useEffect(() => {
 		refetchUsers();
-	}, [selectedStatus]);
+	}, [selectedStatus, refetchUsers]);
+
+	useEffect(() => {
+		setDisplayUsers(users ?? []);
+	}, [users]);
 
 	const handleStatusChange = (value: string) => setSelectedStatus(value);
 
@@ -86,9 +115,8 @@ const ManageUsers = () => {
 			setIsDeleting(true);
 			await deleteUserById(userToDelete);
 			showSuccess("User Deleted");
+			setDisplayUsers((prev) => prev.filter((u) => u._id !== userToDelete));
 			setUserToDelete(null);
-			// Refresh the users list after deletion
-			await refetchUsers();
 		} catch (error) {
 			showError(
 				error instanceof Error ? error.message : "Failed to delete user",
@@ -97,23 +125,49 @@ const ManageUsers = () => {
 			setIsDeleting(false);
 		}
 	};
-	const StatsCard = ({ title, value, icon: Icon, color }: any) => (
-		<Card className="hover:border-primary/50 transition-colors">
-			<CardHeader className="flex justify-between items-center pb-2">
-				<CardTitle className="text-sm text-muted-foreground">{title}</CardTitle>
-				<div className={`p-2 rounded-full bg-${color}/10`}>
-					<Icon className={`w-4 h-4 text-${color}`} />
-				</div>
-			</CardHeader>
-			<CardContent>
-				{isLoadingUsers ? (
-					<Skeleton className="h-9 w-20" />
-				) : (
-					<div className="text-3xl font-bold">{value}</div>
-				)}
-			</CardContent>
-		</Card>
-	);
+
+	const handleRoleUpdate = async (
+		targetUserId: string,
+		targetRole: "user" | "admin" | "superadmin",
+	) => {
+		try {
+			setRoleActionUserId(targetUserId);
+			const updatedUser = await updateUserRole(targetUserId, targetRole);
+			setDisplayUsers((prev) =>
+				prev.map((user) => (user._id === targetUserId ? updatedUser : user)),
+			);
+			showSuccess(`Role updated to ${targetRole}`);
+		} catch (error) {
+			showError(
+				error instanceof Error ? error.message : "Failed to update role",
+			);
+		} finally {
+			setRoleActionUserId(null);
+		}
+	};
+	const StatsCard = ({ title, value, icon: Icon, color }: StatsCardProps) => {
+		const style = STATS_CARD_STYLES[color];
+
+		return (
+			<Card className="hover:border-primary/50 transition-colors">
+				<CardHeader className="flex justify-between items-center pb-2">
+					<CardTitle className="text-sm text-muted-foreground">
+						{title}
+					</CardTitle>
+					<div className={`p-2 rounded-full ${style.bg}`}>
+						<Icon className={`w-4 h-4 ${style.text}`} />
+					</div>
+				</CardHeader>
+				<CardContent>
+					{isLoadingUsers ? (
+						<Skeleton className="h-9 w-20" />
+					) : (
+						<div className="text-3xl font-bold">{value}</div>
+					)}
+				</CardContent>
+			</Card>
+		);
+	};
 
 	return (
 		<>
@@ -154,21 +208,21 @@ const ManageUsers = () => {
 					<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
 						<StatsCard
 							title="Total Users"
-							value={users?.length || 0}
+							value={displayUsers.length}
 							icon={Users}
-							color="blue-500"
+							color="blue"
 						/>
 						<StatsCard
 							title="Verified Users"
 							value={verifiedUsers}
 							icon={ShieldCheck}
-							color="green-500"
+							color="green"
 						/>
 						<StatsCard
 							title="Unverified Users"
 							value={unverifiedUsers}
 							icon={ShieldX}
-							color="red-500"
+							color="red"
 						/>
 					</div>
 
@@ -216,7 +270,7 @@ const ManageUsers = () => {
 												<Skeleton className="h-4 w-full" />
 											</TableCell>
 										</TableRow>
-									) : !users?.length ? (
+									) : !displayUsers?.length ? (
 										<TableRow>
 											<TableCell colSpan={8} className="text-center py-10">
 												<div className="flex flex-col items-center gap-2 text-muted-foreground">
@@ -226,7 +280,7 @@ const ManageUsers = () => {
 											</TableCell>
 										</TableRow>
 									) : (
-										users.map((user) => (
+										displayUsers.map((user) => (
 											<TableRow key={user._id}>
 												<TableCell className="hidden sm:table-cell">
 													{user.avatar ? (
@@ -289,7 +343,35 @@ const ManageUsers = () => {
 															</DropdownMenuItem>
 															<DropdownMenuItem
 																onClick={() =>
-																	console.log("Reset password", user._id)
+																	navigate(
+																		`/admin/messages?userId=${user?._id}`,
+																	)
+																}
+															>
+																Message User
+															</DropdownMenuItem>
+															{isSuperAdmin && user._id !== currentUser?.id && (
+																<DropdownMenuItem
+																	disabled={roleActionUserId === user._id}
+																	onClick={() =>
+																		handleRoleUpdate(
+																			user._id,
+																			user.role === "admin" ? "user" : "admin",
+																		)
+																	}
+																>
+																	{roleActionUserId === user._id
+																		? "Updating role..."
+																		: user.role === "admin"
+																			? "Demote to User"
+																			: "Promote to Admin"}
+																</DropdownMenuItem>
+															)}
+															<DropdownMenuItem
+																onClick={() =>
+																	showError(
+																		"Reset password is not available yet",
+																	)
 																}
 															>
 																Reset Password
@@ -301,7 +383,9 @@ const ManageUsers = () => {
 																Delete User
 															</DropdownMenuItem>
 															<DropdownMenuItem
-																onClick={() => console.log("Ban", user._id)}
+																onClick={() =>
+																	showError("Ban user is not available yet")
+																}
 																className="text-red-600"
 															>
 																Ban User

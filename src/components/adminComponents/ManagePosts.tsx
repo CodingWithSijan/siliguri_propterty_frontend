@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import {
 	Table,
@@ -54,26 +54,31 @@ const ManagePosts = () => {
 	const navigate = useNavigate();
 	const [selectedStatus, setSelectedStatus] = useState<string>("all");
 	const [isActionLoading, setIsActionLoading] = useState<string | null>(null);
+	const [displayPosts, setDisplayPosts] = useState<Post[]>([]);
+	const fetchPostsBySelectedStatus = useCallback(() => {
+		return selectedStatus === "all"
+			? fetchAllPosts()
+			: fetchPostsByStatus(selectedStatus);
+	}, [selectedStatus]);
+
+	const fetchAnalyticsData = useCallback(() => fetchAnalytics(), []);
 
 	const {
 		data: posts,
 		loading: isLoadingPosts,
 		refetch: refetchPosts,
-	} = useFetch(
-		() =>
-			selectedStatus === "all"
-				? fetchAllPosts()
-				: fetchPostsByStatus(selectedStatus),
-		false,
-	);
+	} = useFetch(fetchPostsBySelectedStatus, false);
 
-	const { data: analytics, loading: isLoadingAnalytics } = useFetch(() =>
-		fetchAnalytics(),
-	);
+	const { data: analytics, loading: isLoadingAnalytics } =
+		useFetch(fetchAnalyticsData);
 
 	useEffect(() => {
 		refetchPosts();
-	}, [selectedStatus]);
+	}, [selectedStatus, refetchPosts]);
+
+	useEffect(() => {
+		setDisplayPosts(posts ?? []);
+	}, [posts]);
 
 	const handleStatusChange = (value: string) => setSelectedStatus(value);
 
@@ -101,7 +106,11 @@ const ManagePosts = () => {
 		try {
 			setIsActionLoading(postId);
 			await approvePost(postId);
-			await refetchPosts();
+			setDisplayPosts((prev) =>
+				prev.map((post) =>
+					post._id === postId ? { ...post, approvalStatus: "approved" } : post,
+				),
+			);
 		} catch (err) {
 			console.error("Error approving:", err);
 		} finally {
@@ -113,7 +122,11 @@ const ManagePosts = () => {
 		try {
 			setIsActionLoading(postId);
 			await rejectPost(postId);
-			await refetchPosts();
+			setDisplayPosts((prev) =>
+				prev.map((post) =>
+					post._id === postId ? { ...post, approvalStatus: "rejected" } : post,
+				),
+			);
 		} catch (err) {
 			console.error("Error rejecting:", err);
 		} finally {
@@ -125,7 +138,7 @@ const ManagePosts = () => {
 		try {
 			setIsActionLoading(postId);
 			await deletePost(postId);
-			await refetchPosts();
+			setDisplayPosts((prev) => prev.filter((post) => post._id !== postId));
 		} catch (err) {
 			console.error("Error deleting:", err);
 		} finally {
@@ -139,6 +152,8 @@ const ManagePosts = () => {
 		if (isRent) {
 			// For rent posts
 			if (post.pricePerFrequency && post.frequency) {
+				const rentPrice = Number(post.pricePerFrequency);
+				if (Number.isNaN(rentPrice)) return "Price not set";
 				const frequencyText =
 					post.frequency === "day"
 						? "day"
@@ -147,12 +162,16 @@ const ManagePosts = () => {
 							: post.frequency === "month"
 								? "month"
 								: "year";
-				return `₹${post.pricePerFrequency.toLocaleString()}/${frequencyText}`;
+				return `₹${rentPrice.toLocaleString()}/${frequencyText}`;
 			}
 			// Fallback to legacy price field
-			return post.price
-				? `₹${post.price.toLocaleString()}/month`
-				: "Price not set";
+			if (post.price !== undefined) {
+				const legacyRentPrice = Number(post.price);
+				if (!Number.isNaN(legacyRentPrice)) {
+					return `₹${legacyRentPrice.toLocaleString()}/month`;
+				}
+			}
+			return "Price not set";
 		} else {
 			// For sell posts
 			if (post.totalPrice) {
@@ -162,7 +181,13 @@ const ManagePosts = () => {
 				return `₹${post.pricePerUnit.toLocaleString()}/${post.unit}`;
 			}
 			// Fallback to legacy price field
-			return post.price ? `₹${post.price.toLocaleString()}` : "Price not set";
+			if (post.price !== undefined) {
+				const legacySellPrice = Number(post.price);
+				if (!Number.isNaN(legacySellPrice)) {
+					return `₹${legacySellPrice.toLocaleString()}`;
+				}
+			}
+			return "Price not set";
 		}
 	};
 
@@ -184,6 +209,10 @@ const ManagePosts = () => {
 		return `₹${num.toLocaleString()}`;
 	};
 
+	const formatPropertyType = (post: Post): string => {
+		return post.propertyType || post.propertyCategory || "N/A";
+	};
+
 	const getUserInitials = (name?: string) => {
 		if (!name) return "U";
 		return name
@@ -192,6 +221,19 @@ const ManagePosts = () => {
 			.join("")
 			.toUpperCase()
 			.slice(0, 2);
+	};
+
+	const STATS_CARD_COLOR_STYLE: Record<
+		string,
+		{ bgClass: string; iconClass: string }
+	> = {
+		"text-blue-500": { bgClass: "bg-blue-100", iconClass: "text-blue-500" },
+		"text-green-500": { bgClass: "bg-green-100", iconClass: "text-green-500" },
+		"text-red-500": { bgClass: "bg-red-100", iconClass: "text-red-500" },
+		"text-yellow-500": {
+			bgClass: "bg-yellow-100",
+			iconClass: "text-yellow-500",
+		},
 	};
 
 	const StatsCard = ({
@@ -204,23 +246,30 @@ const ManagePosts = () => {
 		value: number;
 		icon: React.ElementType;
 		color: string;
-	}) => (
-		<Card className="hover:border-primary/50 transition-colors">
-			<CardHeader className="flex justify-between items-center pb-2">
-				<CardTitle className="text-sm text-muted-foreground">{title}</CardTitle>
-				<div className={`p-2 rounded-full bg-${color.replace("text-", "")}/10`}>
-					<Icon className={`w-4 h-4 ${color}`} />
-				</div>
-			</CardHeader>
-			<CardContent>
-				{isLoadingAnalytics ? (
-					<Skeleton className="h-9 w-20" />
-				) : (
-					<div className="text-3xl font-bold">{value}</div>
-				)}
-			</CardContent>
-		</Card>
-	);
+	}) => {
+		const colorStyle =
+			STATS_CARD_COLOR_STYLE[color] ?? STATS_CARD_COLOR_STYLE["text-blue-500"];
+
+		return (
+			<Card className="hover:border-primary/50 transition-colors">
+				<CardHeader className="flex justify-between items-center pb-2">
+					<CardTitle className="text-sm text-muted-foreground">
+						{title}
+					</CardTitle>
+					<div className={`p-2 rounded-full ${colorStyle.bgClass}`}>
+						<Icon className={`w-4 h-4 ${colorStyle.iconClass}`} />
+					</div>
+				</CardHeader>
+				<CardContent>
+					{isLoadingAnalytics ? (
+						<Skeleton className="h-9 w-20" />
+					) : (
+						<div className="text-3xl font-bold">{value}</div>
+					)}
+				</CardContent>
+			</Card>
+		);
+	};
 
 	return (
 		<div className="h-[calc(100vh-2rem)] overflow-auto">
@@ -296,7 +345,7 @@ const ManagePosts = () => {
 											<Skeleton className="h-4 w-full" />
 										</TableCell>
 									</TableRow>
-								) : !posts?.length ? (
+								) : !displayPosts?.length ? (
 									<TableRow>
 										<TableCell colSpan={7} className="text-center py-10">
 											<div className="flex flex-col items-center gap-2 text-muted-foreground">
@@ -306,7 +355,7 @@ const ManagePosts = () => {
 										</TableCell>
 									</TableRow>
 								) : (
-									posts.map((post: Post) => (
+									displayPosts.map((post: Post) => (
 										<TableRow key={post._id}>
 											<TableCell className="break-words whitespace-normal">
 												<div className="space-y-1">
@@ -372,7 +421,9 @@ const ManagePosts = () => {
 														)}
 													<div className="text-sm text-muted-foreground flex items-center gap-1">
 														<Building2 className="h-3 w-3" />
-														<Badge variant="outline">{post.propertyType}</Badge>
+														<Badge variant="outline" className="capitalize">
+															{formatPropertyType(post)}
+														</Badge>
 													</div>
 												</div>
 											</TableCell>
@@ -471,7 +522,6 @@ const ManagePosts = () => {
 														>
 															Reject
 														</DropdownMenuItem>
-														<br />
 														<DropdownMenuItem
 															disabled={isActionLoading === post._id}
 															onClick={() => handleDeletePost(post._id)}

@@ -20,7 +20,7 @@ const PropertyStatsSection: React.FC = () => {
 				"Find your ideal property with our intuitive search filters and detailed listings",
 		},
 		{
-			icon: <FaBullhorn className="text-3xl text-purple-600" />,
+			icon: <FaBullhorn className="text-3xl text-cyan-700" />,
 			title: "Free Property Listing",
 			description:
 				"List your property for free and reach genuine buyers and renters in Siliguri",
@@ -32,7 +32,7 @@ const PropertyStatsSection: React.FC = () => {
 				"Your data and property information are protected with modern security measures",
 		},
 		{
-			icon: <FaClock className="text-3xl text-orange-500" />,
+			icon: <FaClock className="text-3xl text-amber-600" />,
 			title: "Quick Response",
 			description:
 				"Connect directly with property owners and get quick responses to your inquiries",
@@ -44,7 +44,7 @@ const PropertyStatsSection: React.FC = () => {
 				"No middleman fees - connect directly with property owners for transparent deals",
 		},
 		{
-			icon: <FaHome className="text-3xl text-purple-600" />,
+			icon: <FaHome className="text-3xl text-cyan-700" />,
 			title: "Local Focus",
 			description:
 				"Specialized in Siliguri properties with local market knowledge and insights",
@@ -52,7 +52,7 @@ const PropertyStatsSection: React.FC = () => {
 	];
 
 	return (
-		<section className="py-16 bg-gradient-to-br from-blue-50 via-white to-purple-50">
+		<section className="py-16 bg-gradient-to-br from-cyan-50 via-white to-slate-100">
 			<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 				{/* Header */}
 				<motion.div
@@ -63,7 +63,7 @@ const PropertyStatsSection: React.FC = () => {
 				>
 					<h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
 						Your{" "}
-						<span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+						<span className="bg-gradient-to-r from-blue-700 to-cyan-700 bg-clip-text text-transparent">
 							Property Platform
 						</span>
 					</h2>
@@ -120,7 +120,7 @@ const PropertyStatsSection: React.FC = () => {
 							<motion.button
 								whileHover={{ scale: 1.05 }}
 								whileTap={{ scale: 0.95 }}
-								className="inline-flex items-center gap-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-4 rounded-2xl font-semibold hover:shadow-xl transition-all duration-300"
+								className="inline-flex items-center gap-3 bg-gradient-to-r from-blue-700 to-cyan-700 text-white px-8 py-4 rounded-2xl font-semibold hover:shadow-xl transition-all duration-300"
 								onClick={() => navigate("/properties")}
 							>
 								<FaSearch className="text-lg" />

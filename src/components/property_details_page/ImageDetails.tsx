@@ -1,26 +1,35 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
-	FaTimes,
-	FaChevronLeft,
-	FaChevronRight,
-	FaExpand,
-} from "react-icons/fa";
+	ChevronLeft,
+	ChevronRight,
+	Expand,
+	Maximize2,
+	Minimize2,
+	X,
+	ZoomIn,
+	ZoomOut,
+} from "lucide-react";
 import propertyImagePlaceholder from "../../assets/looking_for_rent.png";
 
 import {
 	Dialog,
 	DialogContent,
 	DialogDescription,
-	DialogHeader,
 	DialogTitle,
 	DialogTrigger,
 } from "../ui/dialog";
+
 const Image_UserDetails: React.FC<{
 	listing_images: string[] | undefined;
 	listing_title: string | "";
 }> = ({ listing_images, listing_title }) => {
 	const [currentImageIndex, setCurrentImageIndex] = useState(0);
 	const [isModalOpen, setIsModalOpen] = useState(false);
+	const [zoomLevel, setZoomLevel] = useState(1);
+	const [isImageFullscreen, setIsImageFullscreen] = useState(false);
+	const MIN_ZOOM = 1;
+	const MAX_ZOOM = 4;
+	const ZOOM_STEP = 0.25;
 
 	const images =
 		listing_images && listing_images.length > 0
@@ -29,30 +38,108 @@ const Image_UserDetails: React.FC<{
 
 	const nextImage = () => {
 		setCurrentImageIndex((prev) => (prev + 1) % images.length);
+		setZoomLevel(MIN_ZOOM);
 	};
 
 	const prevImage = () => {
 		setCurrentImageIndex((prev) => (prev - 1 + images.length) % images.length);
+		setZoomLevel(MIN_ZOOM);
 	};
 
 	const handleImageClick = (index: number) => {
 		setCurrentImageIndex(index);
+		setZoomLevel(MIN_ZOOM);
 		setIsModalOpen(true);
 	};
 
-	// Handle keyboard navigation
-	const handleKeyDown = (e: React.KeyboardEvent) => {
-		if (e.key === "ArrowRight") nextImage();
-		if (e.key === "ArrowLeft") prevImage();
-		if (e.key === "Escape") setIsModalOpen(false);
+	const closeGallery = () => {
+		setIsModalOpen(false);
+		setZoomLevel(MIN_ZOOM);
 	};
 
-	// Handle click outside image to close modal
-	const handleBackdropClick = (e: React.MouseEvent) => {
-		if (e.target === e.currentTarget) {
-			setIsModalOpen(false);
+	const zoomIn = () => {
+		setZoomLevel((prev) =>
+			Math.min(MAX_ZOOM, Number((prev + ZOOM_STEP).toFixed(2))),
+		);
+	};
+
+	const zoomOut = () => {
+		setZoomLevel((prev) =>
+			Math.max(MIN_ZOOM, Number((prev - ZOOM_STEP).toFixed(2))),
+		);
+	};
+
+	const handleWheelZoom = (event: React.WheelEvent<HTMLDivElement>) => {
+		event.preventDefault();
+		if (event.deltaY < 0) {
+			zoomIn();
+			return;
+		}
+		zoomOut();
+	};
+
+	const toggleFullscreen = async () => {
+		try {
+			if (!document.fullscreenElement) {
+				await document.documentElement.requestFullscreen();
+				return;
+			}
+			await document.exitFullscreen();
+		} catch {
+			// Ignore unsupported fullscreen requests.
 		}
 	};
+
+	useEffect(() => {
+		const onFullscreenChange = () => {
+			setIsImageFullscreen(Boolean(document.fullscreenElement));
+		};
+
+		document.addEventListener("fullscreenchange", onFullscreenChange);
+		return () => {
+			document.removeEventListener("fullscreenchange", onFullscreenChange);
+		};
+	}, []);
+
+	useEffect(() => {
+		if (!isModalOpen) {
+			return;
+		}
+
+		const onKeyDown = (event: KeyboardEvent) => {
+			if (event.key === "Escape") {
+				closeGallery();
+				return;
+			}
+
+			if (event.key === "ArrowRight") {
+				nextImage();
+				return;
+			}
+
+			if (event.key === "ArrowLeft") {
+				prevImage();
+				return;
+			}
+
+			if (event.key === "+" || event.key === "=") {
+				event.preventDefault();
+				zoomIn();
+				return;
+			}
+
+			if (event.key === "-" || event.key === "_") {
+				event.preventDefault();
+				zoomOut();
+			}
+		};
+
+		window.addEventListener("keydown", onKeyDown);
+		return () => {
+			window.removeEventListener("keydown", onKeyDown);
+		};
+	}, [isModalOpen, images.length]);
+
 	return (
 		<div className="w-full overflow-hidden border border-slate-200 bg-white">
 			{/* Listing Image */}
@@ -72,36 +159,73 @@ const Image_UserDetails: React.FC<{
 					</DialogTrigger>
 
 					<DialogContent
-						className="w-screen h-[95vh] rounded-none border-0 p-0 bg-black/95 backdrop-blur-sm sm:max-w-[85vw]"
-						onKeyDown={handleKeyDown}
-						onClick={handleBackdropClick}
+						showClose={false}
+						className="!top-0 !left-0 !right-0 !bottom-0 !h-screen !w-screen !max-w-none !translate-x-0 !translate-y-0 sm:!max-w-none rounded-none border-0 bg-[radial-gradient(circle_at_top,_rgba(30,41,59,0.95)_0%,_rgba(2,6,23,0.98)_55%)] p-2 sm:p-3"
 					>
-						{/* Header with close button and image counter */}
-						<DialogHeader className="absolute top-0 left-0 right-0 z-50 p-4 bg-gradient-to-b from-black/70 to-transparent flex-1/2">
-							<div className="flex items-center justify-between">
-								<DialogTitle className="text-white text-sm">
-									{listing_title}
-								</DialogTitle>
-								<div className="flex items-center gap-2">
-									<span className="text-white/80 text-sm">
-										{currentImageIndex + 1} / {images.length}
-									</span>
-									<button
-										onClick={() => setIsModalOpen(false)}
-										className="text-white/80 p-2 rounded-full"
-									>
-										<FaTimes className="w-5 h-5" />
-									</button>
-								</div>
-							</div>
-						</DialogHeader>
+						<DialogTitle className="sr-only">
+							Property image gallery
+						</DialogTitle>
+						<DialogDescription className="sr-only">
+							Browse listing images in fullscreen.
+						</DialogDescription>
 
-						{/* Main image display */}
-						<DialogDescription className="relative w-full h-full flex items-center justify-center">
+						<div
+							className="relative flex h-[calc(100vh-96px)] items-center justify-center overflow-hidden rounded-xl border border-white/10 bg-black/60 sm:h-[calc(100vh-120px)]"
+							onWheel={handleWheelZoom}
+						>
+							<div className="absolute right-2 top-2 z-20 flex flex-col gap-2 sm:right-3 sm:top-3">
+								<button
+									type="button"
+									onClick={zoomOut}
+									disabled={zoomLevel <= MIN_ZOOM}
+									className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/20 bg-black/35 text-white transition hover:bg-black/50 disabled:cursor-not-allowed disabled:opacity-40"
+									aria-label="Zoom out"
+								>
+									<ZoomOut className="h-4 w-4" />
+								</button>
+								<button
+									type="button"
+									onClick={zoomIn}
+									disabled={zoomLevel >= MAX_ZOOM}
+									className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/20 bg-black/35 text-white transition hover:bg-black/50 disabled:cursor-not-allowed disabled:opacity-40"
+									aria-label="Zoom in"
+								>
+									<ZoomIn className="h-4 w-4" />
+								</button>
+								<button
+									type="button"
+									onClick={() => {
+										void toggleFullscreen();
+									}}
+									className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/20 bg-black/35 text-white transition hover:bg-black/50"
+									aria-label={
+										isImageFullscreen ? "Exit fullscreen" : "Enter fullscreen"
+									}
+								>
+									{isImageFullscreen ? (
+										<Minimize2 className="h-4 w-4" />
+									) : (
+										<Maximize2 className="h-4 w-4" />
+									)}
+								</button>
+								<button
+									type="button"
+									onClick={closeGallery}
+									className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-rose-300/40 bg-rose-500/20 text-white transition hover:bg-rose-500/35"
+									aria-label="Close gallery"
+								>
+									<X className="h-4 w-4" />
+								</button>
+							</div>
+
 							<img
 								src={images[currentImageIndex]}
 								alt={`${listing_title} - Image ${currentImageIndex + 1}`}
-								className="w-[90vw] h-[90vh] object-contain select-none"
+								className="h-full w-full cursor-zoom-in select-none object-contain transition-transform duration-200 ease-out"
+								style={{ transform: `scale(${zoomLevel})` }}
+								onDoubleClick={() => {
+									setZoomLevel((prev) => (prev === MIN_ZOOM ? 2 : MIN_ZOOM));
+								}}
 								onError={(e) => {
 									const target = e.target as HTMLImageElement;
 									target.src = propertyImagePlaceholder;
@@ -112,47 +236,63 @@ const Image_UserDetails: React.FC<{
 							{images.length > 1 && (
 								<>
 									<button
+										type="button"
 										onClick={prevImage}
-										className="absolute left-4 top-1/2 -translate-y-1/2 text-white/80 bg-black/30 p-3 rounded-full backdrop-blur-sm"
+										className="absolute left-2 top-1/2 z-20 -translate-y-1/2 rounded-full bg-black/45 p-2 text-white transition hover:bg-black/65"
+										aria-label="Previous image"
 									>
-										<FaChevronLeft className="w-6 h-6" />
+										<ChevronLeft className="h-5 w-5" />
 									</button>
 									<button
+										type="button"
 										onClick={nextImage}
-										className="absolute right-4 top-1/2 -translate-y-1/2 text-white/80 bg-black/30 p-3 rounded-full backdrop-blur-sm"
+										className="absolute right-2 top-1/2 z-20 -translate-y-1/2 rounded-full bg-black/45 p-2 text-white transition hover:bg-black/65"
+										aria-label="Next image"
 									>
-										<FaChevronRight className="w-6 h-6" />
+										<ChevronRight className="h-5 w-5" />
 									</button>
 								</>
 							)}
-						</DialogDescription>
 
-						{/* Thumbnail strip at bottom */}
+							<div className="absolute bottom-3 left-3 z-20 rounded-full bg-black/45 px-3 py-1 text-xs font-medium text-white/90 backdrop-blur-sm">
+								{Math.round(zoomLevel * 100)}%
+							</div>
+						</div>
+
+						<div className="mt-2 flex items-center justify-between px-1 text-xs text-white/75">
+							<div className="truncate pr-2">{listing_title}</div>
+							<div className="shrink-0">
+								{currentImageIndex + 1} / {images.length}
+							</div>
+						</div>
+
 						{images.length > 1 && (
-							<div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/70 to-transparent">
-								<div className="flex justify-center gap-2 overflow-x-auto max-w-full">
-									{images.map((image, index) => (
-										<button
-											key={index}
-											onClick={() => setCurrentImageIndex(index)}
-											className={`flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 ${
-												index === currentImageIndex
-													? "border-white shadow-lg"
-													: "border-white/30"
-											}`}
-										>
-											<img
-												src={image}
-												alt={`Thumbnail ${index + 1}`}
-												className="w-full h-full object-cover"
-												onError={(e) => {
-													const target = e.target as HTMLImageElement;
-													target.src = propertyImagePlaceholder;
-												}}
-											/>
-										</button>
-									))}
-								</div>
+							<div className="mt-2 grid grid-cols-4 gap-2 sm:grid-cols-8">
+								{images.map((image, index) => (
+									<button
+										key={index}
+										type="button"
+										onClick={() => {
+											setCurrentImageIndex(index);
+											setZoomLevel(MIN_ZOOM);
+										}}
+										className={`overflow-hidden rounded-lg border ${
+											index === currentImageIndex
+												? "border-sky-400"
+												: "border-white/25"
+										}`}
+									>
+										<img
+											src={image}
+											alt={`Thumbnail ${index + 1}`}
+											className="h-11 w-full object-cover"
+											onError={(e) => {
+												const target = e.target as HTMLImageElement;
+												target.src = propertyImagePlaceholder;
+											}}
+										/>
+									</button>
+								))}
 							</div>
 						)}
 					</DialogContent>
@@ -161,7 +301,7 @@ const Image_UserDetails: React.FC<{
 				{/* Image count indicator for multiple images */}
 				{images.length > 1 && (
 					<div className="absolute top-3 right-3 bg-black/70 backdrop-blur-sm text-white px-3 py-1.5 rounded-full text-sm font-medium">
-						<FaExpand className="inline w-3 h-3 mr-2" />
+						<Expand className="mr-2 inline h-3 w-3" />
 						{images.length} photos
 					</div>
 				)}
@@ -169,7 +309,7 @@ const Image_UserDetails: React.FC<{
 				{/* Hover effect overlay */}
 				<div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center pointer-events-none">
 					<div className="text-center">
-						<FaExpand className="text-white w-10 h-10 mx-auto mb-3" />
+						<Expand className="mx-auto mb-3 h-10 w-10 text-white" />
 						<p className="text-white text-2xl font-semibold tracking-wide">
 							Click to view pictures
 						</p>

@@ -30,17 +30,17 @@ const PostFormBreadcrumb: React.FC<PostFormBreadcrumbProps> = ({
 	currentStep,
 }) => {
 	return (
-		<Breadcrumb className="bg-gray-100 p-2 rounded-sm mb-8">
+		<Breadcrumb className="mb-5 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 shadow-sm">
 			<BreadcrumbList>
 				{steps.map((label, index) => (
 					<React.Fragment key={index}>
 						<BreadcrumbItem className="text-black">
 							<BreadcrumbLink
 								className={cn(
-									"text-sm capitalize",
+									"text-xs capitalize sm:text-sm",
 									index === currentStep
-										? "text-blue-600 font-semibold"
-										: "text-muted-foreground"
+										? "font-semibold text-blue-600"
+										: "text-muted-foreground",
 								)}
 							>
 								{label}

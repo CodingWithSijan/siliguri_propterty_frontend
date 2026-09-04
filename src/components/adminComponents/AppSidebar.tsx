@@ -21,22 +21,21 @@ import {
 import {
 	Home,
 	Edit,
-	Settings,
 	UserPenIcon,
-	ClipboardEditIcon,
+	ChartNoAxesCombined,
+	MessageSquare,
+	Bell,
+	UserCog,
 } from "lucide-react";
 import AdminProfile from "./AdminProfile";
 
-const items = [
-	{ title: "Home", url: "/admin/home", icon: Home },
-	{ title: "Manage Posts", url: "/admin/posts", icon: Edit },
-	{ title: "Manage Users", url: "/admin/users", icon: UserPenIcon },
-	{
-		title: "Manage Pending Posts",
-		url: "/admin/pending-posts",
-		icon: ClipboardEditIcon,
-	},
-	{ title: "Settings", url: "/admin/settings", icon: Settings },
+const BASE_ITEMS = [
+	{ title: "Overview", url: "/admin/home", icon: ChartNoAxesCombined },
+	{ title: "Post Moderation", url: "/admin/posts", icon: Edit },
+	{ title: "User Management", url: "/admin/users", icon: UserPenIcon },
+	{ title: "Messages", url: "/admin/messages", icon: MessageSquare },
+	{ title: "Notifications", url: "/admin/notifications", icon: Bell },
+	{ title: "Back To Site", url: "/", icon: Home },
 ];
 interface Props {
 	activeMenu: number;
@@ -45,13 +44,26 @@ interface Props {
 const AppSidebar = ({ activeMenu, setActiveMenu }: Props) => {
 	const dispatch = useDispatch<AppDispatch>();
 	const theme = useSelector((state: RootState) => state.theme.mode);
+	const currentUser = useSelector((state: RootState) => state.auth.user);
 	const location = useLocation();
+	const isSuperAdmin = currentUser?.role === "superadmin";
+	const items = React.useMemo(
+		() =>
+			isSuperAdmin
+				? [
+						...BASE_ITEMS.slice(0, 3),
+						{ title: "Super Admin", url: "/admin/super-admin", icon: UserCog },
+						...BASE_ITEMS.slice(3),
+					]
+				: BASE_ITEMS,
+		[isSuperAdmin],
+	);
 
 	// Set active menu based on current route
 	React.useEffect(() => {
 		const idx = items.findIndex((item) => item.url === location.pathname);
 		setActiveMenu(idx === -1 ? 0 : idx);
-	}, [location.pathname, setActiveMenu]);
+	}, [items, location.pathname, setActiveMenu]);
 	// Initialize dark theme
 	React.useEffect(() => {
 		if (theme === "dark") {

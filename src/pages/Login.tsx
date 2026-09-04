@@ -17,6 +17,7 @@ import { Button } from "../components/ui/button";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../app/store";
 import { login } from "../app/slices/authSlice";
+import SocialAuthButtons from "../components/common/SocialAuthButtons";
 
 interface UserFormDataTypes {
 	email: string;
@@ -53,8 +54,17 @@ const Login: React.FC = () => {
 
 	// Auto-redirect if already logged in
 	useEffect(() => {
-		if (isAuthenticated && user?.role === "user") navigate("/");
-		else if (isAuthenticated && user?.role === "admin") navigate("/admin");
+		const persistedToken = localStorage.getItem("token");
+		if (!persistedToken) return;
+
+		if (isAuthenticated && user?.role === "user") {
+			navigate("/dashboard/your-profile", { replace: true });
+		} else if (
+			isAuthenticated &&
+			(user?.role === "admin" || user?.role === "superadmin")
+		) {
+			navigate("/admin/home", { replace: true });
+		}
 	}, [isAuthenticated, navigate, user?.role]);
 
 	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -72,7 +82,12 @@ const Login: React.FC = () => {
 
 			dispatch(login({ user, token }));
 
-			navigate(user?.role === "admin" ? "/admin" : "/");
+			navigate(
+				user?.role === "admin" || user?.role === "superadmin"
+					? "/admin/home"
+					: "/",
+				{ replace: true },
+			);
 		} catch (error) {
 			const err = error as AxiosError<{ message: string }>;
 			showError(err.response?.data?.message || "Login failed.");
@@ -166,6 +181,10 @@ const Login: React.FC = () => {
 							Sign up
 						</NavLink>
 					</p>
+
+					<div className="mt-4">
+						<SocialAuthButtons mode="login" />
+					</div>
 				</div>
 			</div>
 

@@ -11,17 +11,22 @@ const InputField = ({ label, name }: { label: string; name: string }) => {
 	} = useFormContext();
 	return (
 		<div>
-			<label className="block font-medium mb-1">{label}</label>
+			<label className="mb-1 block text-sm font-medium text-slate-800">
+				{label}
+			</label>
 			<Input
 				type="number"
-				defaultValue={0}
+				placeholder={`Enter ${label.toLowerCase()}`}
 				{...register(name, {
 					valueAsNumber: true,
 					required: `${name} is required`,
 				})}
+				className="border-slate-300 focus-visible:ring-slate-400"
 			/>
 			{errors[name] && (
-				<p className="text-sm text-red-500">{String(errors[name]?.message)}</p>
+				<p className="mt-1 text-sm text-red-500">
+					{String(errors[name]?.message)}
+				</p>
 			)}
 		</div>
 	);
