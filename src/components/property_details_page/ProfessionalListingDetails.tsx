@@ -17,6 +17,7 @@ import {
 	Ruler,
 	Sparkles,
 	Store,
+	MessageSquare,
 	X,
 	XCircle,
 } from "lucide-react";
@@ -39,6 +40,13 @@ import {
 	DialogTitle,
 	DialogDescription,
 } from "../ui/dialog";
+import { Textarea } from "../ui/textarea";
+import { Button } from "../ui/button";
+import { sendMessage } from "../../services/messaging";
+import { showError, showSuccess } from "../../utils/toastUtils";
+import { useSelector } from "react-redux";
+import { RootState } from "../../app/store";
+import { useNavigate } from "react-router-dom";
 
 interface FeatureItem {
 	label: string;
@@ -269,9 +277,14 @@ const ProfessionalListingDetails: React.FC<ProfessionalListingDetailsProps> = ({
 	listing,
 	listingUserDetails,
 }) => {
+	const { isAuthenticated } = useSelector((state: RootState) => state.auth);
+	const navigate = useNavigate();
 	const [selectedIndex, setSelectedIndex] = useState(0);
 	const [expandedDescription, setExpandedDescription] = useState(false);
 	const [isGalleryOpen, setIsGalleryOpen] = useState(false);
+	const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
+	const [messageContent, setMessageContent] = useState("");
+	const [sendingMessage, setSendingMessage] = useState(false);
 
 	const images =
 		listing.pictures && listing.pictures.length > 0
@@ -306,6 +319,40 @@ const ProfessionalListingDetails: React.FC<ProfessionalListingDetailsProps> = ({
 
 	const nextImage = () => {
 		setSelectedIndex((prev) => (prev + 1) % images.length);
+	};
+
+	const handleSendOwnerMessage = async () => {
+		if (!isAuthenticated) {
+			showError("Please log in first to send messages");
+			navigate("/login");
+			return;
+		}
+
+		if (!listingUserDetails?.userId) {
+			showError("Owner details unavailable");
+			return;
+		}
+
+		if (!messageContent.trim()) {
+			showError("Please write a message");
+			return;
+		}
+
+		try {
+			setSendingMessage(true);
+			await sendMessage({
+				toUserId: listingUserDetails.userId,
+				content: messageContent.trim(),
+				listingId: listing._id,
+			});
+			showSuccess("Message sent to owner");
+			setMessageContent("");
+			setIsMessageModalOpen(false);
+		} catch {
+			showError("Failed to send message");
+		} finally {
+			setSendingMessage(false);
+		}
 	};
 
 	return (
@@ -551,6 +598,15 @@ const ProfessionalListingDetails: React.FC<ProfessionalListingDetailsProps> = ({
 										<MapPin className="h-4 w-4" />
 										{mapCoordinateUrl ? "Open Exact Map" : "View on Map"}
 									</a>
+
+									<button
+										type="button"
+										onClick={() => setIsMessageModalOpen(true)}
+										className="inline-flex items-center justify-center gap-2 rounded-xl border border-sky-300 bg-sky-50 px-4 py-2.5 text-sm font-semibold text-sky-800 transition hover:bg-sky-100"
+									>
+										<MessageSquare className="h-4 w-4" />
+										Send Message
+									</button>
 								</div>
 							</div>
 
@@ -645,6 +701,32 @@ const ProfessionalListingDetails: React.FC<ProfessionalListingDetailsProps> = ({
 					</div>
 				</section>
 			</div>
+			<Dialog open={isMessageModalOpen} onOpenChange={setIsMessageModalOpen}>
+				<DialogContent className="sm:max-w-lg">
+					<DialogTitle>Message the Owner</DialogTitle>
+					<DialogDescription>
+						Send your inquiry directly to{" "}
+						{listingUserDetails?.name || "the owner"}.
+					</DialogDescription>
+					<div className="space-y-3">
+						<Textarea
+							rows={5}
+							placeholder="Hi, I am interested in this property. Please share more details."
+							value={messageContent}
+							onChange={(event) => setMessageContent(event.target.value)}
+						/>
+						<div className="flex justify-end">
+							<Button
+								type="button"
+								onClick={handleSendOwnerMessage}
+								disabled={sendingMessage}
+							>
+								{sendingMessage ? "Sending..." : "Send Message"}
+							</Button>
+						</div>
+					</div>
+				</DialogContent>
+			</Dialog>
 		</div>
 	);
 };

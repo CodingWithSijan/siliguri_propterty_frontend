@@ -10,10 +10,12 @@ import ProtectedRoute from "./route/ProtectedRoute";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import ScrollToTopButton from "./components/common/scrollToTopButton";
+import PhoneNumberCompletionModal from "./components/common/PhoneNumberCompletionModal";
 
 const Signup = lazy(() => import("./pages/Signup"));
 const Homepage = lazy(() => import("./pages/Homepage"));
 const Login = lazy(() => import("./pages/Login"));
+const SocialAuthCallback = lazy(() => import("./pages/SocialAuthCallback"));
 const DashboardLayout = lazy(() => import("./user/DashboardLayout"));
 const NotFound404 = lazy(() => import("./components/homepage/NotFound404"));
 const VerifyEmail = lazy(() => import("./components/homepage/VerifyEmail"));
@@ -49,11 +51,16 @@ const ManagePosts = lazy(
 const ManageUsers = lazy(
 	() => import("./components/adminComponents/ManageUsers"),
 );
+const SuperAdminPanel = lazy(
+	() => import("./components/adminComponents/SuperAdminPanel"),
+);
 const ViewUser = lazy(() => import("./components/adminComponents/ViewUser"));
 const ViewPost = lazy(() => import("./components/adminComponents/ViewPost"));
 const AboutUs = lazy(() => import("./pages/AboutUs"));
 const PrivacyPolicy = lazy(() => import("./pages/PrivacyPolicy"));
 const Terms = lazy(() => import("./pages/Terms"));
+const MessagesPage = lazy(() => import("./pages/MessagesPage"));
+const NotificationsPage = lazy(() => import("./pages/NotificationsPage"));
 
 const LegacySellRedirect: React.FC = () => {
 	const { category, id } = useParams();
@@ -74,6 +81,7 @@ const App: React.FC = () => {
 				pauseOnHover
 				theme="light"
 			/>
+			<PhoneNumberCompletionModal />
 
 			<Suspense
 				fallback={
@@ -121,6 +129,10 @@ const App: React.FC = () => {
 					{/* Auth & Account */}
 					<Route path="/signup" element={<Signup />} />
 					<Route path="/login" element={<Login />} />
+					<Route
+						path="/auth/social-callback"
+						element={<SocialAuthCallback />}
+					/>
 					<Route path="/reset-password/:token" element={<ResetPassword />} />
 					<Route path="/verify-email" element={<VerifyEmail />} />
 
@@ -152,6 +164,8 @@ const App: React.FC = () => {
 							element={<EditPostPage />}
 						/>
 						<Route path="saved-posts" element={<SavedPosts />} />
+						<Route path="messages" element={<MessagesPage />} />
+						<Route path="notifications" element={<NotificationsPage />} />
 						<Route path="*" element={<Navigate to="your-profile" replace />} />
 					</Route>
 
@@ -161,7 +175,7 @@ const App: React.FC = () => {
 					<Route
 						path="/admin"
 						element={
-							<ProtectedRoute allowedRoles={["admin"]}>
+							<ProtectedRoute allowedRoles={["admin", "superadmin"]}>
 								<AdminDashboardPage />
 							</ProtectedRoute>
 						}
@@ -171,7 +185,10 @@ const App: React.FC = () => {
 						<Route path="posts" element={<ManagePosts />} />
 						<Route path="posts/view-post/:id" element={<ViewPost />} />
 						<Route path="users" element={<ManageUsers />} />
+						<Route path="super-admin" element={<SuperAdminPanel />} />
 						<Route path="users/view-user/:id" element={<ViewUser />} />
+						<Route path="messages" element={<MessagesPage />} />
+						<Route path="notifications" element={<NotificationsPage />} />
 						<Route path="*" element={<Navigate to="home" replace />} />
 					</Route>
 

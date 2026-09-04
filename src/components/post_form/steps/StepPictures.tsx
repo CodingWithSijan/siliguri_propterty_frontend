@@ -1,13 +1,38 @@
 // File: components/PostForm/steps/StepPictures.tsx
 
 import { useFormContext, useWatch } from "react-hook-form";
-import { Input } from "../../ui/input";
 import { Film, ImagePlus, Trash2 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { showError } from "../../../utils/toastUtils";
 
 const MAX_IMAGES = 15;
 const MAX_VIDEOS = 2;
+
+const hasAllowedExtension = (
+	fileName: string,
+	allowedExtensions: string[],
+): boolean => {
+	const lower = fileName.toLowerCase();
+	return allowedExtensions.some((ext) => lower.endsWith(ext));
+};
+
+const isImageFile = (file: File): boolean => {
+	if (file.type.startsWith("image/")) return true;
+	return hasAllowedExtension(file.name, [
+		".jpg",
+		".jpeg",
+		".png",
+		".webp",
+		".gif",
+		".avif",
+		".heic",
+	]);
+};
+
+const isVideoFile = (file: File): boolean => {
+	if (file.type.startsWith("video/")) return true;
+	return hasAllowedExtension(file.name, [".mp4", ".webm", ".mov", ".m4v"]);
+};
 
 const StepPictures = () => {
 	const {
@@ -85,7 +110,7 @@ const StepPictures = () => {
 
 	const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const incoming = e.target.files ? Array.from(e.target.files) : [];
-		const filtered = incoming.filter((file) => file.type.startsWith("image/"));
+		const filtered = incoming.filter((file) => isImageFile(file));
 		const unique = new Map(
 			imageFiles.map((file) => [file.name + file.size, file]),
 		);
@@ -108,7 +133,7 @@ const StepPictures = () => {
 
 	const handleVideoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const incoming = e.target.files ? Array.from(e.target.files) : [];
-		const filtered = incoming.filter((file) => file.type.startsWith("video/"));
+		const filtered = incoming.filter((file) => isVideoFile(file));
 		const unique = new Map(
 			videoFiles.map((file) => [file.name + file.size, file]),
 		);
@@ -176,12 +201,14 @@ const StepPictures = () => {
 							<ImagePlus className="h-4 w-4" />
 							Images
 						</label>
-						<Input
+						<input
+							name="pictures"
+							id="post-images"
 							type="file"
 							multiple
 							accept="image/*"
 							onChange={handleImageChange}
-							className="border-slate-300 bg-white"
+							className="block h-10 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 file:mr-3 file:rounded-md file:border-0 file:bg-slate-100 file:px-3 file:py-1 file:text-sm file:font-medium"
 						/>
 						{errors.pictures && (
 							<p className="mt-1 text-sm text-red-500">
@@ -191,6 +218,9 @@ const StepPictures = () => {
 						<p className="mt-1 text-xs text-slate-500">
 							Up to 15 images. JPG, PNG, WEBP recommended.
 						</p>
+						<p className="mt-1 text-xs text-slate-500">
+							If your phone picker selects one image at a time, reopen and add more.
+						</p>
 					</div>
 
 					<div>
@@ -198,12 +228,14 @@ const StepPictures = () => {
 							<Film className="h-4 w-4" />
 							Videos
 						</label>
-						<Input
+						<input
+							name="videos"
+							id="post-videos"
 							type="file"
 							multiple
 							accept="video/mp4,video/webm,video/quicktime"
 							onChange={handleVideoChange}
-							className="border-slate-300 bg-white"
+							className="block h-10 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 file:mr-3 file:rounded-md file:border-0 file:bg-slate-100 file:px-3 file:py-1 file:text-sm file:font-medium"
 						/>
 						{errors.videos && (
 							<p className="mt-1 text-sm text-red-500">

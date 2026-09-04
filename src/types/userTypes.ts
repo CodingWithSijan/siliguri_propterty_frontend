@@ -4,8 +4,8 @@ export interface IUser {
 	email: string;
 	phoneNumber?: string;
 	phone?: string;
-	role?: "user" | "admin";
-	authProvider?: "local" | "google";
+	role?: "user" | "admin" | "superadmin";
+	authProvider?: "local" | "google" | "facebook";
 	avatar?: string;
 	createdAt: Date;
 	isVerified?: boolean;

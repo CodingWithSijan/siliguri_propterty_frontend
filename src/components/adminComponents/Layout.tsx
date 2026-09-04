@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { SidebarProvider, SidebarTrigger } from "../ui/sidebar";
 import AppSidebar from "./AppSidebar";
+import NotificationBell from "../common/NotificationBell";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
 	const [activeMenu, setActiveMenu] = useState<number>(0);
@@ -13,6 +14,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 					<h1 className="ml-2 text-sm font-semibold text-foreground md:text-base">
 						Admin Dashboard
 					</h1>
+					<div className="ml-auto">
+						<NotificationBell />
+					</div>
 				</header>
 
 				<main className="flex-1 overflow-auto p-3 md:p-4">{children}</main>

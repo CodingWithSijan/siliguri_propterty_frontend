@@ -54,6 +54,7 @@ const ManagePosts = () => {
 	const navigate = useNavigate();
 	const [selectedStatus, setSelectedStatus] = useState<string>("all");
 	const [isActionLoading, setIsActionLoading] = useState<string | null>(null);
+	const [displayPosts, setDisplayPosts] = useState<Post[]>([]);
 	const fetchPostsBySelectedStatus = useCallback(() => {
 		return selectedStatus === "all"
 			? fetchAllPosts()
@@ -74,6 +75,10 @@ const ManagePosts = () => {
 	useEffect(() => {
 		refetchPosts();
 	}, [selectedStatus, refetchPosts]);
+
+	useEffect(() => {
+		setDisplayPosts(posts ?? []);
+	}, [posts]);
 
 	const handleStatusChange = (value: string) => setSelectedStatus(value);
 
@@ -101,7 +106,11 @@ const ManagePosts = () => {
 		try {
 			setIsActionLoading(postId);
 			await approvePost(postId);
-			await refetchPosts();
+			setDisplayPosts((prev) =>
+				prev.map((post) =>
+					post._id === postId ? { ...post, approvalStatus: "approved" } : post,
+				),
+			);
 		} catch (err) {
 			console.error("Error approving:", err);
 		} finally {
@@ -113,7 +122,11 @@ const ManagePosts = () => {
 		try {
 			setIsActionLoading(postId);
 			await rejectPost(postId);
-			await refetchPosts();
+			setDisplayPosts((prev) =>
+				prev.map((post) =>
+					post._id === postId ? { ...post, approvalStatus: "rejected" } : post,
+				),
+			);
 		} catch (err) {
 			console.error("Error rejecting:", err);
 		} finally {
@@ -125,7 +138,7 @@ const ManagePosts = () => {
 		try {
 			setIsActionLoading(postId);
 			await deletePost(postId);
-			await refetchPosts();
+			setDisplayPosts((prev) => prev.filter((post) => post._id !== postId));
 		} catch (err) {
 			console.error("Error deleting:", err);
 		} finally {
@@ -332,7 +345,7 @@ const ManagePosts = () => {
 											<Skeleton className="h-4 w-full" />
 										</TableCell>
 									</TableRow>
-								) : !posts?.length ? (
+								) : !displayPosts?.length ? (
 									<TableRow>
 										<TableCell colSpan={7} className="text-center py-10">
 											<div className="flex flex-col items-center gap-2 text-muted-foreground">
@@ -342,7 +355,7 @@ const ManagePosts = () => {
 										</TableCell>
 									</TableRow>
 								) : (
-									posts.map((post: Post) => (
+									displayPosts.map((post: Post) => (
 										<TableRow key={post._id}>
 											<TableCell className="break-words whitespace-normal">
 												<div className="space-y-1">

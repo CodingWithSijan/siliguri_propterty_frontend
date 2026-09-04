@@ -7,8 +7,8 @@ export interface User {
 	name: string;
 	email: string;
 	avatar?: string;
-	authProvider: "local" | "google";
-	role: "user" | "admin";
+	authProvider: "local" | "google" | "facebook";
+	role: "user" | "admin" | "superadmin";
 	phone: string;
 	isVerified: boolean;
 	savedPosts?: string[];
@@ -37,7 +37,9 @@ if (storedToken && isTokenExpired(storedToken)) {
 		const hasRequiredUserFields =
 			typeof parsedUser.id === "string" &&
 			typeof parsedUser.email === "string" &&
-			(parsedUser.role === "user" || parsedUser.role === "admin");
+			(parsedUser.role === "user" ||
+				parsedUser.role === "admin" ||
+				parsedUser.role === "superadmin");
 
 		if (hasRequiredUserFields) {
 			initialUser = parsedUser as User;

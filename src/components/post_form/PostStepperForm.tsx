@@ -128,11 +128,11 @@ const getStep1Fields = (
 		}
 
 		if (propertyCategory === "house" || propertyCategory === "flat") {
-			return ["bedrooms", "bathrooms", "builtUpArea", "price"];
+			return ["bedrooms", "bathrooms", "builtUpArea", "price", "availableFrom"];
 		}
 
 		if (propertyCategory === "shop") {
-			return ["shopArea", "price"];
+			return ["shopArea", "price", "availableFrom"];
 		}
 	}
 
@@ -142,6 +142,7 @@ const getStep1Fields = (
 				"bedrooms",
 				"bathrooms",
 				"builtUpArea",
+				"availableFrom",
 				"pricePerFrequency",
 				"frequency",
 				"availableForDuration",
@@ -152,6 +153,7 @@ const getStep1Fields = (
 		if (propertyCategory === "shop") {
 			return [
 				"shopArea",
+				"availableFrom",
 				"pricePerFrequency",
 				"frequency",
 				"availableForDuration",

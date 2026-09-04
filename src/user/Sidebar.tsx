@@ -1,29 +1,18 @@
 import React from "react";
 import {
-	FiUser,
 	FiPlusCircle,
 	FiList,
 	FiCompass,
 	FiHeart,
-	FiLogOut,
+	FiMessageSquare,
 } from "react-icons/fi";
 import { motion } from "framer-motion";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch, RootState } from "../app/store";
+import { useSelector } from "react-redux";
+import { RootState } from "../app/store";
 import siliguri_property_logo_noBG from "../assets/logo_siliguri_property.png";
 import { getInitials } from "../utils/getInitial";
 import { formatFullName } from "../utils/capitalizeName";
-import {
-	DropdownMenuGroup,
-	DropdownMenu,
-	DropdownMenuContent,
-	DropdownMenuItem,
-	DropdownMenuLabel,
-	DropdownMenuSeparator,
-	DropdownMenuTrigger,
-} from "../components/ui/dropdown-menu";
-import { logout } from "../app/slices/authSlice";
 interface SidebarProps {
 	activeMenu: string;
 	setActiveMenu: (menu: string) => void;
@@ -31,11 +20,6 @@ interface SidebarProps {
 }
 
 const menuItems = [
-	{
-		label: "Your Profile",
-		icon: <FiUser />,
-		path: "/dashboard/your-profile",
-	},
 	{ label: "New Post", icon: <FiPlusCircle />, path: "/dashboard/new-post" },
 	{
 		label: "View Your Listings",
@@ -48,6 +32,11 @@ const menuItems = [
 		path: "/dashboard/saved-posts",
 	},
 	{
+		label: "Messages",
+		icon: <FiMessageSquare />,
+		path: "/dashboard/messages",
+	},
+	{
 		label: "Browse Properties",
 		icon: <FiCompass />,
 		path: "/properties",
@@ -57,13 +46,7 @@ const menuItems = [
 const Sidebar: React.FC<SidebarProps> = ({ setActiveMenu, setSidebarOpen }) => {
 	const navigate = useNavigate();
 	const location = useLocation();
-	const dispatch = useDispatch<AppDispatch>();
 	const { user } = useSelector((state: RootState) => state.auth);
-
-	const handleLogout = () => {
-		dispatch(logout());
-		setSidebarOpen(false);
-	};
 
 	return (
 		<motion.div
@@ -71,57 +54,41 @@ const Sidebar: React.FC<SidebarProps> = ({ setActiveMenu, setSidebarOpen }) => {
 			animate={{ x: 0 }}
 			exit={{ x: -300 }}
 			transition={{ type: "spring", stiffness: 100, damping: 20 }}
-			className=" h-full w-full flex flex-col  border-r border-gray-200 shadow-sm bg-gray-100"
+			className="h-full w-full flex flex-col border-r border-slate-200 shadow-sm bg-gradient-to-b from-white via-slate-50 to-slate-100"
 		>
 			<div className="flex flex-col flex-1">
-				<div className="border-b border-border bg-background/50 block">
+				<div className="border-b border-slate-200 bg-white block">
 					<NavLink to="/" className="block">
 						<img
 							src={siliguri_property_logo_noBG}
 							alt="Logo"
-							className="object-contain h-30 w-30 mx-auto"
+							className="object-contain h-28 w-28 mx-auto"
 						/>
 					</NavLink>
 				</div>
-				{/* user profile and name display */}
-				<DropdownMenu>
-					<DropdownMenuTrigger asChild>
-						<button
-							type="button"
-							className="w-full flex items-center space-x-3 p-4 border-y border-border bg-muted/30 hover:bg-muted/50 transition-all cursor-pointer"
-						>
-							{user?.avatar ? (
-								<img
-									className="w-10 h-10 rounded-full border-2 border-primary shadow-sm"
-									src={user.avatar}
-									alt={user.name}
-								/>
-							) : (
-								<div className="w-10 h-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold shadow-sm">
-									{getInitials(user?.name ?? "")}
-								</div>
-							)}
-							<span className="text-foreground font-semibold text-sm">
-								{formatFullName(user?.name)}
-							</span>
-						</button>
-					</DropdownMenuTrigger>
-					<DropdownMenuContent className="w-[250px]">
-						<DropdownMenuLabel>My Account</DropdownMenuLabel>
-						<DropdownMenuSeparator />
-						<DropdownMenuGroup>
-							<DropdownMenuItem
-								onSelect={handleLogout}
-								className="text-destructive cursor-pointer"
-							>
-								<FiLogOut className="text-lg" />
-								<span className="font-medium">Logout</span>
-							</DropdownMenuItem>
-						</DropdownMenuGroup>
-					</DropdownMenuContent>
-				</DropdownMenu>
 
-				{/* user profile and name display */}
+				<div className="mx-4 mt-4 rounded-2xl border border-slate-200 bg-white p-3 shadow-sm">
+					<div className="flex items-center gap-3">
+						{user?.avatar ? (
+							<img
+								className="w-11 h-11 rounded-full border border-slate-200 object-cover"
+								src={user.avatar}
+								alt={user.name}
+							/>
+						) : (
+							<div className="w-11 h-11 rounded-full bg-sky-600 text-white flex items-center justify-center font-bold">
+								{getInitials(user?.name ?? "")}
+							</div>
+						)}
+						<div className="min-w-0">
+							<p className="text-sm font-semibold text-slate-900 truncate">
+								{formatFullName(user?.name)}
+							</p>
+							<p className="text-xs text-slate-500 truncate">{user?.email}</p>
+						</div>
+					</div>
+				</div>
+
 				<nav className="flex-1 p-4 overflow-y-auto">
 					<ul className="space-y-2">
 						{menuItems.map((item) => {
@@ -131,15 +98,11 @@ const Sidebar: React.FC<SidebarProps> = ({ setActiveMenu, setSidebarOpen }) => {
 									key={item.label}
 									whileHover={{ scale: 1.02, x: 4 }}
 									whileTap={{ scale: 0.98 }}
-									className={`
-                                        flex items-center gap-3 px-4 py-3.5 rounded-xl cursor-pointer
-                                        transition-all duration-200 ease-in-out font-medium
-                                        ${
-																					isActive
-																						? "bg-primary text-primary-foreground shadow-md"
-																						: "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
-																				}
-                                    `}
+									className={`flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer transition-all duration-200 ease-in-out font-medium ${
+										isActive
+											? "bg-sky-700 text-white shadow-md"
+											: "text-slate-700 hover:bg-slate-200"
+									}`}
 									onClick={() => {
 										setActiveMenu(item.label);
 										setSidebarOpen(false);
@@ -155,6 +118,8 @@ const Sidebar: React.FC<SidebarProps> = ({ setActiveMenu, setSidebarOpen }) => {
 						})}
 					</ul>
 				</nav>
+
+				<div className="h-4" />
 			</div>
 		</motion.div>
 	);

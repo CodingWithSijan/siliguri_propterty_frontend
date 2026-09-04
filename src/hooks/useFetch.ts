@@ -5,6 +5,7 @@ const useFetch = <T>(fetchFunction: () => Promise<T>, autoFetch = true) => {
 	const [loading, setLoading] = useState<boolean>(false);
 	const [error, setError] = useState<Error | null>(null);
 	const fetchFunctionRef = useRef(fetchFunction);
+	const hasFetchedOnceRef = useRef(false);
 
 	useEffect(() => {
 		fetchFunctionRef.current = fetchFunction;
@@ -12,11 +13,12 @@ const useFetch = <T>(fetchFunction: () => Promise<T>, autoFetch = true) => {
 
 	const fetchData = useCallback(async () => {
 		try {
-			setLoading(true);
+			setLoading((prevLoading) => prevLoading || !hasFetchedOnceRef.current);
 			setError(null);
 
 			const result = await fetchFunctionRef.current();
 			setData(result);
+			hasFetchedOnceRef.current = true;
 		} catch (err) {
 			setError(err instanceof Error ? err : new Error("An error occured"));
 		} finally {
@@ -28,6 +30,7 @@ const useFetch = <T>(fetchFunction: () => Promise<T>, autoFetch = true) => {
 		setData(null);
 		setLoading(false);
 		setError(null);
+		hasFetchedOnceRef.current = false;
 	};
 
 	useEffect(() => {

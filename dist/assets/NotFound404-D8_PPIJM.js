@@ -1,1 +1,0 @@
-import{j as e}from"./react-vendor-5GclGPpt.js";const s=()=>e.jsxs(e.Fragment,{children:[" ",e.jsx("h1",{className:"text-red-600 w-screen text-center text-4xl sm:text-6xl  h-screen mt-15",children:"Access Denied!"})]});export{s as default};

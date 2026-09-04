@@ -17,6 +17,7 @@ import { Button } from "../components/ui/button";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../app/store";
 import { login } from "../app/slices/authSlice";
+import SocialAuthButtons from "../components/common/SocialAuthButtons";
 
 interface UserFormDataTypes {
 	email: string;
@@ -58,7 +59,10 @@ const Login: React.FC = () => {
 
 		if (isAuthenticated && user?.role === "user") {
 			navigate("/dashboard/your-profile", { replace: true });
-		} else if (isAuthenticated && user?.role === "admin") {
+		} else if (
+			isAuthenticated &&
+			(user?.role === "admin" || user?.role === "superadmin")
+		) {
 			navigate("/admin/home", { replace: true });
 		}
 	}, [isAuthenticated, navigate, user?.role]);
@@ -79,7 +83,9 @@ const Login: React.FC = () => {
 			dispatch(login({ user, token }));
 
 			navigate(
-				user?.role === "admin" ? "/admin/home" : "/dashboard/your-profile",
+				user?.role === "admin" || user?.role === "superadmin"
+					? "/admin/home"
+					: "/",
 				{ replace: true },
 			);
 		} catch (error) {
@@ -175,6 +181,10 @@ const Login: React.FC = () => {
 							Sign up
 						</NavLink>
 					</p>
+
+					<div className="mt-4">
+						<SocialAuthButtons mode="login" />
+					</div>
 				</div>
 			</div>
 
