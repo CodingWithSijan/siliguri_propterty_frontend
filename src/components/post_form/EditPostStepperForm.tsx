@@ -34,6 +34,9 @@ const allFields = [
 	"title",
 	"description",
 	"location",
+	"coordinates",
+	"wbLocalityKey",
+	"wbLocalityLabel",
 	"alternateLocation",
 	"pricePerUnit",
 	"unit",
@@ -76,6 +79,8 @@ const EditPostStepperForm: React.FC<EditPostStepperFormProps> = ({
 			description: initialData.description,
 			location: initialData.location,
 			alternateLocation: initialData.alternateLocation,
+			wbLocalityKey: initialData.wbLocalityKey,
+			wbLocalityLabel: initialData.wbLocalityLabel,
 			coordinates: initialData.coordinates,
 		};
 
@@ -152,6 +157,9 @@ const EditPostStepperForm: React.FC<EditPostStepperFormProps> = ({
 				"propertyCategory",
 				"title",
 				"description",
+				"coordinates",
+				"wbLocalityKey",
+				"wbLocalityLabel",
 				"location",
 				"intent",
 			];
@@ -198,7 +206,11 @@ const EditPostStepperForm: React.FC<EditPostStepperFormProps> = ({
 						);
 					}
 				} else if (value !== undefined && value !== null && value !== "") {
-					formData.append(key, String(value));
+					if (typeof value === "object") {
+						formData.append(key, JSON.stringify(value));
+					} else {
+						formData.append(key, String(value));
+					}
 				}
 			});
 

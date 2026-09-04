@@ -27,7 +27,10 @@ import {
 import RentListingCard from "../components/card/RentListingCard";
 import SellListingCard from "../components/card/SellListingCard";
 import ListingSearchPanel from "../components/listings/ListingSearchPanel";
-import { WEST_BENGAL_LOCATIONS } from "../constants/westBengalLocations";
+import {
+	resolveWestBengalLocationKey,
+	WEST_BENGAL_LOCATIONS,
+} from "../constants/westBengalLocations";
 import {
 	Sheet,
 	SheetContent,
@@ -166,7 +169,8 @@ const formatRecentSearchLabel = (params: string): string => {
 
 	const location = parsed.get("location");
 	if (location) {
-		parts.push(`Area: ${LOCATION_LABEL_MAP[location] ?? location}`);
+		const resolvedKey = resolveWestBengalLocationKey(location);
+		parts.push(`Area: ${LOCATION_LABEL_MAP[resolvedKey] ?? location}`);
 	}
 
 	const minPrice = parsed.get("minPrice");
@@ -341,7 +345,7 @@ const AllListings: React.FC<AllListingsProps> = ({
 
 				if (!isWithinWestBengal(point)) {
 					showError(
-						"This platform currently supports geo-filtering inside West Bengal only.",
+						"This platform currently supports geo-filtering inside Siliguri only.",
 					);
 					setGeoLoading(false);
 					return;

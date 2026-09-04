@@ -115,7 +115,7 @@ const ListingSearchPanel: React.FC<ListingSearchPanelProps> = ({
 
 				<label className="block">
 					<span className="mb-1 block text-sm font-medium text-slate-700">
-						West Bengal Area
+						Siliguri Area
 					</span>
 					<select
 						value={state.locationKey}
@@ -236,7 +236,7 @@ const ListingSearchPanel: React.FC<ListingSearchPanelProps> = ({
 
 				{hasGeoFilter && (
 					<p className="text-sm text-slate-600">
-						Showing properties near your current location inside West Bengal.
+						Showing properties near your current location inside Siliguri.
 					</p>
 				)}
 			</div>

@@ -15,6 +15,8 @@ export interface IBaseListingType {
 	pictures?: string[];
 	location: string;
 	alternateLocation: string;
+	wbLocalityKey?: string;
+	wbLocalityLabel?: string;
 	coordinates?: {
 		type: "Point";
 		coordinates: [number, number];

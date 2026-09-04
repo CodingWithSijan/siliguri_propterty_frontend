@@ -25,7 +25,6 @@ const SellPropertyDetails: React.FC = () => {
 				setListing(res.data.listingDetails);
 				setListingUserDetails(res.data.listingUser);
 			} catch {
-				console.error("Failed to fetch listing");
 				setError("Failed to fetch listing details. Please try again.");
 			} finally {
 				setLoading(false);

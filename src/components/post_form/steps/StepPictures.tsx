@@ -219,7 +219,8 @@ const StepPictures = () => {
 							Up to 15 images. JPG, PNG, WEBP recommended.
 						</p>
 						<p className="mt-1 text-xs text-slate-500">
-							If your phone picker selects one image at a time, reopen and add more.
+							If your phone picker selects one image at a time, reopen and add
+							more.
 						</p>
 					</div>
 

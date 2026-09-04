@@ -16,7 +16,6 @@ import {
 	RentPostFormInputs,
 	SellPostFormInputs,
 } from "../../types/postFormTypes";
-import PostFormBreadcrumb from "./PostFormBreadcrumb";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState, AppDispatch } from "../../app/store";
 import { addNewPost } from "../../app/slices/postSlice";
@@ -47,6 +46,8 @@ interface PostStepperFormProps {
 type FormValues = UniversalPostFormInputs & {
 	intent: string;
 	alternateLocation?: string;
+	wbLocalityKey?: string;
+	wbLocalityLabel?: string;
 	coordinates?: {
 		type: "Point";
 		coordinates: [number, number];
@@ -85,6 +86,8 @@ const allFields = [
 	"title",
 	"description",
 	"location",
+	"wbLocalityKey",
+	"wbLocalityLabel",
 	"coordinates",
 	"alternateLocation",
 	"pricePerUnit",
@@ -108,7 +111,9 @@ const allFields = [
 
 const step0RequiredFields: FormFieldKey[] = [
 	"propertyCategory",
+	"wbLocalityKey",
 	"location",
+	"coordinates",
 	"title",
 	"description",
 ];
@@ -171,6 +176,8 @@ const PostStepperForm: React.FC<PostStepperFormProps> = ({ intent }) => {
 		defaultValues: {
 			intent: intent,
 			propertyCategory: undefined,
+			wbLocalityKey: "",
+			wbLocalityLabel: "",
 			location: "",
 			coordinates: { type: "Point", coordinates: [0, 0] },
 		},
@@ -183,6 +190,8 @@ const PostStepperForm: React.FC<PostStepperFormProps> = ({ intent }) => {
 		if (propertyCategory) {
 			const fieldsToKeep: FormFieldKey[] = [
 				"propertyCategory",
+				"wbLocalityKey",
+				"wbLocalityLabel",
 				"location",
 				"coordinates",
 				"alternateLocation",
@@ -391,9 +400,6 @@ const PostStepperForm: React.FC<PostStepperFormProps> = ({ intent }) => {
 				</div>
 			</div>
 
-			<div className="hidden items-center justify-center sm:flex">
-				<PostFormBreadcrumb currentStep={step} />
-			</div>
 			<FormProvider {...methods}>
 				<form
 					onSubmit={onSubmit}

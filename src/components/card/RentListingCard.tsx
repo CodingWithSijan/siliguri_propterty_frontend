@@ -39,6 +39,15 @@ const RentListingCard: React.FC<{
 	};
 	const postedAgoText = getDaysAgoTextFromObjectId(listing._id);
 	const thumbnail = listing.pictures?.find((url) => isImageUrl(url));
+	const localityText =
+		listing.wbLocalityLabel?.trim() || listing.location?.trim() || "";
+	const exactAddressText = listing.alternateLocation?.trim() || "";
+	const locationText =
+		localityText &&
+		exactAddressText &&
+		localityText.toLowerCase() !== exactAddressText.toLowerCase()
+			? `${localityText} | ${exactAddressText}`
+			: localityText || exactAddressText || "Location not provided";
 
 	return (
 		<motion.div
@@ -122,7 +131,7 @@ const RentListingCard: React.FC<{
 				{/* Location */}
 				<div className="flex items-center gap-2 text-xs text-gray-600">
 					<FaMapMarkerAlt className="text-blue-500 text-sm" />
-					<span className="text-sm truncate">{listing.alternateLocation}</span>
+					<span className="text-sm truncate">{locationText}</span>
 				</div>
 
 				{/* Price moved below location */}

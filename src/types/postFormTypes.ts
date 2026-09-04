@@ -16,6 +16,8 @@ export interface BasePostFormInputs {
 	title: string;
 	description: string;
 	location: string;
+	wbLocalityKey?: string;
+	wbLocalityLabel?: string;
 	coordinates?: {
 		type: "Point";
 		coordinates: [number, number];

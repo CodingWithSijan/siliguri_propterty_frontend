@@ -1,4 +1,5 @@
 import {
+	resolveWestBengalLocationKey,
 	WEST_BENGAL_LOCATION_MAP,
 	type IWestBengalLocation,
 } from "../constants/westBengalLocations";
@@ -75,10 +76,14 @@ const matchesLocationText = (
 	listing: IUniversalListingType,
 	location: IWestBengalLocation,
 ): boolean => {
-	const key = location.label.toLowerCase();
-	return (
-		includesText(listing.location, key) ||
-		includesText(listing.alternateLocation, key)
+	const normalizedTerms = [location.label, ...location.aliases].map((term) =>
+		term.toLowerCase(),
+	);
+
+	return normalizedTerms.some(
+		(term) =>
+			includesText(listing.location, term) ||
+			includesText(listing.alternateLocation, term),
 	);
 };
 
@@ -126,18 +131,34 @@ export const applyListingFilters = (
 		}
 
 		if (filters.locationKey) {
-			const selectedLocation = WEST_BENGAL_LOCATION_MAP[filters.locationKey];
+			const normalizedLocationKey = resolveWestBengalLocationKey(
+				filters.locationKey,
+			);
+			const selectedLocation = WEST_BENGAL_LOCATION_MAP[normalizedLocationKey];
 			if (selectedLocation) {
+				const listingLocalityKey = listing.wbLocalityKey
+					? resolveWestBengalLocationKey(listing.wbLocalityKey)
+					: "";
+				const hasExactLocalityMatch =
+					listingLocalityKey === selectedLocation.value;
+
 				const listingCoords = getListingLatLng(listing);
-				if (listingCoords) {
+				if (listingCoords && !hasExactLocalityMatch) {
+					const hasTextFallbackMatch = matchesLocationText(
+						listing,
+						selectedLocation,
+					);
 					const distance = getDistanceKm(listingCoords, {
 						lat: selectedLocation.lat,
 						lng: selectedLocation.lng,
 					});
-					if (distance > selectedLocation.radiusKm) {
+					if (distance > selectedLocation.radiusKm && !hasTextFallbackMatch) {
 						return false;
 					}
-				} else if (!matchesLocationText(listing, selectedLocation)) {
+				} else if (
+					!listingCoords &&
+					!matchesLocationText(listing, selectedLocation)
+				) {
 					return false;
 				}
 			}

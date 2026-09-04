@@ -25,6 +25,7 @@ interface PreviewFormData {
 	description?: string;
 	location?: string;
 	alternateLocation?: string;
+	wbLocalityLabel?: string;
 	bedrooms?: string | number;
 	bathrooms?: string | number;
 	builtUpArea?: string | number;
@@ -222,7 +223,11 @@ const StepPreview = ({ onEditStep }: StepPreviewProps) => {
 					<InfoRow label="Description" value={previewData.description} />
 					<InfoRow label="Location" value={previewData.location} />
 					<InfoRow
-						label="Alternate Location"
+						label="Siliguri Area"
+						value={toDisplayValue(previewData.wbLocalityLabel)}
+					/>
+					<InfoRow
+						label="Exact Address / Landmark"
 						value={toDisplayValue(previewData.alternateLocation)}
 					/>
 					<InfoRow

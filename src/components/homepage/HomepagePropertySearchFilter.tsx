@@ -145,9 +145,7 @@ const HomepagePropertySearchFilter: React.FC = () => {
 				const lng = position.coords.longitude;
 
 				if (!isWithinWestBengal({ lat, lng })) {
-					showError(
-						"Geo search is currently available inside West Bengal only.",
-					);
+					showError("Geo search is currently available inside Siliguri only.");
 					setGeoLoading(false);
 					return;
 				}
