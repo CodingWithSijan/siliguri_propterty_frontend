@@ -44,14 +44,25 @@ import {
 	deleteUserById,
 	fetchAllUsers,
 	fetchUsersByVerification,
+	resendVerificationLinkByAdmin,
+	resetUserPasswordByAdmin,
+	User,
 } from "../../services/fetchFunctionsForAdmin";
 import { useNavigate } from "react-router-dom";
-import { showError, showSuccess } from "../../utils/toastUtils";
+import { showError, showInfo, showSuccess } from "../../utils/toastUtils";
 import { getInitials } from "../../utils/getInitial";
 
 const ManageUsers = () => {
 	const [isDeleting, setIsDeleting] = useState(false);
+	const [isResettingPassword, setIsResettingPassword] = useState(false);
+	const [verificationActionUserId, setVerificationActionUserId] = useState<
+		string | null
+	>(null);
 	const [userToDelete, setUserToDelete] = useState<string | null>(null);
+	const [userToResetPassword, setUserToResetPassword] = useState<User | null>(
+		null,
+	);
+	const [newPassword, setNewPassword] = useState("");
 	const [selectedStatus, setSelectedStatus] = useState("all");
 	const {
 		data: users,
@@ -73,11 +84,33 @@ const ManageUsers = () => {
 		refetchUsers();
 	}, [selectedStatus, refetchUsers]);
 
+	useEffect(() => {
+		if (!userToDelete && !userToResetPassword) {
+			document.body.style.pointerEvents = "";
+		}
+	}, [userToDelete, userToResetPassword]);
+
 	const handleStatusChange = (value: string) => setSelectedStatus(value);
 
 	const handleCancelDelete = () => {
 		setIsDeleting(false);
 		setUserToDelete(null);
+	};
+
+	const generateTempPassword = (): string => {
+		const random = Math.random().toString(36).slice(-6);
+		return `Sp@${Date.now().toString().slice(-4)}${random}`;
+	};
+
+	const openResetPasswordDialog = (user: User) => {
+		setUserToResetPassword(user);
+		setNewPassword(generateTempPassword());
+	};
+
+	const closeResetPasswordDialog = () => {
+		setIsResettingPassword(false);
+		setUserToResetPassword(null);
+		setNewPassword("");
 	};
 	// function for user deletion by id
 	const handleDeleteUser = async () => {
@@ -95,6 +128,55 @@ const ManageUsers = () => {
 			);
 		} finally {
 			setIsDeleting(false);
+		}
+	};
+
+	const handleAdminResetPassword = async () => {
+		if (!userToResetPassword) {
+			return;
+		}
+
+		const trimmedPassword = newPassword.trim();
+		if (trimmedPassword.length < 8) {
+			showError("Password must be at least 8 characters long");
+			return;
+		}
+
+		try {
+			setIsResettingPassword(true);
+			const message = await resetUserPasswordByAdmin(
+				userToResetPassword._id,
+				trimmedPassword,
+			);
+			showSuccess(message || "Password reset successfully");
+			closeResetPasswordDialog();
+		} catch (error) {
+			showError(
+				error instanceof Error ? error.message : "Failed to reset password",
+			);
+		} finally {
+			setIsResettingPassword(false);
+		}
+	};
+
+	const handleSendVerificationLink = async (user: User) => {
+		if (user.isVerified) {
+			showInfo("User is already verified");
+			return;
+		}
+
+		try {
+			setVerificationActionUserId(user._id);
+			const message = await resendVerificationLinkByAdmin(user._id);
+			showSuccess(message || "Verification link sent");
+		} catch (error) {
+			showError(
+				error instanceof Error
+					? error.message
+					: "Failed to send verification link",
+			);
+		} finally {
+			setVerificationActionUserId(null);
 		}
 	};
 	type IconComponent = React.ComponentType<{ className?: string }>;
@@ -116,7 +198,9 @@ const ManageUsers = () => {
 		return (
 			<Card className="hover:border-primary/50 transition-colors">
 				<CardHeader className="flex justify-between items-center pb-2">
-					<CardTitle className="text-sm text-muted-foreground">{title}</CardTitle>
+					<CardTitle className="text-sm text-muted-foreground">
+						{title}
+					</CardTitle>
 					<div className={`p-2 rounded-full ${colorStyles}`}>
 						<Icon className="w-4 h-4" />
 					</div>
@@ -161,6 +245,61 @@ const ManageUsers = () => {
 							className="bg-red-600 hover:bg-red-700"
 						>
 							{isDeleting ? "Deleting..." : "Delete"}
+						</Button>
+					</div>
+				</AlertDialogContent>
+			</AlertDialog>
+
+			<AlertDialog
+				open={!!userToResetPassword}
+				onOpenChange={(open) => {
+					if (!open) {
+						closeResetPasswordDialog();
+					}
+				}}
+			>
+				<AlertDialogContent>
+					<AlertDialogHeader>
+						<AlertDialogTitle>Reset User Password</AlertDialogTitle>
+						<AlertDialogDescription>
+							Set a temporary password for {userToResetPassword?.email}. Share
+							it securely with the user.
+						</AlertDialogDescription>
+					</AlertDialogHeader>
+					<div className="space-y-3">
+						<label className="block text-sm font-medium text-slate-700">
+							Temporary password
+						</label>
+						<input
+							type="text"
+							value={newPassword}
+							onChange={(event) => setNewPassword(event.target.value)}
+							className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+							placeholder="Enter temporary password"
+						/>
+						<Button
+							type="button"
+							variant="outline"
+							onClick={() => setNewPassword(generateTempPassword())}
+						>
+							Generate New Password
+						</Button>
+					</div>
+					<div className="flex gap-3 justify-end">
+						<Button
+							type="button"
+							onClick={closeResetPasswordDialog}
+							disabled={isResettingPassword}
+						>
+							Cancel
+						</Button>
+						<Button
+							type="button"
+							onClick={handleAdminResetPassword}
+							disabled={isResettingPassword}
+							className="bg-blue-600 hover:bg-blue-700"
+						>
+							{isResettingPassword ? "Resetting..." : "Reset Password"}
 						</Button>
 					</div>
 				</AlertDialogContent>
@@ -285,7 +424,7 @@ const ManageUsers = () => {
 													</Badge>
 												</TableCell>
 												<TableCell className="text-right">
-													<DropdownMenu>
+													<DropdownMenu modal={false}>
 														<DropdownMenuTrigger asChild>
 															<Button
 																size="sm"
@@ -305,12 +444,24 @@ const ManageUsers = () => {
 																View User
 															</DropdownMenuItem>
 															<DropdownMenuItem
-																onClick={() =>
-																	console.log("Reset password", user._id)
-																}
+																onClick={() => openResetPasswordDialog(user)}
 															>
 																Reset Password
 															</DropdownMenuItem>
+															{!user.isVerified && (
+																<DropdownMenuItem
+																	disabled={
+																		verificationActionUserId === user._id
+																	}
+																	onClick={() =>
+																		handleSendVerificationLink(user)
+																	}
+																>
+																	{verificationActionUserId === user._id
+																		? "Sending verification..."
+																		: "Send Verification Link"}
+																</DropdownMenuItem>
+															)}
 															<DropdownMenuItem
 																onClick={() => setUserToDelete(user._id)}
 																className="text-red-600"

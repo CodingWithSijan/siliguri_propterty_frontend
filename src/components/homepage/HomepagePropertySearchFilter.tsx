@@ -291,7 +291,7 @@ const HomepagePropertySearchFilter: React.FC = () => {
 					<span className="text-xs text-slate-600">{filters.radiusKm} km</span>
 				</div>
 
-				<div className="mt-1 flex flex-col gap-2 md:col-span-2 lg:col-span-3 xl:col-span-12 xl:flex-row xl:items-end xl:justify-end">
+				<div className="mt-2 flex flex-col gap-2 md:col-span-2 lg:col-span-3 xl:col-span-12 sm:flex-row sm:flex-wrap sm:justify-center sm:gap-3 xl:items-end xl:justify-center">
 					<button
 						type="button"
 						onClick={handleUseCurrentLocation}
