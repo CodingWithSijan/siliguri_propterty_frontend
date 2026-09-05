@@ -73,7 +73,7 @@ const SocialAuthButtons: React.FC<SocialAuthButtonsProps> = ({ mode }) => {
 			{backendRoot && !providers.google && (
 				<p className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-md px-3 py-2">
 					Google login is disabled on the server. Set GOOGLE_CLIENT_ID and
-					 GOOGLE_CLIENT_SECRET in backend production environment variables.
+					GOOGLE_CLIENT_SECRET in backend production environment variables.
 				</p>
 			)}
 		</div>
