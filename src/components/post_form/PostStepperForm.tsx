@@ -4,7 +4,7 @@
 // Handles step navigation, form state, and submission logic.
 // Renders the appropriate step component based on the current step and intent.
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useForm, FormProvider, useWatch } from "react-hook-form";
 import StepPropertyType from "./steps/StepProperty";
 import StepDetailsRent from "./steps/StepDetailsRent";
@@ -216,7 +216,14 @@ const PostStepperForm: React.FC<PostStepperFormProps> = ({ intent }) => {
 	const dispatch = useDispatch<AppDispatch>();
 
 	const [step, setStep] = useState(0);
+	const submitIntentRef = useRef(false);
 	const progress = Math.round(((step + 1) / STEPS.length) * 100);
+
+	useEffect(() => {
+		if (step === 3) {
+			submitIntentRef.current = false;
+		}
+	}, [step]);
 
 	const getCurrentStepFields = (): FormFieldKey[] => {
 		if (step === 0) {
@@ -251,6 +258,11 @@ const PostStepperForm: React.FC<PostStepperFormProps> = ({ intent }) => {
 	};
 
 	const onSubmit = methods.handleSubmit(async (data) => {
+		if (!submitIntentRef.current) {
+			return;
+		}
+		submitIntentRef.current = false;
+
 		const formData = new FormData();
 		Object.entries(data).forEach(([key, value]) => {
 			if ((key === "pictures" || key === "videos") && Array.isArray(value)) {
@@ -440,6 +452,9 @@ const PostStepperForm: React.FC<PostStepperFormProps> = ({ intent }) => {
 							) : (
 								<Button
 									type="submit"
+									onClick={() => {
+										submitIntentRef.current = true;
+									}}
 									className={`h-10 min-w-[112px] sm:h-11 sm:min-w-[120px] ${loading ? "bg-gray-500" : ""}`}
 									disabled={loading}
 								>

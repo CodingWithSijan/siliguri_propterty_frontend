@@ -32,6 +32,23 @@ export interface User {
 	isVerified: boolean;
 }
 
+export interface CreateUserBySuperAdminPayload {
+	name: string;
+	email: string;
+	phoneNumber?: string;
+	password?: string;
+	verificationMethod: "link" | "otp";
+}
+
+export interface CreateUserBySuperAdminResponse {
+	user: User;
+	temporaryPassword: string;
+	verificationMethod: "link" | "otp";
+	otpCode: string | null;
+	onboardingEmailSent: boolean;
+	onboardingEmailError: string | null;
+}
+
 export interface Post {
 	_id: string;
 	title: string;
@@ -94,6 +111,22 @@ export const updateUserRole = async (
 
 	return response.data.data;
 };
+
+export const resetUserPasswordByAdmin = async (
+	userId: string,
+	newPassword: string,
+): Promise<string> => {
+	const endpoint = `/api/admin/users/${userId}/reset-password`;
+	const response = await BASE_URL.patch<ApiResponse<null>>(endpoint, {
+		newPassword,
+	});
+
+	if (!response.data.success) {
+		throw new Error(response.data.message || "Failed to reset password");
+	}
+
+	return response.data.message;
+};
 export const fetchAllUsers = async (): Promise<User[]> => {
 	const endpoint = `/api/admin/get-all-users`;
 	const response = await BASE_URL.get<ApiResponse<User[]>>(endpoint);
@@ -118,6 +151,19 @@ export const fetchAdminUsers = async (query = ""): Promise<User[]> => {
 	return response.data.data;
 };
 
+export const searchUsersForSuperAdmin = async (query = ""): Promise<User[]> => {
+	const endpoint = `/api/admin/users/search${
+		query.trim() ? `?q=${encodeURIComponent(query.trim())}` : ""
+	}`;
+	const response = await BASE_URL.get<ApiResponse<User[]>>(endpoint);
+
+	if (!response.data.success) {
+		throw new Error(response.data.message || "Failed to search users");
+	}
+
+	return response.data.data;
+};
+
 export const promoteAdminByEmail = async (email: string): Promise<User> => {
 	const endpoint = `/api/admin/promote-admin-by-email`;
 	const response = await BASE_URL.post<ApiResponse<User>>(endpoint, { email });
@@ -127,6 +173,36 @@ export const promoteAdminByEmail = async (email: string): Promise<User> => {
 	}
 
 	return response.data.data;
+};
+
+export const createUserBySuperAdmin = async (
+	payload: CreateUserBySuperAdminPayload,
+): Promise<CreateUserBySuperAdminResponse> => {
+	const endpoint = `/api/admin/users/create`;
+	const response = await BASE_URL.post<
+		ApiResponse<CreateUserBySuperAdminResponse>
+	>(endpoint, payload);
+
+	if (!response.data.success) {
+		throw new Error(response.data.message || "Failed to create user");
+	}
+
+	return response.data.data;
+};
+
+export const resendVerificationLinkByAdmin = async (
+	userId: string,
+): Promise<string> => {
+	const endpoint = `/api/admin/users/${userId}/send-verification-link`;
+	const response = await BASE_URL.patch<ApiResponse<null>>(endpoint);
+
+	if (!response.data.success) {
+		throw new Error(
+			response.data.message || "Failed to send verification link",
+		);
+	}
+
+	return response.data.message;
 };
 export const fetchUserById = async (id: string): Promise<User> => {
 	const endpoint = `/api/admin/view-user/${id}`;
