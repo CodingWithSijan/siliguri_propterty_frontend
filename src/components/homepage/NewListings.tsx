@@ -6,6 +6,7 @@ import {
 	CarouselNext,
 	CarouselPrevious,
 } from "../ui/carousel";
+import { useNavigate } from "react-router-dom";
 import BASE_URL from "../../services";
 import axios from "axios";
 import {
@@ -16,9 +17,10 @@ import {
 import RentListingCard from "../card/RentListingCard";
 import SellListingCard from "../card/SellListingCard";
 import Autoplay from "embla-carousel-autoplay";
-import { FaHome } from "react-icons/fa";
+import { FaHome, FaArrowRight } from "react-icons/fa";
 
 const NewListings: React.FC = () => {
+	const navigate = useNavigate();
 	const [latestPosts, setLatestPosts] = useState<IUniversalListingType[]>([]);
 
 	useEffect(() => {
@@ -71,17 +73,27 @@ const NewListings: React.FC = () => {
 				</div>
 				{/* Carousel Container with Enhanced Styling */}
 				<div className="p-4 sm:p-4">
-					<Carousel
-						opts={{
-							align: "start",
-							loop: true,
-						}}
-						plugins={[plugin.current]}
-						className="w-full"
-					>
-						<CarouselContent>
-							{latestPosts &&
-								latestPosts.map((item) => (
+					{latestPosts.length === 0 ? (
+						<div className="flex min-h-[360px] flex-col items-center justify-center rounded-3xl border border-dashed border-gray-300 bg-white/80 p-10 text-center shadow-sm">
+							<FaHome className="mb-4 text-4xl text-blue-500" />
+							<p className="text-lg font-semibold text-gray-900">
+								No recent listings available yet.
+							</p>
+							<p className="mt-2 text-sm text-gray-600 max-w-lg">
+								We&apos;re updating our collection of new properties daily. Please check back shortly for the freshest listings.
+							</p>
+						</div>
+					) : (
+						<Carousel
+							opts={{
+								align: "start",
+								loop: true,
+							}}
+							plugins={[plugin.current]}
+							className="w-full"
+						>
+							<CarouselContent>
+								{latestPosts.map((item) => (
 									<CarouselItem
 										key={item._id}
 										className="sm:basis-1/1 md:basis-1/2 lg:basis-1/3 xl:basis-1/4 p-2 flex"
@@ -107,19 +119,19 @@ const NewListings: React.FC = () => {
 							<CarouselNext className="translate-x-2 bg-white/90 backdrop-blur-sm border-gray-200 hover:bg-white hover:shadow-lg transition-all duration-300" />
 						</div>
 					</Carousel>
+					)}
 				</div>
-				{/* View All Properties Button
 				{latestPosts && latestPosts.length > 0 && (
-					<div className="text-center mt-12">
+					<div className="text-center mt-10">
 						<button
 							onClick={() => navigate("/properties")}
-							className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-3 rounded-xl font-semibold hover:shadow-lg transition-all duration-300 hover:scale-105"
+							className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-3 rounded-full font-semibold hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5"
 						>
-							<span>View All Properties</span>
+							<span>Browse All Properties</span>
 							<FaArrowRight className="text-sm" />
 						</button>
 					</div>
-				)} */}
+				)}
 			</div>
 		</section>
 	);

@@ -1,5 +1,6 @@
 // 1. Redux Toolkit functions to create slices and async actions
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import axios from "axios";
 import BASE_URL from "../../services"; // Your Axios base instance (e.g., axios.create)
 import { IUniversalListingType } from "../../types/listingTypes"; // Type for post
 
@@ -17,11 +18,11 @@ export const addNewPost = createAsyncThunk<
 				formData
 			);
 			return response.data.post as IUniversalListingType; // Success response
-		} catch (err: any) {
-			// On error, return a custom error message
-			return rejectWithValue(
-				err?.response?.data?.message || "Failed to add new post"
-			);
+		} catch (err: unknown) {
+			const errorMessage = axios.isAxiosError(err)
+				? err.response?.data?.message || err.message
+				: "Failed to add new post";
+			return rejectWithValue(errorMessage);
 		}
 	}
 );

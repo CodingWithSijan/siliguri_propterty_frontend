@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Navbar from "../components/header_and_footer/Navbar";
+import Footer from "../components/header_and_footer/Footer";
 import RentListingCard from "../components/card/RentListingCard";
 import {
 	Pagination,
@@ -114,12 +115,30 @@ const RentalPropertyByCategory: React.FC = () => {
 	return (
 		<>
 			<Navbar />
-			<Breadcrumb items={getBreadcrumbItems()} />
-			<div className="max-w-7xl mx-auto px-4 pb-8">
-				<h1 className="text-2xl font-bold mb-6 text-gray-800">
-					{getCategoryTitle()}
-				</h1>
-				{loading ? (
+			<div className="bg-slate-50 min-h-screen">
+				<div className="max-w-7xl mx-auto px-4 py-10">
+					<Breadcrumb items={getBreadcrumbItems()} />
+					<section className="mb-10 rounded-[2rem] border border-slate-200 bg-white p-8 shadow-lg shadow-slate-200/50">
+						<div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+							<div>
+								<h1 className="text-3xl font-bold text-slate-900">
+									{getCategoryTitle()}
+								</h1>
+								<p className="mt-2 text-slate-600 max-w-2xl">
+									Discover the best rental properties for {category} across Siliguri.
+								</p>
+							</div>
+							<div className="rounded-3xl bg-blue-50 px-4 py-3 text-sm text-blue-700 font-medium">
+								Comfortable rentals with flexible move-in options
+							</div>
+						</div>
+					</section>
+					<div className="max-w-3xl mx-auto mb-8 px-3 py-6 rounded-3xl bg-white shadow-inner shadow-slate-100 border border-slate-200">
+						<p className="text-center text-slate-600">
+							Easily compare neighborhoods, budgets, and amenities for the space you need.
+						</p>
+					</div>
+					{loading ? (
 					<div className="animate-pulse space-y-4">
 						<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
 							{Array.from({ length: 8 }).map((_, i) => (
@@ -174,6 +193,8 @@ const RentalPropertyByCategory: React.FC = () => {
 					</>
 				)}
 			</div>
+			<Footer />
+		</div>
 		</>
 	);
 };

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Navbar from "../components/header_and_footer/Navbar";
+import Footer from "../components/header_and_footer/Footer";
 import SellListingCard from "../components/card/SellListingCard";
 import {
 	Pagination,
@@ -116,23 +117,40 @@ const SellPropertyByCategory: React.FC = () => {
 	return (
 		<>
 			<Navbar />
-
-			<Breadcrumb items={getBreadcrumbItems()} />
-			<div className="max-w-7xl mx-auto px-4 pb-8">
-				<h1 className="text-2xl font-bold mb-6 text-gray-800">
-					{getCategoryTitle()}
-				</h1>
-				{loading ? (
-					<div className="animate-pulse space-y-4">
-						<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-							{Array.from({ length: 8 }).map((_, i) => (
-								<div key={i} className="h-56 bg-gray-200 rounded-md" />
-							))}
+			<div className="bg-slate-50 min-h-screen">
+				<div className="max-w-7xl mx-auto px-4 py-10">
+					<Breadcrumb items={getBreadcrumbItems()} />
+					<section className="mb-10 rounded-[2rem] border border-slate-200 bg-white p-8 shadow-lg shadow-slate-200/50">
+						<div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+							<div>
+								<h1 className="text-3xl font-bold text-slate-900">
+									{getCategoryTitle()}
+								</h1>
+								<p className="mt-2 text-slate-600 max-w-2xl">
+									Browse curated listings for {category} properties in Siliguri and nearby neighborhoods.
+								</p>
+							</div>
+							<div className="rounded-3xl bg-blue-50 px-4 py-3 text-sm text-blue-700 font-medium">
+								Handpicked options for your search
+							</div>
 						</div>
+					</section>
+					<div className="max-w-3xl mx-auto mb-8 px-3 py-6 rounded-3xl bg-white shadow-inner shadow-slate-100 border border-slate-200">
+						<p className="text-center text-slate-600">
+							Browse category-specific for-sale listings filtered by your chosen property type.
+						</p>
 					</div>
-				) : (
-					<>
-						<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-8">
+					{loading ? (
+						<div className="animate-pulse space-y-4">
+							<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+								{Array.from({ length: 8 }).map((_, i) => (
+									<div key={i} className="h-56 bg-gray-200 rounded-md" />
+								))}
+							</div>
+						</div>
+					) : (
+						<>
+							<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-8">
 							{posts.length === 0 ? (
 								<div className="col-span-full text-center text-gray-500">
 									No {category || "sale"} properties found.
@@ -143,7 +161,7 @@ const SellPropertyByCategory: React.FC = () => {
 										key={post._id}
 										listing={post}
 										onClick={() =>
-											navigate(`/sell/${post.propertyCategory}/${post._id}`)
+											navigate(`/buys/${post.propertyCategory}/${post._id}`)
 										}
 										userOrGlobal="global"
 									/>
@@ -179,6 +197,8 @@ const SellPropertyByCategory: React.FC = () => {
 						)}
 					</>
 				)}
+				</div>
+				<Footer />
 			</div>
 		</>
 	);

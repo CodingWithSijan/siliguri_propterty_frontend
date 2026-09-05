@@ -110,16 +110,26 @@ const Navbar: React.FC = () => {
 			<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 				<div className="flex justify-between h-16 items-center">
 					{/* Logo */}
-					<NavLink to="/" className="relative h-14 w-14 sm:h-16 sm:w-16">
-						<img
-							src={siliguri_property_logo_noBG}
-							alt="Logo"
-							className="w-full h-full object-contain"
-						/>
-					</NavLink>
+					<div className="flex items-center gap-3">
+						<NavLink to="/" className="relative h-14 w-14 sm:h-16 sm:w-16">
+							<img
+								src={siliguri_property_logo_noBG}
+								alt="Logo"
+								className="w-full h-full object-contain"
+							/>
+						</NavLink>
+						<div className="hidden sm:flex flex-col leading-tight">
+							<span className="text-base font-semibold text-slate-900">
+								Siliguri Property
+							</span>
+							<span className="text-sm text-slate-500">
+								Buy, rent, and sell with confidence
+							</span>
+						</div>
+					</div>
 
 					{/* Main navigation links */}
-					<div className="hidden md:flex items-center space-x-8 ml-8">
+					<div className="hidden md:flex items-center space-x-8 ml-10">
 						<NavLink
 							to="/properties"
 							className={({ isActive }) =>

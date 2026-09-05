@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import HeroSectionImage1Background from "../../assets/image1_hero_section.jpg";
 import HeroSectionImage2Background from "../../assets/image2_hero_section.jpg";
 import { motion, AnimatePresence } from "framer-motion";
@@ -8,6 +9,7 @@ import { useSiteStats } from "../../hooks/use-SiteStats";
 const HeroSection: React.FC = () => {
 	const [currentSlide, setCurrentSlide] = useState(0);
 	const { stats } = useSiteStats();
+	const navigate = useNavigate();
 	const slides = [
 		{
 			image: HeroSectionImage1Background,
@@ -34,7 +36,7 @@ const HeroSection: React.FC = () => {
 	}, [slides.length]);
 
 	return (
-		<div className="relative h-screen w-full overflow- bg-gray-900">
+		<div className="relative h-screen w-full overflow-hidden bg-gray-900">
 			{/* Carousel */}
 			<div className="absolute inset-0">
 				<AnimatePresence initial={false}>
@@ -63,14 +65,30 @@ const HeroSection: React.FC = () => {
 					initial={{ opacity: 0, y: 20 }}
 					animate={{ opacity: 1, y: 0 }}
 					transition={{ duration: 0.5, delay: 0.2 }}
-					className="text-center mb-12 hidden sm:block"
+					className="text-center mb-10"
 				>
 					<h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 drop-shadow-lg">
 						{slides[currentSlide].text}
 					</h1>
-					<p className="text-xl text-gray-200 drop-shadow-md">
+					<p className="text-xl text-gray-200 drop-shadow-md max-w-3xl mx-auto">
 						{slides[currentSlide].subtext}
 					</p>
+					<div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
+						<button
+							type="button"
+							onClick={() => navigate("/rentals")}
+							className="inline-flex items-center justify-center gap-2 rounded-full bg-blue-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-blue-600/20 transition hover:bg-blue-700"
+						>
+							Explore Rentals
+						</button>
+						<button
+							type="button"
+							onClick={() => navigate("/buys")}
+							className="inline-flex items-center justify-center gap-2 rounded-full bg-white/20 border border-white/30 px-6 py-3 text-sm font-semibold text-white backdrop-blur transition hover:bg-white/30"
+						>
+							Explore Sales
+						</button>
+					</div>
 				</motion.div>
 
 				{/* Interactive Search Filter */}
@@ -78,7 +96,7 @@ const HeroSection: React.FC = () => {
 					initial={{ opacity: 0, y: 30 }}
 					animate={{ opacity: 1, y: 0 }}
 					transition={{ duration: 0.6, delay: 0.4 }}
-					className="w-full max-w-6xl px-4 pt-15 sm:pt-0"
+					className="w-full max-w-6xl px-4 pt-6 sm:pt-0"
 				>
 					<div className="backdrop-blur-md bg-white/10 rounded-2xl border border-white/20 shadow-2xl p-1">
 						<div className="bg-white/95 backdrop-blur-sm rounded-xl shadow-lg">

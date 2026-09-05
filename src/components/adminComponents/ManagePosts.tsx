@@ -73,7 +73,7 @@ const ManagePosts = () => {
 
 	useEffect(() => {
 		refetchPosts();
-	}, [selectedStatus]);
+	}, [selectedStatus, refetchPosts]);
 
 	const handleStatusChange = (value: string) => setSelectedStatus(value);
 

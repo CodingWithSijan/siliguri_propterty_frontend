@@ -34,6 +34,9 @@ const allFields = [
 	"title",
 	"description",
 	"location",
+	"coordinates",
+	"wbLocalityKey",
+	"wbLocalityLabel",
 	"alternateLocation",
 	"pricePerUnit",
 	"unit",
@@ -76,6 +79,9 @@ const EditPostStepperForm: React.FC<EditPostStepperFormProps> = ({
 			description: initialData.description,
 			location: initialData.location,
 			alternateLocation: initialData.alternateLocation,
+			wbLocalityKey: initialData.wbLocalityKey,
+			wbLocalityLabel: initialData.wbLocalityLabel,
+			coordinates: initialData.coordinates,
 		};
 
 		// Add intent-specific fields with type checking
@@ -151,6 +157,9 @@ const EditPostStepperForm: React.FC<EditPostStepperFormProps> = ({
 				"propertyCategory",
 				"title",
 				"description",
+				"coordinates",
+				"wbLocalityKey",
+				"wbLocalityLabel",
 				"location",
 				"intent",
 			];
@@ -186,18 +195,22 @@ const EditPostStepperForm: React.FC<EditPostStepperFormProps> = ({
 					// Handle new pictures - these are File objects
 					if (value instanceof FileList) {
 						Array.from(value).forEach((file) =>
-							formData.append("pictures", file)
+							formData.append("pictures", file),
 						);
 					}
 				} else if (key === "existingPictures") {
 					// Handle existing pictures - these are URLs to keep
 					if (Array.isArray(value)) {
 						value.forEach((imageUrl) =>
-							formData.append("existingPictures", imageUrl)
+							formData.append("existingPictures", imageUrl),
 						);
 					}
 				} else if (value !== undefined && value !== null && value !== "") {
-					formData.append(key, String(value));
+					if (typeof value === "object") {
+						formData.append(key, JSON.stringify(value));
+					} else {
+						formData.append(key, String(value));
+					}
 				}
 			});
 

@@ -1,34 +1,86 @@
 // File: components/PostForm/steps/StepPreview.tsx
 import { useFormContext } from "react-hook-form";
 import { useEffect, useState } from "react";
-import { CheckCircle, XCircle, MinusCircle } from "lucide-react";
+import {
+	CheckCircle,
+	XCircle,
+	MinusCircle,
+	ArrowLeft,
+	FileText,
+	Home,
+	Images,
+	MapPin,
+	Settings2,
+} from "lucide-react";
+import type { ReactNode } from "react";
+import { Button } from "../../ui/button";
 
-const StepPreview = () => {
-	const { getValues } = useFormContext();
-	const [previewData, setPreviewData] = useState<any>({});
+interface StepPreviewProps {
+	onEditStep?: (stepIndex: number) => void;
+}
+
+interface PreviewFormData {
+	propertyCategory?: "house" | "flat" | "land" | "shop" | string;
+	title?: string;
+	description?: string;
+	location?: string;
+	alternateLocation?: string;
+	wbLocalityLabel?: string;
+	bedrooms?: string | number;
+	bathrooms?: string | number;
+	builtUpArea?: string | number;
+	furnishing?: string;
+	attachedBathroom?: boolean;
+	parking?: boolean;
+	availableFrom?: string;
+	availableLandSpace?: string | number;
+	availableLandSpaceUnit?: string;
+	unit?: string;
+	pricePerUnit?: string | number;
+	totalPrice?: string | number;
+	shopArea?: string | number;
+	hasShutter?: boolean;
+	price?: string | number;
+	pricePerFrequency?: string | number;
+	frequency?: string;
+	availableForDuration?: string | number;
+	availableForDurationUnit?: string;
+	duration?: string;
+	pictures?: File[];
+	videos?: File[];
+	[key: string]: unknown;
+}
+
+const StepPreview = ({ onEditStep }: StepPreviewProps) => {
+	const { getValues } = useFormContext<PreviewFormData>();
+	const [previewData, setPreviewData] = useState<PreviewFormData>({});
 	const [previews, setPreviews] = useState<string[]>([]);
+	const [videoPreviews, setVideoPreviews] = useState<string[]>([]);
 
 	useEffect(() => {
 		const values = getValues();
 		setPreviewData(values);
-		const files = values.pictures
-			? Array.from(values.pictures as FileList)
-			: [];
+		const files = values.pictures ? [...values.pictures] : [];
 		const urls = files.map((file) => URL.createObjectURL(file));
+		const videoFiles = values.videos ? [...values.videos] : [];
+		const videoUrls = videoFiles.map((file) => URL.createObjectURL(file));
 		setPreviews(urls);
-		return () => urls.forEach((url) => URL.revokeObjectURL(url));
+		setVideoPreviews(videoUrls);
+		return () => {
+			urls.forEach((url) => URL.revokeObjectURL(url));
+			videoUrls.forEach((url) => URL.revokeObjectURL(url));
+		};
 	}, [getValues]);
 
 	const formatBoolean = (val: boolean | undefined | null) => (
 		<span
-			className={`flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium
-        ${
-					val === true
-						? "bg-green-100 text-green-600"
-						: val === false
-						? "bg-red-100 text-red-600"
-						: "bg-gray-100 text-gray-500"
-				}`}
+			className={`flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium ${
+				val === true
+					? "bg-green-100 text-green-700"
+					: val === false
+						? "bg-red-100 text-red-700"
+						: "bg-slate-100 text-slate-600"
+			}`}
 		>
 			{val === true ? (
 				<CheckCircle size={14} />
@@ -44,7 +96,54 @@ const StepPreview = () => {
 	const formatDate = (val: string | undefined | null) => {
 		if (!val) return "-";
 		const d = new Date(val);
-		return isNaN(d.getTime()) ? String(val) : d.toLocaleDateString();
+		return Number.isNaN(d.getTime()) ? String(val) : d.toLocaleDateString();
+	};
+
+	const formatCurrency = (value: unknown): string => {
+		if (value === undefined || value === null || value === "") return "-";
+		const parsed = typeof value === "string" ? Number(value) : value;
+		if (typeof parsed === "number" && !Number.isNaN(parsed)) {
+			return new Intl.NumberFormat("en-IN", {
+				style: "currency",
+				currency: "INR",
+				maximumFractionDigits: 0,
+			}).format(parsed);
+		}
+		return String(value);
+	};
+
+	const toDisplayValue = (value: unknown): ReactNode => {
+		if (value === undefined || value === null || value === "") {
+			return "-";
+		}
+
+		if (typeof value === "string" || typeof value === "number") {
+			return value;
+		}
+
+		if (typeof value === "boolean") {
+			return value ? "Yes" : "No";
+		}
+
+		return String(value);
+	};
+
+	const normalizeLabel = (field: string): string => {
+		const map: Record<string, string> = {
+			builtUpArea: "Built-up Area",
+			availableLandSpace: "Land Area",
+			availableLandSpaceUnit: "Land Area Unit",
+			pricePerUnit: "Price Per Unit",
+			totalPrice: "Total Price",
+			shopArea: "Shop Area",
+			availableForDuration: "Available Duration",
+			availableForDurationUnit: "Duration Unit",
+			pricePerFrequency: "Price Per Frequency",
+		};
+		if (map[field]) return map[field];
+		return field
+			.replace(/([A-Z])/g, " $1")
+			.replace(/^./, (char) => char.toUpperCase());
 	};
 
 	const propertyCategory = previewData.propertyCategory;
@@ -53,43 +152,108 @@ const StepPreview = () => {
 	const isLand = propertyCategory === "land";
 	const isShop = propertyCategory === "shop";
 
-	const InfoRow = ({ label, value }: { label: string; value: any }) => (
-		<div className="flex flex-col">
-			<span className="text-gray-500 text-sm">{label}</span>
-			<span className="text-gray-900 font-semibold capitalize">
-				{value || "-"}
+	const InfoRow = ({ label, value }: { label: string; value: ReactNode }) => (
+		<div className="flex flex-col rounded-lg border border-slate-200 bg-white px-3 py-2">
+			<span className="text-xs font-medium uppercase tracking-[0.08em] text-slate-500">
+				{label}
+			</span>
+			<span className="break-words text-sm font-semibold text-slate-900">
+				{value ?? "-"}
 			</span>
 		</div>
 	);
 
 	return (
-		<div className="space-y-10 p-6 bg-white rounded-2xl shadow-md border border-gray-200 max-w-5xl mx-auto">
-			<h2 className="text-3xl font-bold text-center text-blue-700 tracking-tight">
-				🎯 Review Your Post
-			</h2>
-			<p className="text-center text-gray-500">
-				Please confirm all details before publishing
-			</p>
-
-			{/* Basic Info */}
-			<div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-				<InfoRow label="Title" value={previewData.title} />
-				<InfoRow label="Description" value={previewData.description} />
-				<InfoRow label="Location" value={previewData.location} />
-				<InfoRow label="Property Type" value={propertyCategory} />
+		<div className="mx-auto max-w-5xl space-y-6 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
+			<div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+				<div className="flex items-start gap-2">
+					<div className="rounded-lg bg-slate-900 p-1.5 text-white">
+						<FileText className="h-4 w-4" />
+					</div>
+					<div>
+						<h2 className="text-lg font-bold text-slate-900 sm:text-2xl">
+							Review Before Publish
+						</h2>
+						<p className="text-sm text-slate-600">
+							Confirm information, pricing, and photos before final submission.
+						</p>
+					</div>
+				</div>
 			</div>
 
-			{/* Conditional Sections */}
-			{isHouseOrFlat && (
-				<div className="bg-gray-50 p-6 rounded-xl border border-gray-200 space-y-4">
-					<h3 className="text-lg font-semibold text-blue-600">
-						🏠 {propertyCategory} Details
+			<div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
+				<Button
+					type="button"
+					variant="outline"
+					className="justify-start"
+					onClick={() => onEditStep?.(0)}
+				>
+					<ArrowLeft className="mr-2 h-4 w-4" />
+					Edit Basics
+				</Button>
+				<Button
+					type="button"
+					variant="outline"
+					className="justify-start"
+					onClick={() => onEditStep?.(1)}
+				>
+					<ArrowLeft className="mr-2 h-4 w-4" />
+					Edit Details
+				</Button>
+				<Button
+					type="button"
+					variant="outline"
+					className="justify-start"
+					onClick={() => onEditStep?.(2)}
+				>
+					<ArrowLeft className="mr-2 h-4 w-4" />
+					Edit Media
+				</Button>
+			</div>
+
+			<div className="space-y-3 rounded-xl border border-slate-200 bg-white p-4">
+				<div className="flex items-center gap-2 text-slate-900">
+					<MapPin className="h-4 w-4" />
+					<h3 className="text-sm font-semibold uppercase tracking-[0.08em]">
+						Listing Basics
 					</h3>
-					<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+				</div>
+				<div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+					<InfoRow label="Title" value={previewData.title} />
+					<InfoRow label="Description" value={previewData.description} />
+					<InfoRow label="Location" value={previewData.location} />
+					<InfoRow
+						label="Siliguri Area"
+						value={toDisplayValue(previewData.wbLocalityLabel)}
+					/>
+					<InfoRow
+						label="Exact Address / Landmark"
+						value={toDisplayValue(previewData.alternateLocation)}
+					/>
+					<InfoRow
+						label="Property Type"
+						value={toDisplayValue(propertyCategory)}
+					/>
+				</div>
+			</div>
+
+			{isHouseOrFlat && (
+				<div className="space-y-3 rounded-xl border border-slate-200 bg-white p-4">
+					<div className="flex items-center gap-2 text-slate-900">
+						<Home className="h-4 w-4" />
+						<h3 className="text-sm font-semibold uppercase tracking-[0.08em]">
+							{String(propertyCategory)} Details
+						</h3>
+					</div>
+					<div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
 						{["bedrooms", "bathrooms", "builtUpArea", "furnishing"].map(
 							(field) => (
-								<InfoRow key={field} label={field} value={previewData[field]} />
-							)
+								<InfoRow
+									key={field}
+									label={normalizeLabel(field)}
+									value={toDisplayValue(previewData[field])}
+								/>
+							),
 						)}
 						<InfoRow
 							label="Attached Bathroom"
@@ -108,11 +272,14 @@ const StepPreview = () => {
 			)}
 
 			{isLand && (
-				<div className="bg-gray-50 p-6 rounded-xl border border-gray-200 space-y-4">
-					<h3 className="text-lg font-semibold text-blue-600">
-						🌾 Land Details
-					</h3>
-					<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+				<div className="space-y-3 rounded-xl border border-slate-200 bg-white p-4">
+					<div className="flex items-center gap-2 text-slate-900">
+						<Settings2 className="h-4 w-4" />
+						<h3 className="text-sm font-semibold uppercase tracking-[0.08em]">
+							Land Details
+						</h3>
+					</div>
+					<div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
 						{[
 							"availableLandSpace",
 							"availableLandSpaceUnit",
@@ -120,19 +287,29 @@ const StepPreview = () => {
 							"pricePerUnit",
 							"totalPrice",
 						].map((field) => (
-							<InfoRow key={field} label={field} value={previewData[field]} />
+							<InfoRow
+								key={field}
+								label={normalizeLabel(field)}
+								value={toDisplayValue(previewData[field])}
+							/>
 						))}
 					</div>
 				</div>
 			)}
 
 			{isShop && (
-				<div className="bg-gray-50 p-6 rounded-xl border border-gray-200 space-y-4">
-					<h3 className="text-lg font-semibold text-blue-600">
-						🏪 Shop Details
-					</h3>
-					<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-						<InfoRow label="Shop Area (sq ft)" value={previewData.shopArea} />
+				<div className="space-y-3 rounded-xl border border-slate-200 bg-white p-4">
+					<div className="flex items-center gap-2 text-slate-900">
+						<Settings2 className="h-4 w-4" />
+						<h3 className="text-sm font-semibold uppercase tracking-[0.08em]">
+							Shop Details
+						</h3>
+					</div>
+					<div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+						<InfoRow
+							label="Shop Area (sq ft)"
+							value={toDisplayValue(previewData.shopArea)}
+						/>
 						<InfoRow
 							label="Has Shutter"
 							value={formatBoolean(previewData.hasShutter)}
@@ -141,40 +318,106 @@ const StepPreview = () => {
 				</div>
 			)}
 
-			{/* Price Section */}
-			<div className="bg-gray-50 p-6 rounded-xl border border-gray-200 space-y-2">
-				<h3 className="text-lg font-semibold text-blue-600">💰 Pricing</h3>
+			{previewData.pricePerFrequency && (
+				<div className="space-y-3 rounded-xl border border-slate-200 bg-white p-4">
+					<div className="flex items-center gap-2 text-slate-900">
+						<Settings2 className="h-4 w-4" />
+						<h3 className="text-sm font-semibold uppercase tracking-[0.08em]">
+							Rental Terms
+						</h3>
+					</div>
+					<div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+						<InfoRow
+							label="Price Per Frequency"
+							value={formatCurrency(previewData.pricePerFrequency)}
+						/>
+						<InfoRow
+							label="Frequency"
+							value={toDisplayValue(previewData.frequency)}
+						/>
+						<InfoRow
+							label="Available Duration"
+							value={toDisplayValue(previewData.availableForDuration)}
+						/>
+						<InfoRow
+							label="Duration Unit"
+							value={toDisplayValue(previewData.availableForDurationUnit)}
+						/>
+					</div>
+				</div>
+			)}
+
+			<div className="space-y-3 rounded-xl border border-slate-200 bg-white p-4">
+				<div className="flex items-center gap-2 text-slate-900">
+					<FileText className="h-4 w-4" />
+					<h3 className="text-sm font-semibold uppercase tracking-[0.08em]">
+						Pricing
+					</h3>
+				</div>
 				<InfoRow
 					label="Price (INR)"
-					value={
+					value={formatCurrency(
 						previewData.price ||
-						previewData.pricePerUnit ||
-						previewData.pricePerFrequency
-					}
+							previewData.pricePerUnit ||
+							previewData.pricePerFrequency,
+					)}
 				/>
 				{previewData.duration && (
 					<InfoRow label="Duration" value={previewData.duration} />
 				)}
 			</div>
 
-			{/* Image Preview */}
 			{previews.length > 0 && (
-				<div className="bg-gray-50 p-6 rounded-xl border border-gray-200">
-					<h3 className="text-lg font-semibold text-blue-600 mb-3">
-						📷 Uploaded Pictures
-					</h3>
-					<div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+				<div className="rounded-xl border border-slate-200 bg-white p-4">
+					<div className="mb-3 flex items-center justify-between gap-2">
+						<div className="flex items-center gap-2 text-slate-900">
+							<Images className="h-4 w-4" />
+							<h3 className="text-sm font-semibold uppercase tracking-[0.08em]">
+								Uploaded Pictures
+							</h3>
+						</div>
+						<span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-600">
+							{previews.length} files
+						</span>
+					</div>
+					<div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
 						{previews.map((src, idx) => (
 							<div
 								key={idx}
-								className="aspect-square rounded-lg overflow-hidden border shadow-sm hover:shadow-md hover:scale-105 transition"
+								className="aspect-square overflow-hidden rounded-lg border border-slate-200 bg-slate-50 shadow-sm transition hover:shadow-md"
 							>
 								<img
 									src={src}
 									alt={`preview-${idx}`}
-									className="w-full h-full object-cover"
+									className="h-full w-full object-cover"
 								/>
 							</div>
+						))}
+					</div>
+				</div>
+			)}
+
+			{videoPreviews.length > 0 && (
+				<div className="rounded-xl border border-slate-200 bg-white p-4">
+					<div className="mb-3 flex items-center justify-between gap-2">
+						<div className="flex items-center gap-2 text-slate-900">
+							<Images className="h-4 w-4" />
+							<h3 className="text-sm font-semibold uppercase tracking-[0.08em]">
+								Uploaded Videos
+							</h3>
+						</div>
+						<span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-600">
+							{videoPreviews.length} files
+						</span>
+					</div>
+					<div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+						{videoPreviews.map((src, idx) => (
+							<video
+								key={src + idx}
+								src={src}
+								controls
+								className="h-52 w-full rounded-lg border border-slate-200 object-cover"
+							/>
 						))}
 					</div>
 				</div>

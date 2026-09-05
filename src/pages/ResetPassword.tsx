@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
 import { FaLock, FaKey } from "react-icons/fa";
 import BASE_URL from "../services";
@@ -40,9 +41,14 @@ const ResetPassword: React.FC = () => {
 			setSuccess("Password reset successful! Redirecting to login...");
 			showSuccess("Password reset successful!");
 			setTimeout(() => navigate("/login"), 2000);
-		} catch (err: any) {
-			setError(err.response?.data?.message || "Failed to reset password.");
-			showError(err.response?.data?.message || "Failed to reset password.");
+		} catch (err: unknown) {
+			const message = axios.isAxiosError(err)
+				? err.response?.data?.message || "Failed to reset password."
+				: err instanceof Error
+				? err.message
+				: "Failed to reset password.";
+			setError(message);
+			showError(message);
 		} finally {
 			setLoading(false);
 		}

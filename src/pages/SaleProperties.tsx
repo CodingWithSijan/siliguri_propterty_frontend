@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Navbar from "../components/header_and_footer/Navbar";
+import Footer from "../components/header_and_footer/Footer";
 import SellListingCard from "../components/card/SellListingCard";
 import {
 	Pagination,
@@ -99,11 +100,24 @@ const SellProperties: React.FC = () => {
 		<>
 			<Navbar />
 			<Breadcrumb items={getBreadcrumbItems()} />
-			<div className="max-w-7xl mx-auto px-4 py-8">
-				<h1 className="text-2xl font-bold mb-6 text-gray-800">
-					Properties for Sale
-				</h1>
-				{loading ? (
+			<div className="bg-slate-50 min-h-screen">
+				<div className="max-w-7xl mx-auto px-4 py-10">
+					<section className="mb-10 rounded-[2rem] border border-slate-200 bg-white p-8 shadow-lg shadow-slate-200/50">
+						<div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+							<div>
+								<h1 className="text-3xl font-bold text-slate-900">
+									Premium properties for sale
+								</h1>
+								<p className="mt-2 text-slate-600 max-w-2xl">
+									Browse top sale listings in Siliguri and find your ideal property with confidence.
+								</p>
+							</div>
+							<div className="rounded-3xl bg-blue-50 px-4 py-3 text-sm text-blue-700 font-medium">
+								Verified for sale listings
+							</div>
+						</div>
+					</section>
+					{loading ? (
 					<div className="animate-pulse space-y-4">
 						<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
 							{Array.from({ length: 8 }).map((_, i) => (
@@ -155,6 +169,8 @@ const SellProperties: React.FC = () => {
 						</Pagination>
 					</>
 				)}
+				</div>
+				<Footer />
 			</div>
 		</>
 	);

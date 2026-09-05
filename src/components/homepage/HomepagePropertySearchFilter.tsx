@@ -1,17 +1,23 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
 	FaSearch,
 	FaMapMarkerAlt,
 	FaHome,
 	FaMoneyBillWave,
 	FaHandshake,
+	FaLocationArrow,
 } from "react-icons/fa";
+import { WEST_BENGAL_LOCATIONS } from "../../constants/westBengalLocations";
+import { isWithinWestBengal } from "../../utils/geo";
+import { showError, showInfo } from "../../utils/toastUtils";
 
 const propertyTypes = [
 	{ value: "", label: "Any Type" },
 	{ value: "house", label: "House" },
 	{ value: "flat", label: "Flat/Apartment" },
 	{ value: "shop", label: "Shop" },
+	{ value: "land", label: "Land" },
 ];
 
 const rentPriceRanges = [
@@ -50,42 +56,23 @@ const buyPriceRanges = [
 	{ value: "15000000+", label: "₹1.5 Crore+" },
 ];
 
-const locations = [
-	{ value: "", label: "Any Location" },
-	{ value: "siliguri_city", label: "Siliguri City Center" },
-	{ value: "sevoke", label: "Sevoke Road" },
-	{ value: "matigara", label: "Matigara" },
-	{ value: "pradhan_nagar", label: "Pradhan Nagar" },
-	{ value: "salugara", label: "Salugara" },
-	{ value: "dagapur", label: "Dagapur" },
-	{ value: "bidhan_nagar", label: "Bidhan Nagar" },
-	{ value: "shiv_mandir", label: "Shiv Mandir Area" },
-	{ value: "jalpaiguri_road", label: "Jalpaiguri Road" },
-	{ value: "hakimpara", label: "Hakimpara" },
-	{ value: "ashighar", label: "Ashighar" },
-	{ value: "khalpara", label: "Khalpara" },
-	{ value: "darjeeling_more", label: "Darjeeling More" },
-	{ value: "court_more", label: "Court More" },
-	{ value: "mallaguri", label: "Mallaguri" },
-	{ value: "champasari", label: "Champasari" },
-	{ value: "uttorayon", label: "Uttorayon" },
-	{ value: "college_para", label: "College Para" },
-	{ value: "bagdogra", label: "Bagdogra" },
-	{ value: "other", label: "Other" },
-];
-
 const purposeOptions = [
 	{ value: "", label: "Any" },
 	{ value: "rent", label: "Rent" },
-	{ value: "buy", label: "Buy" },
+	{ value: "sell", label: "Buy" },
 ];
 
 const HomepagePropertySearchFilter: React.FC = () => {
+	const navigate = useNavigate();
+	const [geoLoading, setGeoLoading] = useState(false);
 	const [filters, setFilters] = useState({
 		propertyType: "",
 		priceRange: "",
 		location: "",
 		purpose: "",
+		lat: "",
+		lng: "",
+		radiusKm: "12",
 	});
 
 	// Function to get appropriate price ranges based on purpose
@@ -119,122 +106,220 @@ const HomepagePropertySearchFilter: React.FC = () => {
 
 	const handleSearch = (e: React.FormEvent) => {
 		e.preventDefault();
-		alert(
-			`Searching for:
-Property Type: ${filters.propertyType || "Any"}
-Price Range: ${filters.priceRange || "Any"}
-Location: ${filters.location || "Any"}
-Purpose: ${filters.purpose || "Any"}`
+		const params = new URLSearchParams();
+
+		if (filters.propertyType) params.set("category", filters.propertyType);
+		if (filters.purpose) params.set("intent", filters.purpose);
+		if (filters.location) params.set("location", filters.location);
+		if (filters.lat && filters.lng) {
+			params.set("lat", filters.lat);
+			params.set("lng", filters.lng);
+			params.set("radiusKm", filters.radiusKm || "12");
+			params.set("sort", "nearest");
+		}
+
+		if (filters.priceRange) {
+			if (filters.priceRange.includes("+")) {
+				const min = filters.priceRange.replace("+", "");
+				params.set("minPrice", min);
+			} else {
+				const [min, max] = filters.priceRange.split("-");
+				if (min) params.set("minPrice", min);
+				if (max) params.set("maxPrice", max);
+			}
+		}
+
+		navigate(`/properties?${params.toString()}`);
+	};
+
+	const handleUseCurrentLocation = () => {
+		if (!navigator.geolocation) {
+			showError("Geolocation is not available in this browser.");
+			return;
+		}
+
+		setGeoLoading(true);
+		navigator.geolocation.getCurrentPosition(
+			(position) => {
+				const lat = position.coords.latitude;
+				const lng = position.coords.longitude;
+
+				if (!isWithinWestBengal({ lat, lng })) {
+					showError("Geo search is currently available inside Siliguri only.");
+					setGeoLoading(false);
+					return;
+				}
+
+				showInfo("Current location captured for nearby property search.");
+				setFilters((prev) => ({
+					...prev,
+					lat: String(lat),
+					lng: String(lng),
+				}));
+				setGeoLoading(false);
+			},
+			() => {
+				showError("Unable to access your location. Please allow permission.");
+				setGeoLoading(false);
+			},
+			{ enableHighAccuracy: true, timeout: 10000 },
 		);
+	};
+
+	const clearGeoSelection = () => {
+		setFilters((prev) => ({ ...prev, lat: "", lng: "" }));
 	};
 
 	return (
 		<form
 			onSubmit={handleSearch}
-			className=" w-full bg-white/40 backdrop-blur-md rounded-xl px-6 py-6 flex flex-wrap gap-4 justify-between items-end shadow-lg border border-white/20"
+			className="w-full rounded-xl border border-white/20 bg-white/40 px-4 py-5 shadow-lg backdrop-blur-md sm:px-6 sm:py-6"
 		>
-			{/* Purpose */}
-			<div className="flex flex-col flex-1 min-w-[180px]">
-				<label
-					htmlFor="purpose"
-					className="mb-1 font-semibold text-gray-700 flex items-center gap-1"
-				>
-					<FaHandshake className="text-purple-500" /> Rent or Buy
-				</label>
-				<select
-					name="purpose"
-					id="purpose"
-					value={filters.purpose}
-					onChange={handleChange}
-					className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
-				>
-					{purposeOptions.map((option) => (
-						<option key={option.value} value={option.value}>
-							{option.label}
-						</option>
-					))}
-				</select>
-			</div>
+			<div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-12 xl:items-end">
+				{/* Purpose */}
+				<div className="flex flex-col xl:col-span-2">
+					<label
+						htmlFor="purpose"
+						className="mb-1 font-semibold text-gray-700 flex items-center gap-1"
+					>
+						<FaHandshake className="text-purple-500" /> Rent or Buy
+					</label>
+					<select
+						name="purpose"
+						id="purpose"
+						value={filters.purpose}
+						onChange={handleChange}
+						className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
+					>
+						{purposeOptions.map((option) => (
+							<option key={option.value} value={option.value}>
+								{option.label}
+							</option>
+						))}
+					</select>
+				</div>
 
-			{/* Property Type */}
-			<div className="flex flex-col flex-1 min-w-[180px]">
-				<label
-					htmlFor="propertyType"
-					className="mb-1 font-semibold text-gray-700 flex items-center gap-1"
-				>
-					<FaHome className="text-blue-500" /> Property Type
-				</label>
-				<select
-					name="propertyType"
-					id="propertyType"
-					value={filters.propertyType}
-					onChange={handleChange}
-					className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
-				>
-					{propertyTypes.map((type) => (
-						<option key={type.value} value={type.value}>
-							{type.label}
-						</option>
-					))}
-				</select>
-			</div>
+				{/* Property Type */}
+				<div className="flex flex-col xl:col-span-2">
+					<label
+						htmlFor="propertyType"
+						className="mb-1 font-semibold text-gray-700 flex items-center gap-1"
+					>
+						<FaHome className="text-blue-500" /> Property Type
+					</label>
+					<select
+						name="propertyType"
+						id="propertyType"
+						value={filters.propertyType}
+						onChange={handleChange}
+						className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
+					>
+						{propertyTypes.map((type) => (
+							<option key={type.value} value={type.value}>
+								{type.label}
+							</option>
+						))}
+					</select>
+				</div>
 
-			{/* Price Range */}
-			<div className="flex flex-col flex-1 min-w-[180px]">
-				<label
-					htmlFor="priceRange"
-					className="mb-1 font-semibold text-gray-700 flex items-center gap-1"
-				>
-					<FaMoneyBillWave className="text-green-500" />
-					{filters.purpose === "rent" ? "Monthly Rent" : "Price Range"}
-				</label>
-				<select
-					name="priceRange"
-					id="priceRange"
-					value={filters.priceRange}
-					onChange={handleChange}
-					className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
-				>
-					{getPriceRanges().map((range) => (
-						<option key={range.value} value={range.value}>
-							{range.label}
-						</option>
-					))}
-				</select>
-			</div>
+				{/* Price Range */}
+				<div className="flex flex-col xl:col-span-2">
+					<label
+						htmlFor="priceRange"
+						className="mb-1 font-semibold text-gray-700 flex items-center gap-1"
+					>
+						<FaMoneyBillWave className="text-green-500" />
+						{filters.purpose === "rent" ? "Monthly Rent" : "Price Range"}
+					</label>
+					<select
+						name="priceRange"
+						id="priceRange"
+						value={filters.priceRange}
+						onChange={handleChange}
+						className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
+					>
+						{getPriceRanges().map((range) => (
+							<option key={range.value} value={range.value}>
+								{range.label}
+							</option>
+						))}
+					</select>
+				</div>
 
-			{/* Location */}
-			<div className="flex flex-col flex-1 min-w-[180px]">
-				<label
-					htmlFor="location"
-					className="mb-1 font-semibold text-gray-700 flex items-center gap-1"
-				>
-					<FaMapMarkerAlt className="text-red-500" /> Location
-				</label>
-				<select
-					name="location"
-					id="location"
-					value={filters.location}
-					onChange={handleChange}
-					className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
-				>
-					{locations.map((loc) => (
-						<option key={loc.value} value={loc.value}>
-							{loc.label}
-						</option>
-					))}
-				</select>
-			</div>
+				{/* Location */}
+				<div className="flex flex-col xl:col-span-2">
+					<label
+						htmlFor="location"
+						className="mb-1 font-semibold text-gray-700 flex items-center gap-1"
+					>
+						<FaMapMarkerAlt className="text-red-500" /> Location
+					</label>
+					<select
+						name="location"
+						id="location"
+						value={filters.location}
+						onChange={handleChange}
+						className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
+					>
+						<option value="">Any Location</option>
+						{WEST_BENGAL_LOCATIONS.map((loc) => (
+							<option key={loc.value} value={loc.value}>
+								{loc.label}
+							</option>
+						))}
+					</select>
+				</div>
 
-			{/* Search Button */}
-			<div className="flex flex-col min-w-[180px] w-full md:w-auto">
-				<button
-					type="submit"
-					className="w-full md:w-auto flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold px-8 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
-				>
-					<FaSearch className="text-lg" />
-					<span>Search Properties</span>
-				</button>
+				<div className="flex flex-col xl:col-span-2">
+					<label
+						htmlFor="radius"
+						className="mb-1 font-semibold text-gray-700 flex items-center gap-1"
+					>
+						<FaLocationArrow className="text-sky-600" /> Geo Radius (km)
+					</label>
+					<input
+						id="radius"
+						type="range"
+						min={1}
+						max={60}
+						value={filters.radiusKm}
+						onChange={(event) =>
+							setFilters((prev) => ({ ...prev, radiusKm: event.target.value }))
+						}
+						className="accent-sky-600"
+					/>
+					<span className="text-xs text-slate-600">{filters.radiusKm} km</span>
+				</div>
+
+				<div className="mt-1 flex flex-col gap-2 md:col-span-2 lg:col-span-3 xl:col-span-12 xl:flex-row xl:items-end xl:justify-end">
+					<button
+						type="button"
+						onClick={handleUseCurrentLocation}
+						disabled={geoLoading}
+						className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-slate-800 px-6 py-3 font-semibold text-white shadow-lg transition-all duration-300 hover:bg-slate-900 xl:w-auto"
+					>
+						<FaLocationArrow className="text-lg" />
+						<span>{geoLoading ? "Detecting..." : "Use Current Location"}</span>
+					</button>
+
+					<button
+						type="submit"
+						className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-3 font-semibold text-white shadow-lg transition-all duration-300 hover:from-blue-700 hover:to-blue-800 hover:shadow-xl xl:w-auto"
+					>
+						<FaSearch className="text-lg" />
+						<span>Search Properties</span>
+					</button>
+
+					{filters.lat && filters.lng && (
+						<button
+							type="button"
+							onClick={clearGeoSelection}
+							className="inline-flex w-full items-center justify-center rounded-lg border border-slate-400 bg-white px-6 py-2.5 font-medium text-slate-700 xl:w-auto"
+						>
+							Clear Geo
+						</button>
+					)}
+				</div>
 			</div>
 		</form>
 	);

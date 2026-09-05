@@ -14,6 +14,13 @@ const AddressInput: React.FC<AddressInputProps> = ({
 }) => {
 	const inputRef = useRef<HTMLInputElement | null>(null);
 	const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(null);
+	const onChangeRef = useRef(onChange);
+	const onSelectRef = useRef(onSelect);
+
+	useEffect(() => {
+		onChangeRef.current = onChange;
+		onSelectRef.current = onSelect;
+	}, [onChange, onSelect]);
 
 	useEffect(() => {
 		const loader = new Loader({
@@ -39,12 +46,12 @@ const AddressInput: React.FC<AddressInputProps> = ({
 					if (!place) return;
 
 					const formattedAddress = place.formatted_address || place.name || "";
-					onChange(formattedAddress);
+					onChangeRef.current(formattedAddress);
 
-					if (onSelect && place.geometry?.location) {
+					if (onSelectRef.current && place.geometry?.location) {
 						const lat = place.geometry.location.lat();
 						const lng = place.geometry.location.lng();
-						onSelect(formattedAddress, { lat, lng });
+						onSelectRef.current(formattedAddress, { lat, lng });
 					}
 				},
 			);

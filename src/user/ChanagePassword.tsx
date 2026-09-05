@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import axios from "axios";
 // import { useAuth } from "../contextAPI/UserAuthContext";
 import { showSuccess, showError } from "../utils/toastUtils";
 import BASE_URL from "../services";
@@ -33,11 +34,11 @@ const ChangePassword: React.FC<{ onClose: () => void }> = ({ onClose }) => {
 			} else {
 				showError(response.data.message || "Failed to change password.");
 			}
-		} catch (error: any) {
+		} catch (error: unknown) {
 			let message = "An error occured while changing the password.";
-			if (error.response && error.response.data?.message) {
-				message = error.response.data.message;
-			} else if (error.message) {
+			if (axios.isAxiosError(error)) {
+				message = error.response?.data?.message || message;
+			} else if (error instanceof Error) {
 				message = error.message;
 			}
 			showError(message);

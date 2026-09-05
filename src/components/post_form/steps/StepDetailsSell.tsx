@@ -10,6 +10,14 @@ import BooleanInput from "../reusable_input_fields/BooleanInput";
 import InputDate from "../reusable_input_fields/InputDate";
 import { useEffect } from "react";
 
+const unitConversionRates: Record<string, number> = {
+	katha: 1,
+	bigha: 20, // 1 bigha = 20 katha
+	decimal: 0.8, // 1 katha = 1.25 decimal → 1 decimal = 0.8 katha
+	acre: 66.67, // 1 acre = 66.67 katha
+	"sq foot": 0.000367, // 1 sq foot ≈ 0.000367 katha
+};
+
 const StepDetailsSell = () => {
 	const {
 		register,
@@ -22,14 +30,6 @@ const StepDetailsSell = () => {
 	const unit = watch("unit");
 	const landSpace = watch("availableLandSpace");
 	const landSpaceUnit = watch("availableLandSpaceUnit");
-
-	const unitConversionRates: Record<string, number> = {
-		katha: 1,
-		bigha: 20, // 1 bigha = 20 katha
-		decimal: 0.8, // 1 katha = 1.25 decimal → 1 decimal = 0.8 katha
-		acre: 66.67, // 1 acre = 66.67 katha
-		"sq foot": 0.000367, // 1 sq foot ≈ 0.000367 katha
-	};
 
 	useEffect(() => {
 		if (

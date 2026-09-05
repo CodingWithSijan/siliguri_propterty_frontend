@@ -61,7 +61,7 @@ const YourProfile: React.FC = () => {
 		try {
 			setUploading(true);
 			const response = await BASE_URL.post(
-				`${import.meta.env.VITE_BACKEND_URL}/api/users/upload-profile-picture`,
+				"/api/users/upload-profile-picture",
 				formData,
 			);
 			const updatedUser = response.data.user;

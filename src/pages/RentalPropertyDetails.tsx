@@ -5,6 +5,7 @@ import { IRentListingType } from "../types/listingTypes";
 import BASE_URL from "../services";
 import { IListingUserDetails } from "../types/listingUserDetails";
 import Navbar from "../components/header_and_footer/Navbar";
+import Footer from "../components/header_and_footer/Footer";
 import HouseRent from "../components/property_details_page/rent/common/HouseRent";
 import ShopRental from "../components/property_details_page/rent/shop/ShopRental";
 import Breadcrumb from "../lib/Breadcrumb";
@@ -52,22 +53,28 @@ const RentalPropertyDetails: React.FC = () => {
 
 	if (!listing)
 		return (
-			<div className="container mx-auto px-4 py-12">
-				<div className="space-y-4">
-					<div className="h-8 bg-gray-200 rounded w-2/5 animate-pulse"></div>
-					<div className="h-56 bg-gray-200 rounded animate-pulse"></div>
-					<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-						<div className="space-y-3">
-							<div className="h-6 bg-gray-200 rounded animate-pulse"></div>
-							<div className="h-6 bg-gray-200 rounded animate-pulse w-4/5"></div>
-						</div>
-						<div className="space-y-3">
-							<div className="h-6 bg-gray-200 rounded animate-pulse"></div>
-							<div className="h-6 bg-gray-200 rounded animate-pulse w-3/4"></div>
+			<>
+				<Navbar />
+				<div className="bg-slate-50 min-h-screen">
+					<div className="max-w-7xl mx-auto px-4 py-12">
+						<div className="space-y-4 rounded-[2rem] border border-slate-200 bg-white p-8 shadow-lg shadow-slate-200/50">
+							<div className="h-8 bg-gray-200 rounded w-2/5 animate-pulse"></div>
+							<div className="h-56 bg-gray-200 rounded animate-pulse"></div>
+							<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+								<div className="space-y-3">
+									<div className="h-6 bg-gray-200 rounded animate-pulse"></div>
+									<div className="h-6 bg-gray-200 rounded animate-pulse w-4/5"></div>
+								</div>
+								<div className="space-y-3">
+									<div className="h-6 bg-gray-200 rounded animate-pulse"></div>
+									<div className="h-6 bg-gray-200 rounded animate-pulse w-3/4"></div>
+								</div>
+							</div>
 						</div>
 					</div>
+					<Footer />
 				</div>
-			</div>
+			</>
 		);
 	const renderPropertyCategory = () => {
 		switch (listing.propertyCategory) {
@@ -86,9 +93,14 @@ const RentalPropertyDetails: React.FC = () => {
 	return (
 		<>
 			<Navbar />
-			<Breadcrumb items={getBreadcrumbItems()} />
-			<div className="flex justify-center items-center min-w-[100vw] min-h-[100%] bg-slate-500">
-				{renderPropertyCategory()}
+			<div className="bg-slate-50 min-h-screen">
+				<Breadcrumb items={getBreadcrumbItems()} />
+				<div className="max-w-7xl mx-auto px-4 py-10">
+					<div className="rounded-[2rem] border border-slate-200 bg-white p-8 shadow-lg shadow-slate-200/50">
+						{renderPropertyCategory()}
+					</div>
+				</div>
+				<Footer />
 			</div>
 		</>
 	);
