@@ -44,7 +44,13 @@ export interface NotificationItem {
 	_id: string;
 	title: string;
 	message: string;
-	type: "message" | "system" | "post-approved" | "post-rejected";
+	type:
+		| "message"
+		| "system"
+		| "post-approved"
+		| "post-rejected"
+		| "post-submitted"
+		| "post-updated";
 	link?: string;
 	isRead: boolean;
 	createdAt: string;

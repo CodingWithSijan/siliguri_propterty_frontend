@@ -109,7 +109,7 @@ const getDisplayPrice = (listing: IUniversalListingType): string => {
 	if (isRentListing(listing)) {
 		const rent = toNumber(listing.pricePerFrequency);
 		if (rent !== null && listing.frequency) {
-			return `${formatIndianCurrency(rent)} / ${listing.frequency}`;
+			return `₹${formatIndianCurrency(rent)} / ${listing.frequency}`;
 		}
 		return "Price on request";
 	}
@@ -117,21 +117,21 @@ const getDisplayPrice = (listing: IUniversalListingType): string => {
 	if (isSellListing(listing) && listing.propertyCategory === "land") {
 		const pricePerUnit = toNumber(listing.pricePerUnit);
 		if (pricePerUnit !== null && listing.availableLandSpaceUnit) {
-			return `${formatIndianCurrency(pricePerUnit)} / ${listing.availableLandSpaceUnit}`;
+			return `₹${formatIndianCurrency(pricePerUnit)} / ${listing.availableLandSpaceUnit}`;
 		}
 	}
 
 	if (isSellListing(listing)) {
 		const totalPrice = toNumber(listing.totalPrice);
 		if (totalPrice !== null) {
-			return `${formatIndianCurrency(totalPrice)}`;
+			return `₹${formatIndianCurrency(totalPrice)}`;
 		}
 	}
 
 	if (isSellListing(listing)) {
 		const sellPrice = toNumber(listing.price);
 		if (sellPrice !== null) {
-			return `${formatIndianCurrency(sellPrice)}`;
+			return `₹${formatIndianCurrency(sellPrice)}`;
 		}
 	}
 
@@ -487,9 +487,6 @@ const ProfessionalListingDetails: React.FC<ProfessionalListingDetailsProps> = ({
 								</span>
 								<span className="rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-amber-800">
 									{categoryLabel}
-								</span>
-								<span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-emerald-800">
-									{listing.approvalStatus}
 								</span>
 							</div>
 
