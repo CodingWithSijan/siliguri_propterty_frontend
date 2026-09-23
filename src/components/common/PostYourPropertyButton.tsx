@@ -26,13 +26,10 @@ export const PostYourPropertyButton: React.FC = (): React.ReactNode => {
 		<button
 			onClick={redirectUser}
 			type="button"
-			className="flex items-center justify-center gap-2 px-4 py-2 bg-transparent text-gray-700 hover:text-gray-900 font-medium text-sm rounded-sm border-1 border-blue-200 hover:border-blue-400 shadow-sm  transition-all duration-300 ease-out overflow-hidden cursor-pointer"
+			className="group inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-emerald-300 bg-emerald-50 px-4 text-sm font-semibold text-emerald-800 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-emerald-500 hover:bg-emerald-100 hover:shadow"
 		>
-			{/* Icon with subtle animation */}
-			<MdHouse className="h-4 w-4 group-hover:scale-110 transition-transform duration-300" />
-
-			{/* Text */}
-			<span className="relative z-10">Post Your Property</span>
+			<MdHouse className="h-4 w-4 transition-transform duration-200 group-hover:scale-110" />
+			<span>Post Your Property</span>
 		</button>
 	);
 };

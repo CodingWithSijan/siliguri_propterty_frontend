@@ -32,6 +32,7 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "../ui/select";
+import { Input } from "../ui/input";
 import {
 	AlertDialog,
 	AlertDialogContent,
@@ -43,8 +44,9 @@ import {
 import useFetch from "../../hooks/useFetch";
 import {
 	deleteUserById,
-	fetchAllUsers,
+	fetchUsersForManagement,
 	fetchUsersByVerification,
+	PhoneFilterOption,
 	resendVerificationLinkByAdmin,
 	resetUserPasswordByAdmin,
 	updateUserRole,
@@ -85,14 +87,24 @@ const ManageUsers = () => {
 	);
 	const [newPassword, setNewPassword] = useState("");
 	const [selectedStatus, setSelectedStatus] = useState("all");
+	const [selectedPhoneFilter, setSelectedPhoneFilter] =
+		useState<PhoneFilterOption>("all");
+	const [searchInput, setSearchInput] = useState("");
+	const [searchQuery, setSearchQuery] = useState("");
 	const [displayUsers, setDisplayUsers] = useState<User[]>([]);
 	const currentUser = useSelector((state: RootState) => state.auth.user);
 	const isSuperAdmin = currentUser?.role === "superadmin";
 	const fetchUsersBySelectedStatus = useCallback(() => {
 		return selectedStatus === "all"
-			? fetchAllUsers()
-			: fetchUsersByVerification(selectedStatus === "verified");
-	}, [selectedStatus]);
+			? fetchUsersForManagement({
+					query: searchQuery,
+					phoneFilter: selectedPhoneFilter,
+				})
+			: fetchUsersByVerification(selectedStatus === "verified", {
+					query: searchQuery,
+					phoneFilter: selectedPhoneFilter,
+				});
+	}, [selectedStatus, searchQuery, selectedPhoneFilter]);
 
 	const {
 		data: users,
@@ -106,7 +118,7 @@ const ManageUsers = () => {
 
 	useEffect(() => {
 		refetchUsers();
-	}, [selectedStatus, refetchUsers]);
+	}, [selectedStatus, selectedPhoneFilter, searchQuery, refetchUsers]);
 
 	useEffect(() => {
 		setDisplayUsers(users ?? []);
@@ -119,6 +131,9 @@ const ManageUsers = () => {
 	}, [userToDelete, userToResetPassword]);
 
 	const handleStatusChange = (value: string) => setSelectedStatus(value);
+	const handlePhoneFilterChange = (value: PhoneFilterOption) =>
+		setSelectedPhoneFilter(value);
+	const handleSearch = () => setSearchQuery(searchInput.trim());
 
 	const handleCancelDelete = () => {
 		setIsDeleting(false);
@@ -363,18 +378,63 @@ const ManageUsers = () => {
 						/>
 					</div>
 
-					<div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-muted/50 p-4 rounded-lg">
-						<h2 className="text-lg font-semibold">Users</h2>
-						<Select value={selectedStatus} onValueChange={handleStatusChange}>
-							<SelectTrigger className="w-full sm:w-[200px] bg-background">
-								<SelectValue placeholder="Filter by status" />
-							</SelectTrigger>
-							<SelectContent>
-								<SelectItem value="all">All</SelectItem>
-								<SelectItem value="verified">Verified</SelectItem>
-								<SelectItem value="unverified">Unverified</SelectItem>
-							</SelectContent>
-						</Select>
+					<div className="flex flex-col gap-4 bg-muted/50 p-4 rounded-lg">
+						<div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+							<h2 className="text-lg font-semibold">Users</h2>
+							<div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+								<Select
+									value={selectedStatus}
+									onValueChange={handleStatusChange}
+								>
+									<SelectTrigger className="w-full sm:w-[180px] bg-background">
+										<SelectValue placeholder="Filter by status" />
+									</SelectTrigger>
+									<SelectContent>
+										<SelectItem value="all">All status</SelectItem>
+										<SelectItem value="verified">Verified</SelectItem>
+										<SelectItem value="unverified">Unverified</SelectItem>
+									</SelectContent>
+								</Select>
+								<Select
+									value={selectedPhoneFilter}
+									onValueChange={(value) =>
+										handlePhoneFilterChange(value as PhoneFilterOption)
+									}
+								>
+									<SelectTrigger className="w-full sm:w-[220px] bg-background">
+										<SelectValue placeholder="Phone filter" />
+									</SelectTrigger>
+									<SelectContent>
+										<SelectItem value="all">All users</SelectItem>
+										<SelectItem value="withPhone">With phone number</SelectItem>
+										<SelectItem value="withoutPhone">
+											Without phone number
+										</SelectItem>
+									</SelectContent>
+								</Select>
+							</div>
+						</div>
+
+						<div className="flex flex-col sm:flex-row gap-3">
+							<Input
+								value={searchInput}
+								onChange={(event) => setSearchInput(event.target.value)}
+								onKeyDown={(event) => {
+									if (event.key === "Enter") {
+										handleSearch();
+									}
+								}}
+								placeholder="Search by name, email, or phone"
+								className="bg-background"
+							/>
+							<Button
+								type="button"
+								onClick={handleSearch}
+								className="sm:w-[120px]"
+							>
+								Search
+							</Button>
+						</div>
 					</div>
 
 					<div className="rounded-md border bg-card overflow-hidden">

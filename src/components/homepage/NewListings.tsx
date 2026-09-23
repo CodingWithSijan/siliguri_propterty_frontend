@@ -1,125 +1,285 @@
 import React, { useEffect, useState } from "react";
-import {
-	Carousel,
-	CarouselContent,
-	CarouselItem,
-	CarouselNext,
-	CarouselPrevious,
-} from "../ui/carousel";
-import BASE_URL from "../../services";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import { BadgeCheck, Bath, BedDouble, MapPin } from "lucide-react";
+import BASE_URL from "../../services";
 import {
-	IUniversalListingType,
-	IRentListingType,
 	ISellListingType,
+	IUniversalListingType,
 } from "../../types/listingTypes";
-import RentListingCard from "../card/RentListingCard";
-import SellListingCard from "../card/SellListingCard";
-import Autoplay from "embla-carousel-autoplay";
-import { FaHome } from "react-icons/fa";
+import { formatIndianCurrency } from "../../utils/priceFormatHelper";
+import HeroSectionImage1Background from "../../assets/image1_hero_section.jpg";
+import HeroSectionImage2Background from "../../assets/image2_hero_section.jpg";
 
 const NewListings: React.FC = () => {
+	const navigate = useNavigate();
 	const [latestPosts, setLatestPosts] = useState<IUniversalListingType[]>([]);
+	const [allApprovedPosts, setAllApprovedPosts] = useState<
+		IUniversalListingType[]
+	>([]);
+	const [closedPosts, setClosedPosts] = useState<IUniversalListingType[]>([]);
 
 	useEffect(() => {
-		const fetchLatest = async () => {
+		const fetchHomeData = async () => {
 			try {
-				const response = await BASE_URL.get("/api/user/post/view-latest-posts");
-				setLatestPosts(response.data.recentPosts);
+				const [latestRes, allRes, closedRes] = await Promise.all([
+					BASE_URL.get("/api/user/post/view-latest-posts"),
+					BASE_URL.get("/api/user/post/view-all-approved-posts"),
+					BASE_URL.get("/api/user/post/view-closed-posts"),
+				]);
+				setLatestPosts(latestRes.data.recentPosts ?? []);
+				setAllApprovedPosts(allRes.data.postArray ?? []);
+				setClosedPosts(closedRes.data.closedPosts ?? []);
 			} catch (error: unknown) {
 				if (axios.isAxiosError(error)) {
 					console.error(
-						"Error fetching latest posts:",
+						"Error fetching home listings:",
 						error.response?.status,
 						error.response?.data || error.message,
 					);
-				} else {
-					console.error("Unexpected Error:", (error as Error).message);
 				}
 			}
 		};
-		fetchLatest();
+
+		void fetchHomeData();
 	}, []);
 
-	const plugin = React.useRef(
-		Autoplay({ delay: 4000, stopOnInteraction: true }),
-	);
+	const featuredListings = latestPosts.slice(0, 3);
+	const recentlyClosedListings = closedPosts.slice(0, 6);
+
+	const getCardImage = (listing?: IUniversalListingType): string => {
+		return (
+			listing?.pictures?.[0] ||
+			(listing?.intent === "rent"
+				? HeroSectionImage2Background
+				: HeroSectionImage1Background)
+		);
+	};
+
+	const getCategoryCount = (category: string): number => {
+		return allApprovedPosts.filter((post) => post.propertyCategory === category)
+			.length;
+	};
+
+	const getCategoryImage = (category: string): string => {
+		const listing = allApprovedPosts.find(
+			(post) => post.propertyCategory === category,
+		);
+		return getCardImage(listing);
+	};
+
+	const getListingPrice = (listing: IUniversalListingType): string => {
+		if (listing.intent === "rent") {
+			const price = Number(
+				"pricePerFrequency" in listing ? (listing.pricePerFrequency ?? 0) : 0,
+			);
+			if (Number.isFinite(price) && price > 0) {
+				return `${formatIndianCurrency(price)}/mo`;
+			}
+			return "Price on request";
+		}
+
+		const sellListing = listing as ISellListingType;
+		const value = Number(
+			sellListing.totalPrice ??
+				sellListing.price ??
+				sellListing.pricePerUnit ??
+				0,
+		);
+		if (Number.isFinite(value) && value > 0) {
+			return formatIndianCurrency(value);
+		}
+		return "Price on request";
+	};
+
+	const getClosedBadge = (listing: IUniversalListingType): string => {
+		return listing.intent === "rent" ? "Rented" : "Sold";
+	};
+
+	const categoryCards = [
+		{ key: "flat", title: "Flats and Apartments" },
+		{ key: "land", title: "Plots and Land" },
+		{ key: "house", title: "Independent Houses" },
+		{ key: "shop", title: "Commercial Spaces" },
+	];
 
 	return (
-		<section className="py-16 bg-gradient-to-br from-slate-50 via-white to-cyan-50">
-			<div className="w-full max-w-7xl mx-auto px-4 sm:px-4 lg:px-8">
-				{/* Enhanced Header */}
-				<div className="text-center mb-12">
-					<div className="inline-flex items-center gap-2 bg-blue-100 rounded-full px-4 py-2 mb-4">
-						<FaHome className="text-blue-600" />
-						<span className="text-sm font-medium text-blue-700">
-							Latest Properties
-						</span>
-					</div>
-
-					<h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-						Newest{" "}
-						<span className="bg-gradient-to-r from-blue-700 to-cyan-600 bg-clip-text text-transparent">
-							Properties
-						</span>
+		<section className="bg-white py-16">
+			<div className="mx-auto w-full max-w-[1320px] px-4 sm:px-6 lg:px-8">
+				<section>
+					<p className="text-xs font-semibold uppercase tracking-[0.12em] text-emerald-700">
+						Browse by category
+					</p>
+					<h2 className="mt-2 text-4xl font-bold leading-tight text-slate-900">
+						What are you looking for?
 					</h2>
 
-					<p className="text-lg text-gray-600 max-w-2xl mx-auto">
-						Discover the latest property listings in Siliguri. Fresh
-						opportunities updated daily.
-					</p>
-				</div>
-				{/* Carousel Container with Enhanced Styling */}
-				<div className="p-4 sm:p-4">
-					<Carousel
-						opts={{
-							align: "start",
-							loop: true,
-						}}
-						plugins={[plugin.current]}
-						className="w-full"
-					>
-						<CarouselContent>
-							{latestPosts &&
-								latestPosts.map((item) => (
-									<CarouselItem
-										key={item._id}
-										className="sm:basis-1/1 md:basis-1/2 lg:basis-1/3 xl:basis-1/4 p-2 flex"
-									>
-										<div className="w-full h-full flex">
-											{item.intent === "rent" ? (
-												<RentListingCard
-													listing={item as IRentListingType}
-													userOrGlobal="global"
-												/>
-											) : (
-												<SellListingCard
-													listing={item as ISellListingType}
-													userOrGlobal="global"
-												/>
-											)}
-										</div>
-									</CarouselItem>
-								))}
-						</CarouselContent>
-						<div className="hidden sm:flex justify-between w-full absolute top-1/2 -translate-y-1/2 px-4">
-							<CarouselPrevious className="-translate-x-2 bg-white/90 backdrop-blur-sm border-gray-200 hover:bg-white hover:shadow-lg transition-all duration-300" />
-							<CarouselNext className="translate-x-2 bg-white/90 backdrop-blur-sm border-gray-200 hover:bg-white hover:shadow-lg transition-all duration-300" />
+					<div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+						{categoryCards.map((category) => (
+							<button
+								key={category.key}
+								type="button"
+								onClick={() => navigate(`/properties?category=${category.key}`)}
+								className="group relative h-40 overflow-hidden rounded-2xl text-left"
+							>
+								<img
+									src={getCategoryImage(category.key)}
+									alt={category.title}
+									className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+								/>
+								<div className="absolute inset-0 bg-gradient-to-t from-black/70 to-black/20" />
+								<div className="absolute bottom-3 left-3 right-3">
+									<p className="text-lg font-semibold text-white">
+										{category.title}
+									</p>
+									<p className="text-xs text-emerald-100">
+										{getCategoryCount(category.key)} listings
+									</p>
+								</div>
+							</button>
+						))}
+					</div>
+				</section>
+
+				<section className="mt-14 rounded-3xl border border-[#e7e3d8] bg-[#f6f5f1] p-6 sm:p-8">
+					<div className="mb-6 flex items-end justify-between gap-3">
+						<div>
+							<p className="text-xs font-semibold uppercase tracking-[0.12em] text-emerald-700">
+								Handpicked for you
+							</p>
+							<h3 className="mt-2 text-4xl font-bold leading-tight text-slate-900">
+								Featured properties in Siliguri
+							</h3>
 						</div>
-					</Carousel>
-				</div>
-				{/* View All Properties Button
-				{latestPosts && latestPosts.length > 0 && (
-					<div className="text-center mt-12">
 						<button
+							type="button"
 							onClick={() => navigate("/properties")}
-							className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-3 rounded-xl font-semibold hover:shadow-lg transition-all duration-300 hover:scale-105"
+							className="text-sm font-semibold text-emerald-700 hover:text-emerald-800"
 						>
-							<span>View All Properties</span>
-							<FaArrowRight className="text-sm" />
+							View all listings
 						</button>
 					</div>
-				)} */}
+
+					<div className="grid gap-4 lg:grid-cols-3">
+						{featuredListings.map((listing) => (
+							<button
+								key={listing._id}
+								type="button"
+								onClick={() =>
+									navigate(
+										listing.intent === "rent"
+											? `/rentals/${listing.propertyCategory}/${listing._id}`
+											: `/buys/${listing.propertyCategory}/${listing._id}`,
+									)
+								}
+								className="overflow-hidden rounded-2xl border border-slate-200 bg-white text-left shadow-sm hover:shadow-md"
+							>
+								<div className="relative h-44 w-full overflow-hidden">
+									<img
+										src={getCardImage(listing)}
+										alt={listing.title}
+										className="h-full w-full object-cover"
+									/>
+									<span className="absolute left-3 top-3 rounded bg-emerald-600 px-2 py-1 text-[11px] font-semibold text-white">
+										{listing.intent === "rent" ? "For Rent" : "For Sale"}
+									</span>
+								</div>
+
+								<div className="p-4">
+									<div className="flex items-start justify-between gap-2">
+										<h4 className="text-2xl font-bold text-slate-900">
+											{getListingPrice(listing)}
+										</h4>
+										<span className="text-xs text-slate-500">
+											{listing.intent === "rent" ? "Monthly" : "Estimated"}
+										</span>
+									</div>
+									<p className="mt-2 line-clamp-1 text-base font-semibold text-slate-800">
+										{listing.title}
+									</p>
+									<p className="mt-1 inline-flex items-center gap-1 text-sm text-slate-500">
+										<MapPin className="h-4 w-4" />
+										{listing.wbLocalityLabel || listing.location}
+									</p>
+
+									<div className="mt-3 flex flex-wrap items-center gap-3 text-xs text-slate-600">
+										{listing.bedrooms !== undefined && (
+											<span className="inline-flex items-center gap-1">
+												<BedDouble className="h-3.5 w-3.5" />
+												{listing.bedrooms} Beds
+											</span>
+										)}
+										{listing.bathrooms !== undefined && (
+											<span className="inline-flex items-center gap-1">
+												<Bath className="h-3.5 w-3.5" />
+												{listing.bathrooms} Baths
+											</span>
+										)}
+										<span className="inline-flex items-center gap-1 text-emerald-700">
+											<BadgeCheck className="h-3.5 w-3.5" /> Verified
+										</span>
+									</div>
+								</div>
+							</button>
+						))}
+					</div>
+				</section>
+
+				{recentlyClosedListings.length > 0 && (
+					<section className="mt-10 rounded-3xl border border-slate-200 bg-white p-6 sm:p-8">
+						<div className="mb-6 flex items-end justify-between gap-3">
+							<div>
+								<p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-600">
+									Closed listings
+								</p>
+								<h3 className="mt-2 text-3xl font-bold leading-tight text-slate-900 sm:text-4xl">
+									Recently sold or rented
+								</h3>
+							</div>
+						</div>
+
+						<div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+							{recentlyClosedListings.map((listing) => (
+								<button
+									key={`closed-${listing._id}`}
+									type="button"
+									onClick={() =>
+										navigate(
+											listing.intent === "rent"
+												? `/rentals/${listing.propertyCategory}/${listing._id}`
+												: `/buys/${listing.propertyCategory}/${listing._id}`,
+										)
+									}
+									className="overflow-hidden rounded-2xl border border-slate-200 bg-slate-50 text-left"
+								>
+									<div className="relative h-40 w-full overflow-hidden">
+										<img
+											src={getCardImage(listing)}
+											alt={listing.title}
+											className="h-full w-full object-cover grayscale-[12%]"
+										/>
+										<span className="absolute left-3 top-3 rounded bg-slate-800 px-2 py-1 text-[11px] font-semibold text-white">
+											{getClosedBadge(listing)}
+										</span>
+									</div>
+
+									<div className="p-4">
+										<p className="text-lg font-bold text-slate-900">
+											{getListingPrice(listing)}
+										</p>
+										<p className="mt-1 line-clamp-1 text-sm font-semibold text-slate-800">
+											{listing.title}
+										</p>
+										<p className="mt-1 inline-flex items-center gap-1 text-xs text-slate-500">
+											<MapPin className="h-3.5 w-3.5" />
+											{listing.wbLocalityLabel || listing.location}
+										</p>
+									</div>
+								</button>
+							))}
+						</div>
+					</section>
+				)}
 			</div>
 		</section>
 	);

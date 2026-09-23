@@ -64,21 +64,8 @@ const AppSidebar = ({ activeMenu, setActiveMenu }: Props) => {
 		const idx = items.findIndex((item) => item.url === location.pathname);
 		setActiveMenu(idx === -1 ? 0 : idx);
 	}, [items, location.pathname, setActiveMenu]);
-	// Initialize dark theme
-	React.useEffect(() => {
-		if (theme === "dark") {
-			document.documentElement.classList.add("dark");
-		}
-	}, [theme]);
-
-	// Toggle theme handler
 	const handleThemeToggle = () => {
 		dispatch(toggleTheme());
-		if (theme === "light") {
-			document.documentElement.classList.add("dark");
-		} else {
-			document.documentElement.classList.remove("dark");
-		}
 	};
 
 	return (
@@ -87,26 +74,36 @@ const AppSidebar = ({ activeMenu, setActiveMenu }: Props) => {
 				<SidebarMenu>
 					<SidebarMenuItem className="overflow-hidden">
 						{/* Theme toggle switch at top */}
-						<div className="flex items-center gap-2 px-4 py-4 border-b">
-							<span className="text-sm font-medium">Light</span>
+						<div className="flex items-center gap-2 border-b border-slate-200 bg-slate-50 px-4 py-4 dark:border-slate-700 dark:bg-slate-900">
+							<span className="text-sm font-medium text-slate-700 dark:text-slate-200">
+								Light
+							</span>
 							<Switch
 								checked={theme === "dark"}
 								onCheckedChange={handleThemeToggle}
 								className="data-[state=checked]:bg-gray-800 data-[state=unchecked]:bg-gray-200"
 							/>
-							<span className="text-sm font-medium">Dark</span>
+							<span className="text-sm font-medium text-slate-700 dark:text-slate-200">
+								Dark
+							</span>
 						</div>
 					</SidebarMenuItem>
 				</SidebarMenu>
 			</SidebarHeader>
-			<SidebarContent>
+			<SidebarContent className="bg-white dark:bg-slate-950">
 				<SidebarGroup>
-					<SidebarGroupLabel>Menu</SidebarGroupLabel>
+					<SidebarGroupLabel className="text-xs uppercase tracking-[0.12em] text-slate-500 dark:text-slate-400">
+						Menu
+					</SidebarGroupLabel>
 					<SidebarGroupContent>
 						<SidebarMenu>
 							{items.map((item, index) => (
 								<SidebarMenuItem key={item.title}>
-									<SidebarMenuButton asChild isActive={activeMenu === index}>
+									<SidebarMenuButton
+										asChild
+										isActive={activeMenu === index}
+										className="rounded-lg"
+									>
 										<Link to={item.url}>
 											<item.icon />
 											<span>{item.title}</span>

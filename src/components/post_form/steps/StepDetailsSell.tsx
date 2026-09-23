@@ -7,7 +7,6 @@ import { Input } from "../../ui/input";
 import InputField from "../reusable_input_fields/InputField";
 import SelectFurnishing from "../reusable_input_fields/SelectFurnishing";
 import BooleanInput from "../reusable_input_fields/BooleanInput";
-import InputDate from "../reusable_input_fields/InputDate";
 import { useEffect } from "react";
 
 const UNIT_CONVERSION_RATES: Record<string, number> = {
@@ -46,7 +45,7 @@ const StepDetailsSell = () => {
 			if (unitRate && landUnitRate) {
 				const landInPriceUnit = (landSpaceNum * landUnitRate) / unitRate;
 				const total = Math.round(landInPriceUnit * pricePerUnit);
-				setValue("totalPrice", total);
+				setValue("totalPrice", Math.max(0, total));
 			}
 		}
 	}, [pricePerUnit, landSpace, unit, landSpaceUnit, setValue]);
@@ -81,10 +80,12 @@ const StepDetailsSell = () => {
 							<label className="mb-1 block font-medium">Price (per unit)</label>
 							<Input
 								type="number"
+								min={1}
 								step="10000"
 								{...register("pricePerUnit", {
 									valueAsNumber: true,
 									required: "Price per unit is required",
+									min: { value: 1, message: "Price must be greater than 0" },
 								})}
 								placeholder="Enter price per unit"
 							/>
@@ -123,9 +124,15 @@ const StepDetailsSell = () => {
 							<label className="mb-1 block font-medium">Total Land Space</label>
 							<Input
 								type="number"
+								min={0.1}
+								step="0.1"
 								{...register("availableLandSpace", {
 									required: "Total land space is required",
 									valueAsNumber: true,
+									min: {
+										value: 0.1,
+										message: "Land space must be greater than 0",
+									},
 								})}
 								placeholder="e.g., 10.5"
 							/>
@@ -195,10 +202,12 @@ const StepDetailsSell = () => {
 							</label>
 							<Input
 								type="number"
+								min={1}
 								step="100"
 								{...register("price", {
 									required: "Price is requried",
 									valueAsNumber: true,
+									min: { value: 1, message: "Price must be greater than 0" },
 								})}
 							/>
 							{errors.price && (
@@ -207,7 +216,6 @@ const StepDetailsSell = () => {
 								</p>
 							)}
 						</div>
-						<InputDate label="Available From" name="availableFrom" />
 					</div>
 				</section>
 			)}
@@ -222,17 +230,18 @@ const StepDetailsSell = () => {
 						<InputField label="Shop Area (in sq foot)" name="shopArea" />
 						<BooleanInput label="Has Shutter" name="hasShutter" />
 						<SelectFurnishing />
-						<InputDate label="Available From" name="availableFrom" />
 						<div>
 							<label htmlFor="price" className="block font-medium mb-1">
 								Price (in INR)
 							</label>
 							<Input
 								type="number"
+								min={1}
 								step="100"
 								{...register("price", {
 									required: "Price is requried",
 									valueAsNumber: true,
+									min: { value: 1, message: "Price must be greater than 0" },
 								})}
 							/>
 							{errors.price && (

@@ -15,6 +15,7 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "../ui/select";
+import { Input } from "../ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Badge } from "../ui/badge";
 import {
@@ -38,6 +39,7 @@ import {
 	fetchAllPosts,
 	fetchAnalytics,
 	fetchPostsByStatus,
+	PhoneFilterOption,
 	rejectPost,
 } from "../../services/fetchFunctionsForAdmin";
 import { Skeleton } from "../ui/skeleton";
@@ -53,13 +55,64 @@ import {
 const ManagePosts = () => {
 	const navigate = useNavigate();
 	const [selectedStatus, setSelectedStatus] = useState<string>("all");
+	const [selectedPhoneFilter, setSelectedPhoneFilter] =
+		useState<PhoneFilterOption>("all");
+	const [selectedIntent, setSelectedIntent] = useState<
+		"all" | "buy" | "sell" | "rent"
+	>("all");
+	const [selectedCategory, setSelectedCategory] = useState<
+		"all" | "land" | "house" | "flat" | "shop"
+	>("all");
+	const [searchInput, setSearchInput] = useState("");
+	const [searchQuery, setSearchQuery] = useState("");
+	const [minPriceInput, setMinPriceInput] = useState("");
+	const [maxPriceInput, setMaxPriceInput] = useState("");
+	const [locationInput, setLocationInput] = useState("");
+	const [appliedMinPrice, setAppliedMinPrice] = useState<number | undefined>();
+	const [appliedMaxPrice, setAppliedMaxPrice] = useState<number | undefined>();
+	const [appliedLocation, setAppliedLocation] = useState("");
 	const [isActionLoading, setIsActionLoading] = useState<string | null>(null);
 	const [displayPosts, setDisplayPosts] = useState<Post[]>([]);
+
+	const parseOptionalNumber = (value: string): number | undefined => {
+		const trimmed = value.trim();
+		if (!trimmed) {
+			return undefined;
+		}
+		const parsed = Number(trimmed);
+		return Number.isFinite(parsed) ? parsed : undefined;
+	};
+
 	const fetchPostsBySelectedStatus = useCallback(() => {
 		return selectedStatus === "all"
-			? fetchAllPosts()
-			: fetchPostsByStatus(selectedStatus);
-	}, [selectedStatus]);
+			? fetchAllPosts({
+					query: searchQuery,
+					phoneFilter: selectedPhoneFilter,
+					intent: selectedIntent === "all" ? undefined : selectedIntent,
+					category: selectedCategory === "all" ? undefined : selectedCategory,
+					minPrice: appliedMinPrice,
+					maxPrice: appliedMaxPrice,
+					location: appliedLocation,
+				})
+			: fetchPostsByStatus(selectedStatus, {
+					query: searchQuery,
+					phoneFilter: selectedPhoneFilter,
+					intent: selectedIntent === "all" ? undefined : selectedIntent,
+					category: selectedCategory === "all" ? undefined : selectedCategory,
+					minPrice: appliedMinPrice,
+					maxPrice: appliedMaxPrice,
+					location: appliedLocation,
+				});
+	}, [
+		selectedStatus,
+		searchQuery,
+		selectedPhoneFilter,
+		selectedIntent,
+		selectedCategory,
+		appliedMinPrice,
+		appliedMaxPrice,
+		appliedLocation,
+	]);
 
 	const fetchAnalyticsData = useCallback(() => fetchAnalytics(), []);
 
@@ -74,13 +127,46 @@ const ManagePosts = () => {
 
 	useEffect(() => {
 		refetchPosts();
-	}, [selectedStatus, refetchPosts]);
+	}, [
+		selectedStatus,
+		selectedPhoneFilter,
+		searchQuery,
+		selectedIntent,
+		selectedCategory,
+		appliedMinPrice,
+		appliedMaxPrice,
+		appliedLocation,
+		refetchPosts,
+	]);
 
 	useEffect(() => {
 		setDisplayPosts(posts ?? []);
 	}, [posts]);
 
 	const handleStatusChange = (value: string) => setSelectedStatus(value);
+	const handlePhoneFilterChange = (value: PhoneFilterOption) =>
+		setSelectedPhoneFilter(value);
+	const handleSearch = () => {
+		setSearchQuery(searchInput.trim());
+		setAppliedMinPrice(parseOptionalNumber(minPriceInput));
+		setAppliedMaxPrice(parseOptionalNumber(maxPriceInput));
+		setAppliedLocation(locationInput.trim());
+	};
+
+	const handleResetFilters = () => {
+		setSelectedStatus("all");
+		setSelectedPhoneFilter("all");
+		setSelectedIntent("all");
+		setSelectedCategory("all");
+		setSearchInput("");
+		setSearchQuery("");
+		setMinPriceInput("");
+		setMaxPriceInput("");
+		setLocationInput("");
+		setAppliedMinPrice(undefined);
+		setAppliedMaxPrice(undefined);
+		setAppliedLocation("");
+	};
 
 	const getStatusBadge = (status: "approved" | "rejected" | "pending") => {
 		const config = {
@@ -303,19 +389,129 @@ const ManagePosts = () => {
 				</div>
 
 				{/* Filter */}
-				<div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-muted/50 p-4 rounded-lg">
-					<h2 className="text-lg font-semibold">Posts</h2>
-					<Select value={selectedStatus} onValueChange={handleStatusChange}>
-						<SelectTrigger className="w-full sm:w-[200px] bg-background">
-							<SelectValue placeholder="Filter by status" />
-						</SelectTrigger>
-						<SelectContent>
-							<SelectItem value="all">All</SelectItem>
-							<SelectItem value="approved">Approved</SelectItem>
-							<SelectItem value="rejected">Rejected</SelectItem>
-							<SelectItem value="pending">Pending</SelectItem>
-						</SelectContent>
-					</Select>
+				<div className="flex flex-col gap-4 bg-muted/50 p-4 rounded-lg">
+					<div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+						<h2 className="text-lg font-semibold">Posts</h2>
+						<div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+							<Select value={selectedStatus} onValueChange={handleStatusChange}>
+								<SelectTrigger className="w-full sm:w-[180px] bg-background">
+									<SelectValue placeholder="Filter by status" />
+								</SelectTrigger>
+								<SelectContent>
+									<SelectItem value="all">All status</SelectItem>
+									<SelectItem value="approved">Approved</SelectItem>
+									<SelectItem value="rejected">Rejected</SelectItem>
+									<SelectItem value="pending">Pending</SelectItem>
+								</SelectContent>
+							</Select>
+							<Select
+								value={selectedIntent}
+								onValueChange={(value) =>
+									setSelectedIntent(value as "all" | "buy" | "sell" | "rent")
+								}
+							>
+								<SelectTrigger className="w-full sm:w-[160px] bg-background">
+									<SelectValue placeholder="Intent" />
+								</SelectTrigger>
+								<SelectContent>
+									<SelectItem value="all">All intents</SelectItem>
+									<SelectItem value="sell">Sell</SelectItem>
+									<SelectItem value="rent">Rent</SelectItem>
+									<SelectItem value="buy">Buy</SelectItem>
+								</SelectContent>
+							</Select>
+							<Select
+								value={selectedCategory}
+								onValueChange={(value) =>
+									setSelectedCategory(
+										value as "all" | "land" | "house" | "flat" | "shop",
+									)
+								}
+							>
+								<SelectTrigger className="w-full sm:w-[170px] bg-background">
+									<SelectValue placeholder="Category" />
+								</SelectTrigger>
+								<SelectContent>
+									<SelectItem value="all">All categories</SelectItem>
+									<SelectItem value="land">Land</SelectItem>
+									<SelectItem value="house">House</SelectItem>
+									<SelectItem value="flat">Flat</SelectItem>
+									<SelectItem value="shop">Shop</SelectItem>
+								</SelectContent>
+							</Select>
+							<Select
+								value={selectedPhoneFilter}
+								onValueChange={(value) =>
+									handlePhoneFilterChange(value as PhoneFilterOption)
+								}
+							>
+								<SelectTrigger className="w-full sm:w-[220px] bg-background">
+									<SelectValue placeholder="Phone filter" />
+								</SelectTrigger>
+								<SelectContent>
+									<SelectItem value="all">All creators</SelectItem>
+									<SelectItem value="withPhone">With phone number</SelectItem>
+									<SelectItem value="withoutPhone">
+										Without phone number
+									</SelectItem>
+								</SelectContent>
+							</Select>
+						</div>
+					</div>
+
+					<div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+						<Input
+							type="number"
+							min={0}
+							value={minPriceInput}
+							onChange={(event) => setMinPriceInput(event.target.value)}
+							placeholder="Min price"
+							className="bg-background"
+						/>
+						<Input
+							type="number"
+							min={0}
+							value={maxPriceInput}
+							onChange={(event) => setMaxPriceInput(event.target.value)}
+							placeholder="Max price"
+							className="bg-background"
+						/>
+						<Input
+							value={locationInput}
+							onChange={(event) => setLocationInput(event.target.value)}
+							placeholder="Area / Location (e.g. Matigara, Sevoke Road)"
+							className="bg-background"
+						/>
+					</div>
+
+					<div className="flex flex-col sm:flex-row gap-3">
+						<Input
+							value={searchInput}
+							onChange={(event) => setSearchInput(event.target.value)}
+							onKeyDown={(event) => {
+								if (event.key === "Enter") {
+									handleSearch();
+								}
+							}}
+							placeholder="Search by title, location, creator name/email"
+							className="bg-background"
+						/>
+						<Button
+							type="button"
+							onClick={handleSearch}
+							className="sm:w-[120px]"
+						>
+							Search
+						</Button>
+						<Button
+							type="button"
+							variant="outline"
+							onClick={handleResetFilters}
+							className="sm:w-[120px]"
+						>
+							Reset
+						</Button>
+					</div>
 				</div>
 
 				{/* Table */}

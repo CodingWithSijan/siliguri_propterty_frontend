@@ -1,8 +1,13 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { SlidersHorizontal } from "lucide-react";
+import {
+	ChevronDown,
+	ChevronUp,
+	LocateFixed,
+	Search,
+	SlidersHorizontal,
+} from "lucide-react";
 import Navbar from "../components/header_and_footer/Navbar";
-import Breadcrumb from "../lib/Breadcrumb";
 import BASE_URL from "../services";
 import type {
 	IRentListingType,
@@ -39,14 +44,13 @@ import {
 	SheetTitle,
 } from "../components/ui/sheet";
 import { showError, showInfo } from "../utils/toastUtils";
+import { getDaysAgoFromObjectId } from "../utils/getDaysAgo";
 
 interface AllListingsProps {
 	forcedIntent?: "rent" | "sell";
 	forcedCategory?: "house" | "flat" | "shop" | "land";
 	title?: string;
 }
-const RECENT_SEARCHES_KEY = "sp_recent_searches";
-
 const ITEMS_PER_PAGE = 8;
 
 const parseNumber = (value: string | null): number | null => {
@@ -61,6 +65,55 @@ const parsePage = (value: string | null): number => {
 		return 1;
 	}
 	return Math.floor(parsed);
+};
+
+const normalizeSearchState = (
+	state: IListingSearchState,
+	forcedIntent?: "rent" | "sell",
+	forcedCategory?: "house" | "flat" | "shop" | "land",
+): IListingSearchState => {
+	const next: IListingSearchState = {
+		...state,
+		intent: forcedIntent ?? state.intent,
+		category: forcedCategory ?? state.category,
+	};
+
+	if (next.intent === "rent" && next.category === "land") {
+		next.category = "all";
+	}
+
+	if (next.minPrice !== null && next.minPrice < 0) {
+		next.minPrice = 0;
+	}
+
+	if (next.maxPrice !== null && next.maxPrice < 0) {
+		next.maxPrice = 0;
+	}
+
+	if (
+		next.minPrice !== null &&
+		next.maxPrice !== null &&
+		next.minPrice > next.maxPrice
+	) {
+		const min = next.maxPrice;
+		next.maxPrice = next.minPrice;
+		next.minPrice = min;
+	}
+
+	const hasGeo = next.lat !== null && next.lng !== null;
+	if (!hasGeo && next.sortBy === "nearest") {
+		next.sortBy = "newest";
+	}
+
+	if (next.radiusKm < 1) {
+		next.radiusKm = 1;
+	}
+
+	if (next.radiusKm > 60) {
+		next.radiusKm = 60;
+	}
+
+	return next;
 };
 
 const toStateFromParams = (
@@ -122,74 +175,9 @@ const stateToSearchParams = (state: IListingSearchState): URLSearchParams => {
 	return params;
 };
 
-const buildBreadcrumbItems = (state: IListingSearchState) => {
-	const items: { label: string; path: string }[] = [
-		{ label: "Properties", path: "/properties" },
-	];
-
-	if (state.intent === "rent") {
-		items.push({ label: "For Rent", path: "/properties?intent=rent" });
-	}
-
-	if (state.intent === "sell") {
-		items.push({ label: "For Sale", path: "/properties?intent=sell" });
-	}
-
-	if (state.category !== "all") {
-		items.push({
-			label: `${state.category.charAt(0).toUpperCase()}${state.category.slice(1)}`,
-			path: `/properties?${stateToSearchParams({ ...state, page: 1 }).toString()}`,
-		});
-	}
-
-	return items;
-};
-
 const LOCATION_LABEL_MAP = Object.fromEntries(
 	WEST_BENGAL_LOCATIONS.map((location) => [location.value, location.label]),
 ) as Record<string, string>;
-
-const formatRecentSearchLabel = (params: string): string => {
-	const parsed = new URLSearchParams(params);
-	const parts: string[] = [];
-
-	const query = parsed.get("q");
-	if (query) {
-		parts.push(`Keyword: ${query}`);
-	}
-
-	const intent = parsed.get("intent");
-	if (intent === "rent") parts.push("For Rent");
-	if (intent === "sell") parts.push("For Sale");
-
-	const category = parsed.get("category");
-	if (category) {
-		parts.push(`Type: ${category.charAt(0).toUpperCase()}${category.slice(1)}`);
-	}
-
-	const location = parsed.get("location");
-	if (location) {
-		const resolvedKey = resolveWestBengalLocationKey(location);
-		parts.push(`Area: ${LOCATION_LABEL_MAP[resolvedKey] ?? location}`);
-	}
-
-	const minPrice = parsed.get("minPrice");
-	if (minPrice) {
-		parts.push(`Min ₹${Number(minPrice).toLocaleString()}`);
-	}
-
-	const maxPrice = parsed.get("maxPrice");
-	if (maxPrice) {
-		parts.push(`Max ₹${Number(maxPrice).toLocaleString()}`);
-	}
-
-	const lat = parsed.get("lat");
-	if (lat) {
-		parts.push("Near Me");
-	}
-
-	return parts.length > 0 ? parts.join(" • ") : "Recent Search";
-};
 
 const AllListings: React.FC<AllListingsProps> = ({
 	forcedIntent,
@@ -202,24 +190,33 @@ const AllListings: React.FC<AllListingsProps> = ({
 	const [loading, setLoading] = useState(false);
 	const [geoLoading, setGeoLoading] = useState(false);
 	const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
-	const [desktopFilterVisible, setDesktopFilterVisible] = useState(true);
-	const [recentSearches, setRecentSearches] = useState<string[]>([]);
+	const [mobileQuickFiltersExpanded, setMobileQuickFiltersExpanded] =
+		useState(false);
 
 	const state = useMemo(
 		() => toStateFromParams(searchParams, forcedIntent, forcedCategory),
 		[forcedCategory, forcedIntent, searchParams],
 	);
-
-	useEffect(() => {
-		try {
-			const recentRaw = localStorage.getItem(RECENT_SEARCHES_KEY);
-			if (recentRaw) {
-				setRecentSearches(JSON.parse(recentRaw) as string[]);
-			}
-		} catch {
-			setRecentSearches([]);
-		}
-	}, []);
+	const normalizedState = useMemo(
+		() => normalizeSearchState(state, forcedIntent, forcedCategory),
+		[forcedCategory, forcedIntent, state],
+	);
+	const effectiveIntent = forcedIntent ?? state.intent;
+	const categoryOptions =
+		effectiveIntent === "rent"
+			? [
+					{ label: "All Types", value: "all" },
+					{ label: "House", value: "house" },
+					{ label: "Flat", value: "flat" },
+					{ label: "Shop", value: "shop" },
+				]
+			: [
+					{ label: "All Types", value: "all" },
+					{ label: "House", value: "house" },
+					{ label: "Flat", value: "flat" },
+					{ label: "Shop", value: "shop" },
+					{ label: "Land", value: "land" },
+				];
 
 	useEffect(() => {
 		const fetchPosts = async () => {
@@ -241,57 +238,37 @@ const AllListings: React.FC<AllListingsProps> = ({
 	}, []);
 
 	useEffect(() => {
-		const paramsString = stateToSearchParams(state).toString();
-		const hasActiveSearch =
-			paramsString.length > 0 &&
-			(state.query.length > 0 ||
-				state.locationKey.length > 0 ||
-				state.minPrice !== null ||
-				state.maxPrice !== null ||
-				state.intent !== "all" ||
-				state.category !== "all" ||
-				state.lat !== null);
-
-		if (!hasActiveSearch) {
-			return;
+		const currentParams = stateToSearchParams(state).toString();
+		const normalizedParams = stateToSearchParams(normalizedState).toString();
+		if (currentParams !== normalizedParams) {
+			setSearchParams(stateToSearchParams(normalizedState), { replace: true });
 		}
-
-		setRecentSearches((prev) => {
-			const next = [
-				paramsString,
-				...prev.filter((item) => item !== paramsString),
-			].slice(0, 6);
-			localStorage.setItem(RECENT_SEARCHES_KEY, JSON.stringify(next));
-			return next;
-		});
-	}, [state]);
+	}, [normalizedState, setSearchParams, state]);
 
 	const searchFilters = useMemo<IListingSearchFilters>(
 		() => ({
-			query: state.query,
-			intent: forcedIntent ?? state.intent,
-			category: forcedCategory ?? state.category,
-			minPrice: state.minPrice,
-			maxPrice: state.maxPrice,
-			locationKey: state.locationKey,
-			sortBy: state.sortBy,
-			lat: state.lat,
-			lng: state.lng,
-			radiusKm: state.radiusKm,
+			query: normalizedState.query,
+			intent: normalizedState.intent,
+			category: normalizedState.category,
+			minPrice: normalizedState.minPrice,
+			maxPrice: normalizedState.maxPrice,
+			locationKey: normalizedState.locationKey,
+			sortBy: normalizedState.sortBy,
+			lat: normalizedState.lat,
+			lng: normalizedState.lng,
+			radiusKm: normalizedState.radiusKm,
 		}),
 		[
-			forcedCategory,
-			forcedIntent,
-			state.category,
-			state.intent,
-			state.lat,
-			state.lng,
-			state.locationKey,
-			state.maxPrice,
-			state.minPrice,
-			state.query,
-			state.radiusKm,
-			state.sortBy,
+			normalizedState.category,
+			normalizedState.intent,
+			normalizedState.lat,
+			normalizedState.lng,
+			normalizedState.locationKey,
+			normalizedState.maxPrice,
+			normalizedState.minPrice,
+			normalizedState.query,
+			normalizedState.radiusKm,
+			normalizedState.sortBy,
 		],
 	);
 
@@ -304,14 +281,14 @@ const AllListings: React.FC<AllListingsProps> = ({
 		1,
 		Math.ceil(filteredPosts.length / ITEMS_PER_PAGE),
 	);
-	const currentPage = Math.min(state.page, totalPages);
+	const currentPage = Math.min(normalizedState.page, totalPages);
 
 	useEffect(() => {
-		if (state.page > totalPages) {
-			const nextState = { ...state, page: totalPages };
+		if (normalizedState.page > totalPages) {
+			const nextState = { ...normalizedState, page: totalPages };
 			setSearchParams(stateToSearchParams(nextState), { replace: true });
 		}
-	}, [setSearchParams, state, totalPages]);
+	}, [normalizedState, setSearchParams, totalPages]);
 
 	const paginatedPosts = useMemo(() => {
 		const start = (currentPage - 1) * ITEMS_PER_PAGE;
@@ -319,12 +296,16 @@ const AllListings: React.FC<AllListingsProps> = ({
 	}, [currentPage, filteredPosts]);
 
 	const updateState = (patch: Partial<IListingSearchState>) => {
-		const nextState: IListingSearchState = {
-			...state,
-			...patch,
-			intent: forcedIntent ?? patch.intent ?? state.intent,
-			category: forcedCategory ?? patch.category ?? state.category,
-		};
+		const nextState = normalizeSearchState(
+			{
+				...normalizedState,
+				...patch,
+				intent: forcedIntent ?? patch.intent ?? normalizedState.intent,
+				category: forcedCategory ?? patch.category ?? normalizedState.category,
+			},
+			forcedIntent,
+			forcedCategory,
+		);
 
 		setSearchParams(stateToSearchParams(nextState));
 	};
@@ -391,10 +372,6 @@ const AllListings: React.FC<AllListingsProps> = ({
 		setSearchParams(stateToSearchParams(resetState));
 	};
 
-	const applySearchQuery = (params: string) => {
-		setSearchParams(new URLSearchParams(params));
-	};
-
 	const goToPage = (page: number) => {
 		if (page < 1 || page > totalPages) {
 			return;
@@ -447,41 +424,564 @@ const AllListings: React.FC<AllListingsProps> = ({
 	};
 
 	const heading = title ?? "All Properties";
-	const breadcrumbItems = buildBreadcrumbItems({ ...state, page: 1 });
+	const activeAreaLabel = normalizedState.locationKey
+		? LOCATION_LABEL_MAP[
+				resolveWestBengalLocationKey(normalizedState.locationKey)
+			] || normalizedState.locationKey
+		: "Siliguri";
+	const contextualHeading =
+		effectiveIntent === "rent"
+			? `${filteredPosts.length} Properties for Rent in ${activeAreaLabel}`
+			: effectiveIntent === "sell"
+				? `${filteredPosts.length} Properties for Sale in ${activeAreaLabel}`
+				: `${filteredPosts.length} Properties in ${activeAreaLabel}`;
+
+	const activeFilterChips = [
+		normalizedState.intent !== "all"
+			? {
+					key: "intent",
+					label: normalizedState.intent === "sell" ? "Buy" : "Rent",
+					onClear: () => updateState({ intent: "all", page: 1 }),
+				}
+			: null,
+		normalizedState.category !== "all"
+			? {
+					key: "category",
+					label: `Type: ${normalizedState.category}`,
+					onClear: () => updateState({ category: "all", page: 1 }),
+				}
+			: null,
+		normalizedState.locationKey
+			? {
+					key: "location",
+					label: `Area: ${activeAreaLabel}`,
+					onClear: () => updateState({ locationKey: "", page: 1 }),
+				}
+			: null,
+		normalizedState.minPrice !== null
+			? {
+					key: "minPrice",
+					label: `Min ₹${normalizedState.minPrice.toLocaleString("en-IN")}`,
+					onClear: () => updateState({ minPrice: null, page: 1 }),
+				}
+			: null,
+		normalizedState.maxPrice !== null
+			? {
+					key: "maxPrice",
+					label: `Max ₹${normalizedState.maxPrice.toLocaleString("en-IN")}`,
+					onClear: () => updateState({ maxPrice: null, page: 1 }),
+				}
+			: null,
+		normalizedState.lat !== null && normalizedState.lng !== null
+			? {
+					key: "nearMe",
+					label: `Near me (${normalizedState.radiusKm} km)`,
+					onClear: onClearGeoFilter,
+				}
+			: null,
+	].filter(Boolean) as Array<{
+		key: string;
+		label: string;
+		onClear: () => void;
+	}>;
+
+	const quickBudgetPresets =
+		effectiveIntent === "rent"
+			? [
+					{ label: "Under ₹10k", min: null, max: 10000 },
+					{ label: "₹10k-₹25k", min: 10000, max: 25000 },
+					{ label: "₹25k+", min: 25000, max: null },
+				]
+			: [
+					{ label: "Under ₹25L", min: null, max: 2500000 },
+					{ label: "₹25L-₹75L", min: 2500000, max: 7500000 },
+					{ label: "₹75L+", min: 7500000, max: null },
+				];
+
+	const priceAnalytics = useMemo(() => {
+		const prices = filteredPosts
+			.map((item) => {
+				if (item.intent === "rent") {
+					return "pricePerFrequency" in item
+						? Number(item.pricePerFrequency ?? NaN)
+						: NaN;
+				}
+				if ("totalPrice" in item && item.totalPrice !== undefined) {
+					return Number(item.totalPrice);
+				}
+				if ("price" in item && item.price !== undefined) {
+					return Number(item.price);
+				}
+				if ("pricePerUnit" in item && item.pricePerUnit !== undefined) {
+					return Number(item.pricePerUnit);
+				}
+				return NaN;
+			})
+			.filter((price) => Number.isFinite(price) && price > 0)
+			.sort((a, b) => a - b);
+
+		if (prices.length === 0) {
+			return {
+				median: "Not enough data",
+				min: "Not enough data",
+				max: "Not enough data",
+			};
+		}
+
+		const middle = Math.floor(prices.length / 2);
+		const medianRaw =
+			prices.length % 2 === 0
+				? Math.round((prices[middle - 1] + prices[middle]) / 2)
+				: prices[middle];
+
+		return {
+			median: `₹${medianRaw.toLocaleString("en-IN")}`,
+			min: `₹${prices[0].toLocaleString("en-IN")}`,
+			max: `₹${prices[prices.length - 1].toLocaleString("en-IN")}`,
+		};
+	}, [filteredPosts]);
+
+	const inventoryMix = useMemo(() => {
+		const rentCount = filteredPosts.filter(
+			(item) => item.intent === "rent",
+		).length;
+		const sellCount = filteredPosts.filter(
+			(item) => item.intent === "sell",
+		).length;
+		const total = rentCount + sellCount;
+		if (total === 0) {
+			return "No active inventory";
+		}
+		const rentPct = Math.round((rentCount / total) * 100);
+		const sellPct = 100 - rentPct;
+		return `Buy ${sellPct}% • Rent ${rentPct}%`;
+	}, [filteredPosts]);
+
+	const topLocalities = useMemo(() => {
+		const counts = filteredPosts.reduce<Record<string, number>>((acc, item) => {
+			const key =
+				item.wbLocalityLabel?.trim() || item.location?.trim() || "Unknown";
+			acc[key] = (acc[key] ?? 0) + 1;
+			return acc;
+		}, {});
+
+		return Object.entries(counts)
+			.sort((a, b) => b[1] - a[1])
+			.slice(0, 3);
+	}, [filteredPosts]);
+
+	const listingAgeInsight = useMemo(() => {
+		const ages = filteredPosts
+			.map((item) => getDaysAgoFromObjectId(item._id))
+			.filter((days): days is number => days !== null)
+			.sort((a, b) => a - b);
+
+		if (ages.length === 0) {
+			return "Not enough listing age data";
+		}
+
+		const mid = Math.floor(ages.length / 2);
+		const median =
+			ages.length % 2 === 0
+				? Math.round((ages[mid - 1] + ages[mid]) / 2)
+				: ages[mid];
+
+		if (median === 0) {
+			return "Median listing age: Posted today";
+		}
+
+		return `Median listing age: ${median} day${median > 1 ? "s" : ""}`;
+	}, [filteredPosts]);
 
 	return (
 		<>
 			<Navbar />
-			<Breadcrumb items={breadcrumbItems} />
+			<section className="sticky top-[66px] z-30 border-y border-slate-200 bg-white/95 backdrop-blur md:top-[104px]">
+				<div className="mx-auto w-full max-w-7xl px-4 py-3 md:px-6">
+					<div className="grid grid-cols-1 gap-2 md:hidden">
+						<div className="grid grid-cols-[1fr_auto] gap-2">
+							<div className="relative">
+								<Search className="pointer-events-none absolute left-3 top-3 h-4 w-4 text-slate-400" />
+								<input
+									type="text"
+									value={normalizedState.query}
+									onChange={(event) =>
+										updateState({ query: event.target.value, page: 1 })
+									}
+									placeholder="Search locality, landmark, title"
+									className="h-10 w-full rounded-lg border border-slate-300 bg-white pl-9 pr-3 text-sm text-slate-900 outline-none focus:border-emerald-500"
+								/>
+							</div>
+
+							<button
+								type="button"
+								onClick={() => setMobileFilterOpen(true)}
+								className="inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-3 text-sm font-semibold text-slate-700 hover:bg-slate-100"
+							>
+								<SlidersHorizontal className="h-4 w-4" />
+								Filters
+							</button>
+						</div>
+
+						<div className="flex items-center gap-2">
+							{[
+								{ label: "All", value: "all" },
+								{ label: "Buy", value: "sell" },
+								{ label: "Rent", value: "rent" },
+							].map((intentOption) => {
+								const active =
+									(forcedIntent ?? normalizedState.intent) ===
+									intentOption.value;
+								return (
+									<button
+										key={intentOption.value}
+										type="button"
+										disabled={Boolean(forcedIntent)}
+										onClick={() =>
+											updateState({
+												intent:
+													intentOption.value as IListingSearchState["intent"],
+												page: 1,
+											})
+										}
+										className={`rounded-full border px-3 py-1 text-xs font-semibold ${
+											active
+												? "border-emerald-600 bg-emerald-600 text-white"
+												: "border-slate-300 bg-white text-slate-700 hover:bg-slate-100"
+										}`}
+									>
+										{intentOption.label}
+									</button>
+								);
+							})}
+
+							<button
+								type="button"
+								onClick={() =>
+									setMobileQuickFiltersExpanded((current) => !current)
+								}
+								className="ml-auto inline-flex items-center gap-1 rounded-full border border-slate-300 bg-white px-3 py-1 text-xs font-semibold text-slate-700 hover:bg-slate-100"
+							>
+								More
+								{mobileQuickFiltersExpanded ? (
+									<ChevronUp className="h-3.5 w-3.5" />
+								) : (
+									<ChevronDown className="h-3.5 w-3.5" />
+								)}
+							</button>
+						</div>
+
+						{mobileQuickFiltersExpanded && (
+							<div className="space-y-2 rounded-xl border border-slate-200 bg-white p-2.5">
+								<div className="grid grid-cols-2 gap-2">
+									<select
+										value={normalizedState.locationKey}
+										onChange={(event) =>
+											updateState({ locationKey: event.target.value, page: 1 })
+										}
+										className="h-9 rounded-lg border border-slate-300 bg-white px-2.5 text-xs text-slate-900 outline-none focus:border-emerald-500"
+									>
+										<option value="">Any Area</option>
+										{WEST_BENGAL_LOCATIONS.map((location) => (
+											<option key={location.value} value={location.value}>
+												{location.label}
+											</option>
+										))}
+									</select>
+
+									<select
+										value={normalizedState.sortBy}
+										onChange={(event) =>
+											updateState({
+												sortBy: event.target
+													.value as IListingSearchState["sortBy"],
+												page: 1,
+											})
+										}
+										className="h-9 rounded-lg border border-slate-300 bg-white px-2.5 text-xs text-slate-900 outline-none focus:border-emerald-500"
+									>
+										<option value="newest">Newest First</option>
+										<option value="priceLow">Price: Low to High</option>
+										<option value="priceHigh">Price: High to Low</option>
+										<option value="nearest">Nearest</option>
+									</select>
+
+									<button
+										type="button"
+										onClick={onUseCurrentLocation}
+										disabled={geoLoading}
+										className="inline-flex h-9 items-center justify-center gap-1 rounded-lg border border-slate-300 bg-white px-2.5 text-xs font-semibold text-slate-700 hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-60"
+									>
+										<LocateFixed className="h-3.5 w-3.5" />
+										{geoLoading ? "Detecting..." : "Near Me"}
+									</button>
+
+									<button
+										type="button"
+										onClick={onResetFilters}
+										className="inline-flex h-9 items-center justify-center rounded-lg border border-slate-300 bg-white px-2.5 text-xs font-semibold text-slate-700 hover:bg-slate-100"
+									>
+										Clear all
+									</button>
+								</div>
+
+								<div className="flex flex-wrap gap-1.5">
+									{categoryOptions.map((categoryOption) => {
+										const active =
+											(forcedCategory ?? normalizedState.category) ===
+											categoryOption.value;
+										return (
+											<button
+												key={categoryOption.value}
+												type="button"
+												disabled={Boolean(forcedCategory)}
+												onClick={() =>
+													updateState({
+														category:
+															categoryOption.value as IListingSearchState["category"],
+														page: 1,
+													})
+												}
+												className={`rounded-full border px-2.5 py-1 text-[11px] font-semibold ${
+													active
+														? "border-emerald-600 bg-emerald-50 text-emerald-700"
+														: "border-slate-300 bg-white text-slate-700 hover:bg-slate-100"
+												}`}
+											>
+												{categoryOption.label}
+											</button>
+										);
+									})}
+
+									{quickBudgetPresets.map((preset) => {
+										const active =
+											normalizedState.minPrice === preset.min &&
+											normalizedState.maxPrice === preset.max;
+										return (
+											<button
+												key={preset.label}
+												type="button"
+												onClick={() =>
+													updateState({
+														minPrice: preset.min,
+														maxPrice: preset.max,
+														page: 1,
+													})
+												}
+												className={`rounded-full border px-2.5 py-1 text-[11px] font-semibold ${
+													active
+														? "border-emerald-600 bg-emerald-50 text-emerald-700"
+														: "border-slate-300 bg-white text-slate-700 hover:bg-slate-100"
+												}`}
+											>
+												{preset.label}
+											</button>
+										);
+									})}
+								</div>
+							</div>
+						)}
+					</div>
+
+					<div className="hidden grid-cols-1 gap-2 md:grid lg:grid-cols-[1.4fr_0.8fr_0.7fr_auto_auto_auto]">
+						<div className="relative">
+							<Search className="pointer-events-none absolute left-3 top-3 h-4 w-4 text-slate-400" />
+							<input
+								type="text"
+								value={normalizedState.query}
+								onChange={(event) =>
+									updateState({ query: event.target.value, page: 1 })
+								}
+								placeholder="Search locality, landmark, title"
+								className="h-10 w-full rounded-lg border border-slate-300 bg-white pl-9 pr-3 text-sm text-slate-900 outline-none focus:border-emerald-500"
+							/>
+						</div>
+
+						<select
+							value={normalizedState.locationKey}
+							onChange={(event) =>
+								updateState({ locationKey: event.target.value, page: 1 })
+							}
+							className="h-10 rounded-lg border border-slate-300 bg-white px-3 text-sm text-slate-900 outline-none focus:border-emerald-500"
+						>
+							<option value="">Any Area</option>
+							{WEST_BENGAL_LOCATIONS.map((location) => (
+								<option key={location.value} value={location.value}>
+									{location.label}
+								</option>
+							))}
+						</select>
+
+						<select
+							value={normalizedState.sortBy}
+							onChange={(event) =>
+								updateState({
+									sortBy: event.target.value as IListingSearchState["sortBy"],
+									page: 1,
+								})
+							}
+							className="h-10 rounded-lg border border-slate-300 bg-white px-3 text-sm text-slate-900 outline-none focus:border-emerald-500"
+						>
+							<option value="newest">Newest First</option>
+							<option value="priceLow">Price: Low to High</option>
+							<option value="priceHigh">Price: High to Low</option>
+							<option value="nearest">Nearest</option>
+						</select>
+
+						<button
+							type="button"
+							onClick={onUseCurrentLocation}
+							disabled={geoLoading}
+							className="inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-3 text-sm font-semibold text-slate-700 hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-60"
+						>
+							<LocateFixed className="h-4 w-4" />
+							{geoLoading ? "Detecting..." : "Near Me"}
+						</button>
+
+						<button
+							type="button"
+							onClick={() => setMobileFilterOpen(true)}
+							className="inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-3 text-sm font-semibold text-slate-700 hover:bg-slate-100"
+						>
+							<SlidersHorizontal className="h-4 w-4" />
+							More Filters
+						</button>
+
+						<button
+							type="button"
+							onClick={onResetFilters}
+							className="inline-flex h-10 items-center justify-center rounded-lg border border-slate-300 bg-white px-3 text-sm font-semibold text-slate-700 hover:bg-slate-100"
+						>
+							Clear all
+						</button>
+					</div>
+
+					<div className="mt-2 hidden flex-wrap gap-2 md:flex">
+						{[
+							{ label: "All", value: "all" },
+							{ label: "Buy", value: "sell" },
+							{ label: "Rent", value: "rent" },
+						].map((intentOption) => {
+							const active =
+								(forcedIntent ?? normalizedState.intent) === intentOption.value;
+							return (
+								<button
+									key={intentOption.value}
+									type="button"
+									disabled={Boolean(forcedIntent)}
+									onClick={() =>
+										updateState({
+											intent:
+												intentOption.value as IListingSearchState["intent"],
+											page: 1,
+										})
+									}
+									className={`rounded-full border px-3 py-1 text-xs font-semibold ${
+										active
+											? "border-emerald-600 bg-emerald-600 text-white"
+											: "border-slate-300 bg-white text-slate-700 hover:bg-slate-100"
+									}`}
+								>
+									{intentOption.label}
+								</button>
+							);
+						})}
+
+						{categoryOptions.map((categoryOption) => {
+							const active =
+								(forcedCategory ?? normalizedState.category) ===
+								categoryOption.value;
+							return (
+								<button
+									key={categoryOption.value}
+									type="button"
+									disabled={Boolean(forcedCategory)}
+									onClick={() =>
+										updateState({
+											category:
+												categoryOption.value as IListingSearchState["category"],
+											page: 1,
+										})
+									}
+									className={`rounded-full border px-3 py-1 text-xs font-semibold ${
+										active
+											? "border-emerald-600 bg-emerald-50 text-emerald-700"
+											: "border-slate-300 bg-white text-slate-700 hover:bg-slate-100"
+									}`}
+								>
+									{categoryOption.label}
+								</button>
+							);
+						})}
+
+						{quickBudgetPresets.map((preset) => {
+							const active =
+								normalizedState.minPrice === preset.min &&
+								normalizedState.maxPrice === preset.max;
+							return (
+								<button
+									key={preset.label}
+									type="button"
+									onClick={() =>
+										updateState({
+											minPrice: preset.min,
+											maxPrice: preset.max,
+											page: 1,
+										})
+									}
+									className={`rounded-full border px-3 py-1 text-xs font-semibold ${
+										active
+											? "border-emerald-600 bg-emerald-50 text-emerald-700"
+											: "border-slate-300 bg-white text-slate-700 hover:bg-slate-100"
+									}`}
+								>
+									{preset.label}
+								</button>
+							);
+						})}
+					</div>
+				</div>
+			</section>
+
 			<main className="mx-auto w-full max-w-7xl px-4 py-8 md:px-6">
 				<header className="mb-6 flex flex-wrap items-center justify-between gap-3">
 					<div>
 						<h1 className="text-2xl font-bold text-slate-900 md:text-3xl">
-							{heading}
+							{heading !== "All Properties" ? heading : contextualHeading}
 						</h1>
 						<p className="mt-1 text-sm text-slate-600 md:text-base">
 							{filteredPosts.length} properties match your current filters.
 						</p>
 					</div>
-					<div className="flex items-center gap-2">
-						<button
-							type="button"
-							onClick={() => setMobileFilterOpen(true)}
-							className="inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100 lg:hidden"
-						>
-							<SlidersHorizontal className="h-4 w-4" />
-							Filters
-						</button>
-						<button
-							type="button"
-							onClick={() => setDesktopFilterVisible((prev) => !prev)}
-							className="hidden items-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100 lg:inline-flex"
-						>
-							<SlidersHorizontal className="h-4 w-4" />
-							{desktopFilterVisible ? "Hide Filters" : "Show Filters"}
-						</button>
+					<div className="flex items-center gap-2 text-sm text-slate-500">
+						{normalizedState.lat !== null && normalizedState.lng !== null
+							? "Near Me enabled"
+							: ""}
 					</div>
 				</header>
+
+				{activeFilterChips.length > 0 && (
+					<div className="mb-5 flex flex-wrap items-center gap-2">
+						{activeFilterChips.map((chip) => (
+							<button
+								key={chip.key}
+								type="button"
+								onClick={chip.onClear}
+								className="inline-flex items-center gap-1 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-800 hover:bg-emerald-100"
+							>
+								{chip.label}
+								<span className="text-emerald-600">x</span>
+							</button>
+						))}
+						<button
+							type="button"
+							onClick={onResetFilters}
+							className="rounded-full border border-slate-300 bg-white px-3 py-1 text-xs font-semibold text-slate-700 hover:bg-slate-100"
+						>
+							Clear all filters
+						</button>
+					</div>
+				)}
 
 				<Sheet open={mobileFilterOpen} onOpenChange={setMobileFilterOpen}>
 					<SheetContent
@@ -496,46 +996,7 @@ const AllListings: React.FC<AllListingsProps> = ({
 						</SheetHeader>
 						<div className="px-2 pb-6">
 							<ListingSearchPanel
-								state={state}
-								onChange={updateState}
-								onUseCurrentLocation={onUseCurrentLocation}
-								onClearGeoFilter={onClearGeoFilter}
-								onReset={onResetFilters}
-								geoLoading={geoLoading}
-								lockIntent={forcedIntent}
-								lockCategory={forcedCategory}
-								layout="full"
-							/>
-						</div>
-					</SheetContent>
-				</Sheet>
-
-				{recentSearches.length > 0 && (
-					<section className="mb-6 rounded-xl border border-slate-200 bg-white p-4">
-						<h3 className="mb-2 text-sm font-semibold text-slate-700">
-							Recent Searches
-						</h3>
-						<div className="flex flex-wrap gap-2">
-							{recentSearches.map((params) => (
-								<button
-									key={params}
-									type="button"
-									onClick={() => applySearchQuery(params)}
-									className="rounded-full border border-slate-300 px-3 py-1 text-xs text-slate-700 hover:bg-slate-100"
-									title={params}
-								>
-									{formatRecentSearchLabel(params)}
-								</button>
-							))}
-						</div>
-					</section>
-				)}
-
-				<div className="grid grid-cols-1 gap-6 lg:grid-cols-[320px_minmax(0,1fr)] lg:items-start">
-					{desktopFilterVisible ? (
-						<aside className="hidden lg:block lg:sticky lg:top-20">
-							<ListingSearchPanel
-								state={state}
+								state={normalizedState}
 								onChange={updateState}
 								onUseCurrentLocation={onUseCurrentLocation}
 								onClearGeoFilter={onClearGeoFilter}
@@ -545,24 +1006,24 @@ const AllListings: React.FC<AllListingsProps> = ({
 								lockCategory={forcedCategory}
 								layout="sidebar"
 							/>
-						</aside>
-					) : (
-						<div className="hidden lg:block" />
-					)}
+						</div>
+					</SheetContent>
+				</Sheet>
 
-					<div>
+				<div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,860px)_minmax(280px,320px)] lg:items-start">
+					<div className="space-y-4 lg:max-w-[860px]">
 						{loading ? (
-							<div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
+							<div className="space-y-4">
 								{Array.from({ length: 8 }).map((_, index) => (
 									<div
 										key={index}
-										className="h-72 animate-pulse rounded-xl bg-slate-200"
+										className="h-56 animate-pulse rounded-xl bg-slate-200"
 									/>
 								))}
 							</div>
 						) : (
 							<>
-								<div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
+								<div className="space-y-4">
 									{paginatedPosts.length === 0 ? (
 										<div className="col-span-full rounded-xl border border-slate-200 bg-white p-8 text-center text-slate-600">
 											No properties found. Adjust filters and try again.
@@ -574,6 +1035,7 @@ const AllListings: React.FC<AllListingsProps> = ({
 													<RentListingCard
 														listing={post as IRentListingType}
 														userOrGlobal="global"
+														variant="search"
 													/>
 												) : (
 													<SellListingCard
@@ -584,6 +1046,7 @@ const AllListings: React.FC<AllListingsProps> = ({
 															)
 														}
 														userOrGlobal="global"
+														variant="search"
 													/>
 												)}
 											</div>
@@ -623,6 +1086,105 @@ const AllListings: React.FC<AllListingsProps> = ({
 							</>
 						)}
 					</div>
+
+					<aside className="space-y-4 lg:sticky lg:top-32">
+						<div className="rounded-2xl bg-gradient-to-br from-emerald-900 via-emerald-800 to-emerald-700 p-5 text-white shadow-md">
+							<h3 className="text-xl font-bold">
+								Sell faster with SiliguriProperty
+							</h3>
+							<p className="mt-2 text-sm text-emerald-100">
+								Publish once and reach active buyers and tenants browsing this
+								exact market.
+							</p>
+							<button
+								type="button"
+								onClick={() => navigate("/dashboard/new-post")}
+								className="mt-4 w-full rounded-lg bg-white px-4 py-2.5 text-sm font-bold text-emerald-800 transition hover:bg-emerald-50"
+							>
+								Post Property FREE
+							</button>
+						</div>
+
+						<div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+							<h4 className="text-base font-semibold text-slate-900">
+								Market Analytics
+							</h4>
+							<p className="mt-1 text-xs text-slate-500">
+								Based on current filtered inventory
+							</p>
+							<div className="mt-3 space-y-3 text-sm">
+								<div className="rounded-lg bg-slate-50 p-3">
+									<p className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">
+										Median Price
+									</p>
+									<p className="mt-1 font-semibold text-slate-900">
+										{priceAnalytics.median}
+									</p>
+								</div>
+								<div className="grid grid-cols-2 gap-2">
+									<div className="rounded-lg bg-slate-50 p-3">
+										<p className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">
+											Min
+										</p>
+										<p className="mt-1 font-semibold text-slate-900">
+											{priceAnalytics.min}
+										</p>
+									</div>
+									<div className="rounded-lg bg-slate-50 p-3">
+										<p className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">
+											Max
+										</p>
+										<p className="mt-1 font-semibold text-slate-900">
+											{priceAnalytics.max}
+										</p>
+									</div>
+								</div>
+								<div className="rounded-lg bg-slate-50 p-3">
+									<p className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">
+										Inventory Mix
+									</p>
+									<p className="mt-1 font-semibold text-slate-900">
+										{inventoryMix}
+									</p>
+								</div>
+								<div className="rounded-lg bg-slate-50 p-3">
+									<p className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">
+										Listing Freshness
+									</p>
+									<p className="mt-1 font-semibold text-slate-900">
+										{listingAgeInsight}
+									</p>
+								</div>
+							</div>
+						</div>
+
+						<div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+							<h4 className="text-base font-semibold text-slate-900">
+								Top Localities
+							</h4>
+							<div className="mt-3 space-y-2">
+								{topLocalities.length === 0 ? (
+									<p className="text-sm text-slate-500">
+										No locality data for current filters.
+									</p>
+								) : (
+									topLocalities.map(([name, count]) => (
+										<div
+											key={name}
+											className="flex items-center justify-between rounded-lg bg-slate-50 px-3 py-2"
+										>
+											<span className="text-sm text-slate-700 line-clamp-1">
+												{name}
+											</span>
+											<span className="rounded bg-white px-2 py-0.5 text-xs font-semibold text-slate-600">
+												{count}
+											</span>
+										</div>
+									))
+								)}
+							</div>
+						</div>
+					</aside>
 				</div>
 
 				<button

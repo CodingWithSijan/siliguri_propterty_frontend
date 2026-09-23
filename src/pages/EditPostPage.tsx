@@ -54,36 +54,6 @@ const EditPostPage = () => {
 		);
 	}
 
-	// Check if post can be edited (only pending posts)
-	if (post.approvalStatus !== "pending") {
-		const statusClass =
-			post.approvalStatus === "approved" ? "text-green-600" : "text-red-600";
-
-		return (
-			<div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
-				<div className="text-center max-w-md mx-auto p-8">
-					<h1 className="text-2xl font-bold text-gray-900 mb-4">
-						Cannot Edit Post
-					</h1>
-					<div className="bg-white rounded-lg p-6 shadow-lg">
-						<p className="text-gray-600 mb-4">
-							This post has been{" "}
-							<span className={`font-semibold ${statusClass}`}>
-								{post.approvalStatus.toUpperCase()}
-							</span>{" "}
-							and cannot be edited.
-						</p>
-						<p className="text-sm text-gray-500">
-							{post.approvalStatus === "approved"
-								? "Approved posts cannot be modified. Contact support if changes are needed."
-								: "Rejected posts cannot be edited. You may create a new post instead."}
-						</p>
-					</div>
-				</div>
-			</div>
-		);
-	}
-
 	// Render the correct form based on post.intent
 	return (
 		<EditPostStepperForm intent={post.intent} initialData={post} postId={id!} />

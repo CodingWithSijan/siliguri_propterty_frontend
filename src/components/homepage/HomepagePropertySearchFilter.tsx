@@ -1,18 +1,27 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-	FaSearch,
-	FaMapMarkerAlt,
-	FaHome,
-	FaMoneyBillWave,
-	FaHandshake,
-	FaLocationArrow,
-} from "react-icons/fa";
+import { FaSearch, FaLocationArrow, FaFilter } from "react-icons/fa";
 import { WEST_BENGAL_LOCATIONS } from "../../constants/westBengalLocations";
 import { isWithinWestBengal } from "../../utils/geo";
 import { showError, showInfo } from "../../utils/toastUtils";
+import { Slider } from "../ui/slider";
+import { formatIndianCurrency } from "../../utils/priceFormatHelper";
 
-const propertyTypes = [
+type ListingIntent = "sell" | "rent" | "";
+
+interface IHomepageSearchFilters {
+	propertyType: string;
+	location: string;
+	customLocation: string;
+	intent: ListingIntent;
+	lat: string;
+	lng: string;
+	radiusKm: string;
+	minPrice: number;
+	maxPrice: number;
+}
+
+const allPropertyTypes = [
 	{ value: "", label: "Any Type" },
 	{ value: "house", label: "House" },
 	{ value: "flat", label: "Flat/Apartment" },
@@ -20,87 +29,92 @@ const propertyTypes = [
 	{ value: "land", label: "Land" },
 ];
 
-const rentPriceRanges = [
-	{ value: "", label: "Any Price" },
-	// Daily rates
-	{ value: "0-500", label: "₹0 - ₹500 /day" },
-	{ value: "500-1000", label: "₹500 - ₹1,000 /day" },
-	{ value: "1000-2000", label: "₹1,000 - ₹2,000 /day" },
-	{ value: "2000-5000", label: "₹2,000 - ₹5,000 /day" },
-	// Weekly rates
-	{ value: "3000-7000", label: "₹3,000 - ₹7,000 /week" },
-	{ value: "7000-15000", label: "₹7,000 - ₹15,000 /week" },
-	{ value: "15000-30000", label: "₹15,000 - ₹30,000 /week" },
-	// Monthly rates
-	{ value: "5000-10000", label: "₹5,000 - ₹10,000 /month" },
-	{ value: "10000-20000", label: "₹10,000 - ₹20,000 /month" },
-	{ value: "20000-35000", label: "₹20,000 - ₹35,000 /month" },
-	{ value: "35000-50000", label: "₹35,000 - ₹50,000 /month" },
-	{ value: "50000-75000", label: "₹50,000 - ₹75,000 /month" },
-	// Yearly rates
-	{ value: "60000-120000", label: "₹60,000 - ₹1.2 Lakh /year" },
-	{ value: "120000-240000", label: "₹1.2 Lakh - ₹2.4 Lakh /year" },
-	{ value: "240000-480000", label: "₹2.4 Lakh - ₹4.8 Lakh /year" },
-	{ value: "480000-720000", label: "₹4.8 Lakh - ₹7.2 Lakh /year" },
-	{ value: "720000+", label: "₹7.2 Lakh+ /year" },
-];
+const PRICE_LIMITS = {
+	sell: { min: 0, max: 20000000, step: 100000 },
+	rent: { min: 0, max: 100000, step: 1000 },
+} as const;
 
-const buyPriceRanges = [
-	{ value: "", label: "Any Price" },
-	{ value: "0-1000000", label: "₹0 - ₹10 Lakh" },
-	{ value: "1000000-2500000", label: "₹10 Lakh - ₹25 Lakh" },
-	{ value: "2500000-5000000", label: "₹25 Lakh - ₹50 Lakh" },
-	{ value: "5000000-7500000", label: "₹50 Lakh - ₹75 Lakh" },
-	{ value: "7500000-10000000", label: "₹75 Lakh - ₹1 Crore" },
-	{ value: "10000000-15000000", label: "₹1 Crore - ₹1.5 Crore" },
-	{ value: "15000000+", label: "₹1.5 Crore+" },
-];
+const getPriceLimits = (intent: ListingIntent) =>
+	intent === "rent" ? PRICE_LIMITS.rent : PRICE_LIMITS.sell;
 
-const purposeOptions = [
-	{ value: "", label: "Any" },
-	{ value: "rent", label: "Rent" },
-	{ value: "sell", label: "Buy" },
-];
+const formatReadablePrice = (value: number): string => {
+	const safeValue = Math.max(0, Number.isFinite(value) ? value : 0);
+	return `₹${safeValue.toLocaleString("en-IN")} (${formatIndianCurrency(safeValue)})`;
+};
 
 const HomepagePropertySearchFilter: React.FC = () => {
 	const navigate = useNavigate();
 	const [geoLoading, setGeoLoading] = useState(false);
-	const [filters, setFilters] = useState({
+	const OTHER_LOCATION_VALUE = "other";
+	const defaultLimits = getPriceLimits("sell");
+	const [filters, setFilters] = useState<IHomepageSearchFilters>({
 		propertyType: "",
-		priceRange: "",
 		location: "",
-		purpose: "",
+		customLocation: "",
+		intent: "sell" as ListingIntent,
 		lat: "",
 		lng: "",
 		radiusKm: "12",
+		minPrice: defaultLimits.min,
+		maxPrice: defaultLimits.max,
 	});
 
-	// Function to get appropriate price ranges based on purpose
-	const getPriceRanges = () => {
-		if (filters.purpose === "rent") {
-			return rentPriceRanges;
-		} else if (filters.purpose === "buy") {
-			return buyPriceRanges;
-		} else {
-			// Default to buy prices when no purpose is selected
-			return buyPriceRanges;
+	const activePriceLimits = getPriceLimits(filters.intent);
+	const sliderMax = Math.max(
+		activePriceLimits.max,
+		filters.maxPrice,
+		filters.minPrice,
+	);
+	const hasActiveFilters =
+		Boolean(filters.propertyType) ||
+		Boolean(filters.location) ||
+		Boolean(filters.customLocation.trim()) ||
+		Boolean(filters.lat && filters.lng) ||
+		filters.intent !== "sell" ||
+		filters.minPrice !== activePriceLimits.min ||
+		filters.maxPrice !== activePriceLimits.max;
+
+	const getPropertyTypes = () => {
+		if (filters.intent === "rent") {
+			return allPropertyTypes.filter((type) => type.value !== "land");
 		}
+		return allPropertyTypes;
 	};
 
 	const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
 		const { name, value } = e.target;
+		setFilters((prev) => ({
+			...prev,
+			[name]: value,
+			...(name === "location" && value !== OTHER_LOCATION_VALUE
+				? { customLocation: "" }
+				: {}),
+		}));
+	};
+
+	const handleCustomLocationChange = (
+		e: React.ChangeEvent<HTMLInputElement>,
+	) => {
+		setFilters((prev) => ({
+			...prev,
+			customLocation: e.target.value,
+		}));
+	};
+
+	const setIntent = (intent: ListingIntent) => {
+		const limits = getPriceLimits(intent);
 		setFilters((prev) => {
-			const newFilters = {
+			const nextType =
+				intent === "rent" && prev.propertyType === "land"
+					? ""
+					: prev.propertyType;
+			return {
 				...prev,
-				[name]: value,
+				intent,
+				propertyType: nextType,
+				minPrice: limits.min,
+				maxPrice: limits.max,
 			};
-
-			// Reset price range when purpose changes
-			if (name === "purpose") {
-				newFilters.priceRange = "";
-			}
-
-			return newFilters;
 		});
 	};
 
@@ -109,8 +123,14 @@ const HomepagePropertySearchFilter: React.FC = () => {
 		const params = new URLSearchParams();
 
 		if (filters.propertyType) params.set("category", filters.propertyType);
-		if (filters.purpose) params.set("intent", filters.purpose);
-		if (filters.location) params.set("location", filters.location);
+		if (filters.intent) params.set("intent", filters.intent);
+		if (filters.location && filters.location !== OTHER_LOCATION_VALUE) {
+			params.set("location", filters.location);
+		}
+
+		if (filters.location === OTHER_LOCATION_VALUE && filters.customLocation) {
+			params.set("q", filters.customLocation.trim());
+		}
 		if (filters.lat && filters.lng) {
 			params.set("lat", filters.lat);
 			params.set("lng", filters.lng);
@@ -118,15 +138,12 @@ const HomepagePropertySearchFilter: React.FC = () => {
 			params.set("sort", "nearest");
 		}
 
-		if (filters.priceRange) {
-			if (filters.priceRange.includes("+")) {
-				const min = filters.priceRange.replace("+", "");
-				params.set("minPrice", min);
-			} else {
-				const [min, max] = filters.priceRange.split("-");
-				if (min) params.set("minPrice", min);
-				if (max) params.set("maxPrice", max);
-			}
+		if (filters.minPrice !== activePriceLimits.min) {
+			params.set("minPrice", String(filters.minPrice));
+		}
+
+		if (filters.maxPrice !== activePriceLimits.max) {
+			params.set("maxPrice", String(filters.maxPrice));
 		}
 
 		navigate(`/properties?${params.toString()}`);
@@ -170,51 +187,148 @@ const HomepagePropertySearchFilter: React.FC = () => {
 		setFilters((prev) => ({ ...prev, lat: "", lng: "" }));
 	};
 
+	const handlePriceRangeChange = (values: number[]) => {
+		if (values.length !== 2) {
+			return;
+		}
+
+		setFilters((prev) => ({
+			...prev,
+			minPrice: Math.max(activePriceLimits.min, values[0]),
+			maxPrice: Math.max(values[1], values[0]),
+		}));
+	};
+
+	const handleMinPriceInput = (event: React.ChangeEvent<HTMLInputElement>) => {
+		const nextRaw = event.target.value;
+		const nextMin = nextRaw === "" ? activePriceLimits.min : Number(nextRaw);
+		if (!Number.isFinite(nextMin)) {
+			return;
+		}
+
+		setFilters((prev) => {
+			const safeMin = Math.max(0, Math.floor(nextMin));
+			const safeMax = Math.max(prev.maxPrice, safeMin);
+			return {
+				...prev,
+				minPrice: safeMin,
+				maxPrice: safeMax,
+			};
+		});
+	};
+
+	const handleMaxPriceInput = (event: React.ChangeEvent<HTMLInputElement>) => {
+		const nextRaw = event.target.value;
+		const nextMax = nextRaw === "" ? activePriceLimits.max : Number(nextRaw);
+		if (!Number.isFinite(nextMax)) {
+			return;
+		}
+
+		setFilters((prev) => {
+			const safeMax = Math.max(0, Math.floor(nextMax));
+			const safeMin = Math.min(prev.minPrice, safeMax);
+			return {
+				...prev,
+				minPrice: safeMin,
+				maxPrice: safeMax,
+			};
+		});
+	};
+
+	const resetFilters = () => {
+		const limits = getPriceLimits("sell");
+		setFilters({
+			propertyType: "",
+			location: "",
+			customLocation: "",
+			intent: "sell",
+			lat: "",
+			lng: "",
+			radiusKm: "12",
+			minPrice: limits.min,
+			maxPrice: limits.max,
+		});
+	};
+
 	return (
 		<form
 			onSubmit={handleSearch}
-			className="w-full rounded-xl border border-white/20 bg-white/40 px-4 py-5 shadow-lg backdrop-blur-md sm:px-6 sm:py-6"
+			className="w-full rounded-2xl border border-slate-200 bg-white/95 px-4 py-4 shadow-[0_20px_55px_-35px_rgba(15,23,42,0.9)] backdrop-blur md:px-6 md:py-5"
 		>
-			<div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-12 xl:items-end">
-				{/* Purpose */}
-				<div className="flex flex-col xl:col-span-2">
-					<label
-						htmlFor="purpose"
-						className="mb-1 font-semibold text-gray-700 flex items-center gap-1"
-					>
-						<FaHandshake className="text-purple-500" /> Rent or Buy
-					</label>
-					<select
-						name="purpose"
-						id="purpose"
-						value={filters.purpose}
-						onChange={handleChange}
-						className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
-					>
-						{purposeOptions.map((option) => (
-							<option key={option.value} value={option.value}>
-								{option.label}
-							</option>
-						))}
-					</select>
+			<div className="mb-4 flex flex-wrap items-start justify-between gap-3 border-b border-slate-200 pb-3">
+				<div>
+					<p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-emerald-700">
+						Smart Property Search
+					</p>
+					<h3 className="mt-1 text-base font-semibold text-slate-900">
+						Find the right property faster
+					</h3>
+					<p className="mt-1 text-xs text-slate-600">
+						Set location, type and budget to narrow listings instantly.
+					</p>
 				</div>
+				<span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700">
+					<FaFilter className="text-[10px]" /> Refine search
+				</span>
+			</div>
 
-				{/* Property Type */}
-				<div className="flex flex-col xl:col-span-2">
+			<div className="mb-4 rounded-xl border border-slate-200 bg-slate-50 p-1">
+				<p className="mb-1 px-2 pt-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-slate-500">
+					Looking to
+				</p>
+				<div className="grid grid-cols-3 gap-2">
+					<button
+						type="button"
+						onClick={() => setIntent("sell")}
+						className={`rounded-md px-2 py-2 text-xs font-semibold transition ${
+							filters.intent === "sell"
+								? "bg-emerald-600 text-white shadow-sm"
+								: "text-slate-700 hover:bg-slate-200"
+						}`}
+					>
+						Buy
+					</button>
+					<button
+						type="button"
+						onClick={() => setIntent("rent")}
+						className={`rounded-md px-2 py-2 text-xs font-semibold transition ${
+							filters.intent === "rent"
+								? "bg-emerald-600 text-white shadow-sm"
+								: "text-slate-700 hover:bg-slate-200"
+						}`}
+					>
+						Rent
+					</button>
+					<button
+						type="button"
+						onClick={() => setIntent("")}
+						className={`rounded-md px-2 py-2 text-xs font-semibold transition ${
+							filters.intent === ""
+								? "bg-emerald-700 text-white shadow-sm"
+								: "text-slate-700 hover:bg-slate-200"
+						}`}
+					>
+						All
+					</button>
+				</div>
+			</div>
+
+			<div className="grid grid-cols-1 gap-3 md:grid-cols-12 md:gap-4">
+				<div className="md:col-span-4">
 					<label
 						htmlFor="propertyType"
-						className="mb-1 font-semibold text-gray-700 flex items-center gap-1"
+						className="mb-1 block text-xs font-medium text-slate-600"
 					>
-						<FaHome className="text-blue-500" /> Property Type
+						Property Type
 					</label>
 					<select
 						name="propertyType"
 						id="propertyType"
 						value={filters.propertyType}
 						onChange={handleChange}
-						className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
+						className="h-11 w-full rounded-lg border border-slate-200 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-300"
 					>
-						{propertyTypes.map((type) => (
+						{getPropertyTypes().map((type) => (
 							<option key={type.value} value={type.value}>
 								{type.label}
 							</option>
@@ -222,44 +336,19 @@ const HomepagePropertySearchFilter: React.FC = () => {
 					</select>
 				</div>
 
-				{/* Price Range */}
-				<div className="flex flex-col xl:col-span-2">
-					<label
-						htmlFor="priceRange"
-						className="mb-1 font-semibold text-gray-700 flex items-center gap-1"
-					>
-						<FaMoneyBillWave className="text-green-500" />
-						{filters.purpose === "rent" ? "Monthly Rent" : "Price Range"}
-					</label>
-					<select
-						name="priceRange"
-						id="priceRange"
-						value={filters.priceRange}
-						onChange={handleChange}
-						className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
-					>
-						{getPriceRanges().map((range) => (
-							<option key={range.value} value={range.value}>
-								{range.label}
-							</option>
-						))}
-					</select>
-				</div>
-
-				{/* Location */}
-				<div className="flex flex-col xl:col-span-2">
+				<div className="md:col-span-4">
 					<label
 						htmlFor="location"
-						className="mb-1 font-semibold text-gray-700 flex items-center gap-1"
+						className="mb-1 block text-xs font-medium text-slate-600"
 					>
-						<FaMapMarkerAlt className="text-red-500" /> Location
+						Locality
 					</label>
 					<select
 						name="location"
 						id="location"
 						value={filters.location}
 						onChange={handleChange}
-						className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
+						className="h-11 w-full rounded-lg border border-slate-200 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-300"
 					>
 						<option value="">Any Location</option>
 						{WEST_BENGAL_LOCATIONS.map((loc) => (
@@ -267,58 +356,127 @@ const HomepagePropertySearchFilter: React.FC = () => {
 								{loc.label}
 							</option>
 						))}
+						<option value={OTHER_LOCATION_VALUE}>Other</option>
 					</select>
+					{filters.location === OTHER_LOCATION_VALUE && (
+						<input
+							type="text"
+							value={filters.customLocation}
+							onChange={handleCustomLocationChange}
+							placeholder="Type locality not listed"
+							className="mt-2 h-11 w-full rounded-lg border border-slate-200 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-300"
+						/>
+					)}
 				</div>
 
-				<div className="flex flex-col xl:col-span-2">
-					<label
-						htmlFor="radius"
-						className="mb-1 font-semibold text-gray-700 flex items-center gap-1"
-					>
-						<FaLocationArrow className="text-sky-600" /> Geo Radius (km)
+				<div className="md:col-span-4">
+					<label className="mb-1 block text-xs font-medium text-slate-600">
+						Nearby Search
 					</label>
-					<input
-						id="radius"
-						type="range"
-						min={1}
-						max={60}
-						value={filters.radiusKm}
-						onChange={(event) =>
-							setFilters((prev) => ({ ...prev, radiusKm: event.target.value }))
-						}
-						className="accent-sky-600"
-					/>
-					<span className="text-xs text-slate-600">{filters.radiusKm} km</span>
-				</div>
-
-				<div className="mt-2 flex flex-col gap-2 md:col-span-2 lg:col-span-3 xl:col-span-12 sm:flex-row sm:flex-wrap sm:justify-center sm:gap-3 xl:items-end xl:justify-center">
-					<button
-						type="button"
-						onClick={handleUseCurrentLocation}
-						disabled={geoLoading}
-						className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-slate-800 px-6 py-3 font-semibold text-white shadow-lg transition-all duration-300 hover:bg-slate-900 xl:w-auto"
-					>
-						<FaLocationArrow className="text-lg" />
-						<span>{geoLoading ? "Detecting..." : "Use Current Location"}</span>
-					</button>
-
-					<button
-						type="submit"
-						className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-3 font-semibold text-white shadow-lg transition-all duration-300 hover:from-blue-700 hover:to-blue-800 hover:shadow-xl xl:w-auto"
-					>
-						<FaSearch className="text-lg" />
-						<span>Search Properties</span>
-					</button>
-
-					{filters.lat && filters.lng && (
+					<div className="flex gap-2">
 						<button
 							type="button"
-							onClick={clearGeoSelection}
-							className="inline-flex w-full items-center justify-center rounded-lg border border-slate-400 bg-white px-6 py-2.5 font-medium text-slate-700 xl:w-auto"
+							onClick={handleUseCurrentLocation}
+							disabled={geoLoading}
+							className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-4 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-70"
 						>
-							Clear Geo
+							<FaLocationArrow className="text-sm" />
+							<span>
+								{geoLoading
+									? "Detecting..."
+									: filters.lat && filters.lng
+										? "Nearby enabled"
+										: "Use Current Location"}
+							</span>
 						</button>
-					)}
+						{filters.lat && filters.lng && (
+							<button
+								type="button"
+								onClick={clearGeoSelection}
+								className="inline-flex h-11 items-center justify-center rounded-lg border border-slate-300 bg-white px-3 text-sm font-medium text-slate-700"
+							>
+								Clear
+							</button>
+						)}
+					</div>
+				</div>
+
+				<div className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 md:col-span-8">
+					<label className="mb-1 block text-xs font-medium text-slate-600">
+						Budget Range
+					</label>
+					<div className="mb-2 flex items-center justify-between text-xs font-medium text-slate-700">
+						<span>Min: ₹{formatIndianCurrency(filters.minPrice)}</span>
+						<span>Max: ₹{formatIndianCurrency(filters.maxPrice)}</span>
+					</div>
+					<Slider
+						min={activePriceLimits.min}
+						max={sliderMax}
+						step={activePriceLimits.step}
+						value={[filters.minPrice, filters.maxPrice]}
+						onValueChange={handlePriceRangeChange}
+						className="py-1"
+					/>
+					<div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
+						<label className="block">
+							<span className="mb-1 block text-[11px] font-medium text-slate-600">
+								Min price
+							</span>
+							<input
+								type="number"
+								inputMode="numeric"
+								min={0}
+								value={filters.minPrice}
+								onChange={handleMinPriceInput}
+								className="h-10 w-full rounded-lg border border-slate-300 bg-white px-3 text-sm text-slate-900 outline-none focus:border-emerald-500"
+							/>
+							<p className="mt-1 text-[11px] font-medium text-slate-600">
+								{formatReadablePrice(filters.minPrice)}
+							</p>
+						</label>
+						<label className="block">
+							<span className="mb-1 block text-[11px] font-medium text-slate-600">
+								Max price
+							</span>
+							<input
+								type="number"
+								inputMode="numeric"
+								min={0}
+								value={filters.maxPrice}
+								onChange={handleMaxPriceInput}
+								className="h-10 w-full rounded-lg border border-slate-300 bg-white px-3 text-sm text-slate-900 outline-none focus:border-emerald-500"
+							/>
+							<p className="mt-1 text-[11px] font-medium text-slate-600">
+								{formatReadablePrice(filters.maxPrice)}
+							</p>
+						</label>
+					</div>
+					<div className="mt-2 flex items-center justify-between text-[11px] text-slate-500">
+						<span>Any</span>
+						<span>Upper: ₹{formatIndianCurrency(sliderMax)}</span>
+					</div>
+				</div>
+
+				<div className="md:col-span-4 flex gap-2 md:items-end">
+					<div className="flex w-full gap-2">
+						{hasActiveFilters && (
+							<button
+								type="button"
+								onClick={resetFilters}
+								className="inline-flex h-11 items-center justify-center rounded-lg border border-slate-300 bg-white px-3 text-sm font-medium text-slate-700"
+							>
+								Reset
+							</button>
+						)}
+
+						<button
+							type="submit"
+							className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-lg bg-emerald-600 px-4 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700"
+						>
+							<FaSearch className="text-sm" />
+							<span>Search</span>
+						</button>
+					</div>
 				</div>
 			</div>
 		</form>

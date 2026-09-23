@@ -23,6 +23,8 @@ export interface IBaseListingType {
 	};
 	propertyCategory: PropertyCategory;
 	approvalStatus: "approved" | "pending" | "rejected";
+	listingStatus?: "available" | "sold";
+	viewCount?: number;
 }
 export interface ISellListingType extends IBaseListingType {
 	furnishing?: FurnishingType;

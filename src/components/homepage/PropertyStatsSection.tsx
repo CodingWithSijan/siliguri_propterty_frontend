@@ -1,134 +1,135 @@
 import React from "react";
 import { motion } from "framer-motion";
-import {
-	FaHome,
-	FaShieldAlt,
-	FaSearch,
-	FaBullhorn,
-	FaClock,
-	FaHandshake,
-} from "react-icons/fa";
+import { FaCheckCircle } from "react-icons/fa";
+import WhyImage from "../../assets/image.png";
 import { useNavigate } from "react-router-dom";
+import { useSiteStats } from "../../hooks/use-SiteStats";
+import { WEST_BENGAL_LOCATIONS } from "../../constants/westBengalLocations";
 
 const PropertyStatsSection: React.FC = () => {
 	const navigate = useNavigate();
-	const features = [
+	const { stats } = useSiteStats();
+	const highlights = [
 		{
-			icon: <FaSearch className="text-3xl text-blue-600" />,
-			title: "Easy Property Search",
+			title: "Verified listings only",
 			description:
-				"Find your ideal property with our intuitive search filters and detailed listings",
+				"Every property is reviewed by our local team before it goes live.",
 		},
 		{
-			icon: <FaBullhorn className="text-3xl text-cyan-700" />,
-			title: "Free Property Listing",
+			title: "Deep local knowledge",
 			description:
-				"List your property for free and reach genuine buyers and renters in Siliguri",
+				"Siliguri-first data and locality coverage that reflects real buyer demand.",
 		},
 		{
-			icon: <FaShieldAlt className="text-3xl text-green-600" />,
-			title: "Secure Platform",
+			title: "Transparent pricing",
 			description:
-				"Your data and property information are protected with modern security measures",
+				"No hidden brokerage commitments from platform-side listing visibility.",
+		},
+	];
+
+	const platformFacts = [
+		{
+			label: "Active listings",
+			value: `${stats.propertiesListed}+`,
+			description: "Approved listings visible across the platform.",
 		},
 		{
-			icon: <FaClock className="text-3xl text-amber-600" />,
-			title: "Quick Response",
-			description:
-				"Connect directly with property owners and get quick responses to your inquiries",
+			label: "Verified users",
+			value: `${stats.happyCustomers}+`,
+			description: "Users with verified identity and active presence.",
 		},
 		{
-			icon: <FaHandshake className="text-3xl text-blue-600" />,
-			title: "Direct Connection",
-			description:
-				"No middleman fees - connect directly with property owners for transparent deals",
-		},
-		{
-			icon: <FaHome className="text-3xl text-cyan-700" />,
-			title: "Local Focus",
-			description:
-				"Specialized in Siliguri properties with local market knowledge and insights",
+			label: "Localities covered",
+			value: `${WEST_BENGAL_LOCATIONS.length}+`,
+			description: "Siliguri areas mapped in search filters.",
 		},
 	];
 
 	return (
-		<section className="py-16 bg-gradient-to-br from-cyan-50 via-white to-slate-100">
-			<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-				{/* Header */}
-				<motion.div
-					initial={{ opacity: 0, y: 20 }}
-					whileInView={{ opacity: 1, y: 0 }}
-					transition={{ duration: 0.6 }}
-					className="text-center mb-16"
-				>
-					<h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-						Your{" "}
-						<span className="bg-gradient-to-r from-blue-700 to-cyan-700 bg-clip-text text-transparent">
-							Property Platform
-						</span>
-					</h2>
-					<p className="text-lg text-gray-600 max-w-2xl mx-auto">
-						A modern platform designed to simplify property transactions in
-						Siliguri. Built with trust, transparency, and user experience in
-						mind.
-					</p>
-				</motion.div>
-
-				{/* Features Grid */}
-				<div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
-					{features.map((feature, index) => (
-						<motion.div
-							key={index}
-							initial={{ opacity: 0, y: 30 }}
-							whileInView={{ opacity: 1, y: 0 }}
-							transition={{ duration: 0.6, delay: index * 0.1 }}
-							className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-white/20 hover:shadow-xl transition-all duration-300 group"
-						>
-							<div className="flex justify-center mb-4">
-								<div className="p-3 bg-white rounded-full shadow-md group-hover:shadow-lg transition-shadow duration-300">
-									{feature.icon}
-								</div>
-							</div>
-							<h3 className="text-xl font-semibold text-gray-900 mb-3 text-center">
-								{feature.title}
-							</h3>
-							<p className="text-gray-600 text-sm leading-relaxed text-center">
-								{feature.description}
-							</p>
-						</motion.div>
-					))}
-				</div>
-
-				{/* Call to Action Section */}
-				<motion.div
-					initial={{ opacity: 0, y: 30 }}
-					whileInView={{ opacity: 1, y: 0 }}
-					transition={{ duration: 0.8 }}
-					className="bg-white/60 backdrop-blur-sm rounded-3xl p-8 md:p-12 shadow-xl border border-white/30"
-				>
-					<div className="text-center">
-						<h3 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4">
-							Ready to Get Started?
-						</h3>
-						<p className="text-gray-600 max-w-3xl mx-auto mb-8">
-							Whether you're looking to buy, sell, or rent a property in
-							Siliguri, our platform makes it simple and secure. Join our
-							growing community today.
+		<section className="bg-white pb-16">
+			<div className="mx-auto w-full max-w-[1320px] px-4 sm:px-6 lg:px-8">
+				<section className="grid items-center gap-8 py-12 lg:grid-cols-2">
+					<div className="overflow-hidden rounded-3xl">
+						<img
+							src={WhyImage}
+							alt="Local property experts"
+							className="h-[360px] w-full object-cover"
+						/>
+					</div>
+					<div>
+						<p className="text-xs font-semibold uppercase tracking-[0.12em] text-emerald-700">
+							Why SiliguriProperty
 						</p>
-
-						<div className="flex flex-col sm:flex-row gap-4 justify-center">
-							<motion.button
-								whileHover={{ scale: 1.05 }}
-								whileTap={{ scale: 0.95 }}
-								className="inline-flex items-center gap-3 bg-gradient-to-r from-blue-700 to-cyan-700 text-white px-8 py-4 rounded-2xl font-semibold hover:shadow-xl transition-all duration-300"
-								onClick={() => navigate("/properties")}
-							>
-								<FaSearch className="text-lg" />
-								<span>Find Properties</span>
-							</motion.button>
+						<h3 className="mt-3 text-5xl font-bold leading-tight text-slate-900">
+							Local expertise, verified listings, zero brokerage confusion.
+						</h3>
+						<div className="mt-6 space-y-4">
+							{highlights.map((item) => (
+								<div
+									key={item.title}
+									className="flex gap-3 rounded-xl bg-emerald-50 p-3"
+								>
+									<FaCheckCircle className="mt-1 text-emerald-600" />
+									<div>
+										<p className="font-semibold text-slate-900">{item.title}</p>
+										<p className="text-sm text-slate-600">{item.description}</p>
+									</div>
+								</div>
+							))}
 						</div>
 					</div>
-				</motion.div>
+				</section>
+
+				<section className="rounded-sm bg-emerald-950 px-6 py-12 text-white sm:px-8">
+					<p className="text-center text-xs font-semibold uppercase tracking-[0.12em] text-emerald-300">
+						Platform facts
+					</p>
+					<h3 className="mt-2 text-center text-4xl font-bold">
+						Live marketplace snapshot
+					</h3>
+					<div className="mt-8 grid gap-4 lg:grid-cols-3">
+						{platformFacts.map((card) => (
+							<motion.div
+								key={card.label}
+								initial={{ opacity: 0, y: 20 }}
+								whileInView={{ opacity: 1, y: 0 }}
+								transition={{ duration: 0.4 }}
+								className="rounded-2xl border border-emerald-800 bg-emerald-900/40 p-5"
+							>
+								<p className="text-xs uppercase tracking-[0.12em] text-emerald-200">
+									{card.label}
+								</p>
+								<p className="mt-2 text-4xl font-bold text-white">
+									{card.value}
+								</p>
+								<p className="mt-3 text-sm leading-relaxed text-emerald-100">
+									{card.description}
+								</p>
+							</motion.div>
+						))}
+					</div>
+				</section>
+
+				<section className="mt-10 overflow-hidden rounded-3xl bg-gradient-to-r from-emerald-900 via-emerald-800 to-emerald-900 px-6 py-10 sm:px-10">
+					<div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
+						<div>
+							<h4 className="text-4xl font-bold text-white">
+								Have a property to sell or rent?
+							</h4>
+							<p className="mt-1 text-sm text-emerald-100">
+								List it free and reach thousands of verified buyers in Siliguri
+								today.
+							</p>
+						</div>
+						<button
+							type="button"
+							onClick={() => navigate("/dashboard/new-post")}
+							className="rounded-xl bg-white px-6 py-3 text-sm font-bold text-emerald-800 hover:bg-emerald-50"
+						>
+							Post Property - It's Free
+						</button>
+					</div>
+				</section>
 			</div>
 		</section>
 	);

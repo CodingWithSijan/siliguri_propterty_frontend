@@ -133,11 +133,11 @@ const getStep1Fields = (
 		}
 
 		if (propertyCategory === "house" || propertyCategory === "flat") {
-			return ["bedrooms", "bathrooms", "builtUpArea", "price", "availableFrom"];
+			return ["bedrooms", "bathrooms", "builtUpArea", "price"];
 		}
 
 		if (propertyCategory === "shop") {
-			return ["shopArea", "price", "availableFrom"];
+			return ["shopArea", "price"];
 		}
 	}
 
@@ -235,7 +235,7 @@ const PostStepperForm: React.FC<PostStepperFormProps> = ({ intent }) => {
 		}
 
 		if (step === 2) {
-			return ["pictures", "videos"];
+			return ["pictures"];
 		}
 
 		return [];
@@ -274,6 +274,8 @@ const PostStepperForm: React.FC<PostStepperFormProps> = ({ intent }) => {
 			} else if (value !== undefined && value !== "") {
 				if (typeof value === "object") {
 					formData.append(key, JSON.stringify(value)); // stringify objects
+				} else if (typeof value === "string") {
+					formData.append(key, value.trim());
 				} else {
 					formData.append(key, value as string | Blob);
 				}

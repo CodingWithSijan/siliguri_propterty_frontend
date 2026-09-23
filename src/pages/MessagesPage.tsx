@@ -135,7 +135,7 @@ const MessagesPage: React.FC = () => {
 			<h1 className="text-2xl font-semibold text-gray-900 mb-4">Messages</h1>
 
 			<div className="grid grid-cols-1 lg:grid-cols-[320px_1fr] gap-4">
-				<div className="rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden">
+				<div className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
 					<div className="px-4 py-3 border-b border-gray-100">
 						<p className="text-sm font-semibold text-gray-900">Conversations</p>
 					</div>
@@ -190,7 +190,7 @@ const MessagesPage: React.FC = () => {
 					</div>
 				</div>
 
-				<div className="rounded-xl border border-gray-200 bg-white shadow-sm flex flex-col min-h-[70vh]">
+				<div className="rounded-xl border border-slate-200 bg-white shadow-sm flex flex-col min-h-[70vh]">
 					<div className="px-4 py-3 border-b border-gray-100">
 						<p className="text-sm font-semibold text-gray-900">
 							{selectedConversation

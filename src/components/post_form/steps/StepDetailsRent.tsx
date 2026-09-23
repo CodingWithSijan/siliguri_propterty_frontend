@@ -71,10 +71,12 @@ const StepDetailsRent = () => {
 						<label className="mb-1 block font-medium">Price (INR)</label>
 						<input
 							type="number"
+							min={1}
 							step="100"
 							{...register("pricePerFrequency", {
 								required: "Price is required",
 								valueAsNumber: true,
+								min: { value: 1, message: "Price must be greater than 0" },
 							})}
 							className="w-full rounded-lg border border-slate-300 px-3 py-2"
 							placeholder="Enter price or budget"
@@ -116,9 +118,11 @@ const StepDetailsRent = () => {
 						</label>
 						<input
 							type="number"
+							min={1}
 							{...register("availableForDuration", {
 								valueAsNumber: true,
 								required: "Available For Duration is required",
+								min: { value: 1, message: "Duration must be at least 1" },
 							})}
 							className="w-full rounded-lg border border-slate-300 px-3 py-2"
 							placeholder="e.g., 6"

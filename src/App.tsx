@@ -11,6 +11,8 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import ScrollToTopButton from "./components/common/scrollToTopButton";
 import PhoneNumberCompletionModal from "./components/common/PhoneNumberCompletionModal";
+import { useSelector } from "react-redux";
+import { RootState } from "./app/store";
 
 const Signup = lazy(() => import("./pages/Signup"));
 const Homepage = lazy(() => import("./pages/Homepage"));
@@ -71,6 +73,13 @@ const LegacySellRedirect: React.FC = () => {
 };
 
 const App: React.FC = () => {
+	const themeMode = useSelector((state: RootState) => state.theme.mode);
+
+	React.useEffect(() => {
+		document.documentElement.classList.toggle("dark", themeMode === "dark");
+		window.localStorage.setItem("theme-mode", themeMode);
+	}, [themeMode]);
+
 	return (
 		<Router>
 			<ScrollToTopButton />
@@ -79,7 +88,7 @@ const App: React.FC = () => {
 				autoClose={2000}
 				newestOnTop
 				pauseOnHover
-				theme="light"
+				theme={themeMode === "dark" ? "dark" : "light"}
 			/>
 			<PhoneNumberCompletionModal />
 

@@ -8,6 +8,8 @@ import { Input } from "../../ui/input";
 import { Trash2, Plus, ImageIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 
+const MAX_IMAGES = 15;
+
 interface StepPicturesEditProps {
 	existingPictures?: string[];
 }
@@ -50,9 +52,14 @@ const StepPicturesEdit: React.FC<StepPicturesEditProps> = ({
 
 	const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const selectedFiles = e.target.files ? Array.from(e.target.files) : [];
-		const fileMap = new Map(newFiles.map((f) => [f.name, f]));
-		selectedFiles.forEach((f) => fileMap.set(f.name, f));
+		const fileMap = new Map(newFiles.map((f) => [`${f.name}:${f.size}`, f]));
+		selectedFiles.forEach((f) => fileMap.set(`${f.name}:${f.size}`, f));
 		const combined = Array.from(fileMap.values());
+
+		if (keptExistingImages.length + combined.length > MAX_IMAGES) {
+			return;
+		}
+
 		setNewFiles(combined);
 
 		const dt = new DataTransfer();
@@ -82,7 +89,7 @@ const StepPicturesEdit: React.FC<StepPicturesEditProps> = ({
 					Property Pictures
 				</label>
 				<p className="text-sm text-gray-600 mb-4">
-					Manage your existing images and add new ones. You can upload up to 10
+					Manage your existing images and add new ones. You can upload up to 15
 					images total.
 				</p>
 			</div>
@@ -160,7 +167,7 @@ const StepPicturesEdit: React.FC<StepPicturesEditProps> = ({
 			{/* Add Images Section */}
 			<div className="space-y-3">
 				<h3 className="text-md font-medium text-gray-700">
-					Add More Images {totalImages > 0 && `(${totalImages}/10)`}
+					Add More Images {totalImages > 0 && `(${totalImages}/${MAX_IMAGES})`}
 				</h3>
 
 				<div className="border-2 border-dashed border-gray-300 rounded-lg p-6 hover:border-blue-400 transition-colors">
@@ -186,14 +193,14 @@ const StepPicturesEdit: React.FC<StepPicturesEditProps> = ({
 						accept="image/*"
 						onChange={handleFileChange}
 						className="hidden"
-						disabled={totalImages >= 10}
+						disabled={totalImages >= MAX_IMAGES}
 					/>
 				</div>
 
-				{totalImages >= 10 && (
+				{totalImages >= MAX_IMAGES && (
 					<div className="bg-amber-50 border border-amber-200 rounded-lg p-3">
 						<p className="text-sm text-amber-800">
-							Maximum of 10 images allowed. Remove some images to add new ones.
+							Maximum of 15 images allowed. Remove some images to add new ones.
 						</p>
 					</div>
 				)}

@@ -27,6 +27,7 @@ const ListingSearchPanel: React.FC<ListingSearchPanelProps> = ({
 	layout = "full",
 }) => {
 	const hasGeoFilter = state.lat !== null && state.lng !== null;
+	const effectiveIntent = lockIntent ?? state.intent;
 	const gridClassName =
 		layout === "sidebar"
 			? "grid grid-cols-1 gap-4 sm:grid-cols-2"
@@ -38,7 +39,7 @@ const ListingSearchPanel: React.FC<ListingSearchPanelProps> = ({
 				<div className="flex items-center gap-2">
 					<SlidersHorizontal className="h-5 w-5 text-slate-700" />
 					<h2 className="text-lg font-semibold text-slate-900">
-						Search and Filter
+						Search Filters
 					</h2>
 				</div>
 				<button
@@ -49,6 +50,9 @@ const ListingSearchPanel: React.FC<ListingSearchPanelProps> = ({
 					Reset All
 				</button>
 			</div>
+			<p className="mb-4 text-xs text-slate-500">
+				Changes apply instantly to listing results.
+			</p>
 
 			<div className={gridClassName}>
 				<label className="block">
@@ -71,7 +75,7 @@ const ListingSearchPanel: React.FC<ListingSearchPanelProps> = ({
 
 				<label className="block">
 					<span className="mb-1 block text-sm font-medium text-slate-700">
-						Intent
+						Looking For
 					</span>
 					<select
 						disabled={Boolean(lockIntent)}
@@ -109,7 +113,7 @@ const ListingSearchPanel: React.FC<ListingSearchPanelProps> = ({
 						<option value="house">House</option>
 						<option value="flat">Flat</option>
 						<option value="shop">Shop</option>
-						<option value="land">Land</option>
+						{effectiveIntent !== "rent" && <option value="land">Land</option>}
 					</select>
 				</label>
 
@@ -177,7 +181,7 @@ const ListingSearchPanel: React.FC<ListingSearchPanelProps> = ({
 
 				<label className="block">
 					<span className="mb-1 block text-sm font-medium text-slate-700">
-						Sort By
+						Sort Results
 					</span>
 					<select
 						value={state.sortBy}

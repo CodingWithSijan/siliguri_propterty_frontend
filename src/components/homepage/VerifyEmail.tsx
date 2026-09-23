@@ -16,14 +16,14 @@ const VerifyEmail: React.FC = () => {
 				await axios.get(
 					`${
 						import.meta.env.VITE_BACKEND_URL
-					}/api/auth/verify-email?token=${token}`
+					}/api/auth/verify-email?token=${token}`,
 				);
 				setStatus("✅ Email verified successfully!");
 				// Fetch Latest User info and disptach in redux
 				setTimeout(() => navigate("/login?verified=true"), 2000);
 			} catch (err) {
 				setStatus("❌ Verification failed or link expired.");
-				console.log(err instanceof Error ? err : "Verification Failed");
+				console.error(err instanceof Error ? err : "Verification Failed");
 			}
 		};
 
