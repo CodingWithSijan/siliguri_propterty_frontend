@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import type { ReactNode } from "react";
 import { Button } from "../../ui/button";
+import { sanitizeHTML } from "../../../utils/descriptionUtils";
 
 interface StepPreviewProps {
 	onEditStep?: (stepIndex: number) => void;
@@ -151,6 +152,12 @@ const StepPreview = ({ onEditStep }: StepPreviewProps) => {
 		propertyCategory === "house" || propertyCategory === "flat";
 	const isLand = propertyCategory === "land";
 	const isShop = propertyCategory === "shop";
+	const sanitizedDescription = previewData.description
+		? sanitizeHTML(previewData.description)
+		: "";
+	const hasRentPricing = previewData.pricePerFrequency !== undefined;
+	const hasSellPricing = previewData.price !== undefined;
+	const hasLandPricing = previewData.pricePerUnit !== undefined;
 
 	const InfoRow = ({ label, value }: { label: string; value: ReactNode }) => (
 		<div className="flex flex-col rounded-lg border border-slate-200 bg-white px-3 py-2">
@@ -220,7 +227,6 @@ const StepPreview = ({ onEditStep }: StepPreviewProps) => {
 				</div>
 				<div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
 					<InfoRow label="Title" value={previewData.title} />
-					<InfoRow label="Description" value={previewData.description} />
 					<InfoRow label="Location" value={previewData.location} />
 					<InfoRow
 						label="Siliguri Area"
@@ -234,6 +240,19 @@ const StepPreview = ({ onEditStep }: StepPreviewProps) => {
 						label="Property Type"
 						value={toDisplayValue(propertyCategory)}
 					/>
+				</div>
+				<div className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-3">
+					<p className="mb-2 text-xs font-medium uppercase tracking-[0.08em] text-slate-500">
+						Description
+					</p>
+					{sanitizedDescription ? (
+						<div
+							className="property-description text-sm text-slate-800"
+							dangerouslySetInnerHTML={{ __html: sanitizedDescription }}
+						/>
+					) : (
+						<p className="text-sm font-semibold text-slate-900">-</p>
+					)}
 				</div>
 			</div>
 
@@ -318,35 +337,6 @@ const StepPreview = ({ onEditStep }: StepPreviewProps) => {
 				</div>
 			)}
 
-			{previewData.pricePerFrequency && (
-				<div className="space-y-3 rounded-xl border border-slate-200 bg-white p-4">
-					<div className="flex items-center gap-2 text-slate-900">
-						<Settings2 className="h-4 w-4" />
-						<h3 className="text-sm font-semibold uppercase tracking-[0.08em]">
-							Rental Terms
-						</h3>
-					</div>
-					<div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-						<InfoRow
-							label="Price Per Frequency"
-							value={formatCurrency(previewData.pricePerFrequency)}
-						/>
-						<InfoRow
-							label="Frequency"
-							value={toDisplayValue(previewData.frequency)}
-						/>
-						<InfoRow
-							label="Available Duration"
-							value={toDisplayValue(previewData.availableForDuration)}
-						/>
-						<InfoRow
-							label="Duration Unit"
-							value={toDisplayValue(previewData.availableForDurationUnit)}
-						/>
-					</div>
-				</div>
-			)}
-
 			<div className="space-y-3 rounded-xl border border-slate-200 bg-white p-4">
 				<div className="flex items-center gap-2 text-slate-900">
 					<FileText className="h-4 w-4" />
@@ -354,17 +344,65 @@ const StepPreview = ({ onEditStep }: StepPreviewProps) => {
 						Pricing
 					</h3>
 				</div>
-				<InfoRow
-					label="Price (INR)"
-					value={formatCurrency(
-						previewData.price ||
-							previewData.pricePerUnit ||
-							previewData.pricePerFrequency,
+				<div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+					{hasSellPricing && (
+						<div className="rounded-xl border border-emerald-200 bg-emerald-50 p-3">
+							<p className="text-xs font-semibold uppercase tracking-[0.08em] text-emerald-700">
+								Total Selling Price
+							</p>
+							<p className="mt-1 text-lg font-bold text-emerald-900">
+								{formatCurrency(previewData.price)}
+							</p>
+						</div>
 					)}
-				/>
-				{previewData.duration && (
-					<InfoRow label="Duration" value={previewData.duration} />
-				)}
+					{hasLandPricing && (
+						<div className="rounded-xl border border-blue-200 bg-blue-50 p-3">
+							<p className="text-xs font-semibold uppercase tracking-[0.08em] text-blue-700">
+								Price Per Unit
+							</p>
+							<p className="mt-1 text-lg font-bold text-blue-900">
+								{formatCurrency(previewData.pricePerUnit)}
+							</p>
+							<p className="mt-1 text-xs font-medium text-blue-700">
+								Unit: {toDisplayValue(previewData.unit)}
+							</p>
+						</div>
+					)}
+					{previewData.totalPrice !== undefined && (
+						<div className="rounded-xl border border-purple-200 bg-purple-50 p-3">
+							<p className="text-xs font-semibold uppercase tracking-[0.08em] text-purple-700">
+								Estimated Total
+							</p>
+							<p className="mt-1 text-lg font-bold text-purple-900">
+								{formatCurrency(previewData.totalPrice)}
+							</p>
+						</div>
+					)}
+					{hasRentPricing && (
+						<div className="rounded-xl border border-amber-200 bg-amber-50 p-3">
+							<p className="text-xs font-semibold uppercase tracking-[0.08em] text-amber-700">
+								Rental Price
+							</p>
+							<p className="mt-1 text-lg font-bold text-amber-900">
+								{formatCurrency(previewData.pricePerFrequency)}
+							</p>
+							<p className="mt-1 text-xs font-medium text-amber-700">
+								Per {toDisplayValue(previewData.frequency)}
+							</p>
+						</div>
+					)}
+					{previewData.availableForDuration !== undefined && (
+						<div className="rounded-xl border border-slate-200 bg-slate-50 p-3">
+							<p className="text-xs font-semibold uppercase tracking-[0.08em] text-slate-600">
+								Available For
+							</p>
+							<p className="mt-1 text-base font-semibold text-slate-900">
+								{toDisplayValue(previewData.availableForDuration)}{" "}
+								{toDisplayValue(previewData.availableForDurationUnit)}
+							</p>
+						</div>
+					)}
+				</div>
 			</div>
 
 			{previews.length > 0 && (
