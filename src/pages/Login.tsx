@@ -114,9 +114,9 @@ const Login: React.FC = () => {
 
 	return (
 		<>
-			<div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-100 via-white to-blue-200 px-4">
-				<div className="w-full max-w-md bg-white shadow-2xl rounded-3xl p-8">
-					<h2 className="text-2xl sm:text-3xl font-bold text-center text-blue-700 mb-6">
+			<div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-emerald-50 via-white to-slate-100 px-4">
+				<div className="w-full max-w-md rounded-3xl border border-slate-200 bg-white p-8 shadow-2xl">
+					<h2 className="mb-6 text-center text-2xl font-bold text-emerald-800 sm:text-3xl">
 						Welcome Back
 					</h2>
 					<form className="space-y-5 text-black" onSubmit={handleSubmit}>
@@ -131,7 +131,7 @@ const Login: React.FC = () => {
 								value={formData.email}
 								onChange={handleChange}
 								placeholder="Email address"
-								className="w-full pl-10 pr-4 py-2 text-sm border rounded-md border-gray-300 focus:ring-blue-500 focus:border-blue-500"
+								className="w-full rounded-md border border-slate-300 py-2 pl-10 pr-4 text-sm focus:border-emerald-500 focus:ring-emerald-500"
 							/>
 						</div>
 
@@ -146,7 +146,7 @@ const Login: React.FC = () => {
 								value={formData.password}
 								onChange={handleChange}
 								placeholder="Password"
-								className="w-full pl-10 pr-4 py-2 text-sm border rounded-md border-gray-300 focus:ring-blue-500 focus:border-blue-500"
+								className="w-full rounded-md border border-slate-300 py-2 pl-10 pr-4 text-sm focus:border-emerald-500 focus:ring-emerald-500"
 							/>
 						</div>
 
@@ -154,7 +154,7 @@ const Login: React.FC = () => {
 						<div className="flex justify-end mb-2">
 							<button
 								type="button"
-								className="text-xs text-blue-600 hover:underline focus:outline-none"
+								className="text-xs text-emerald-700 hover:underline focus:outline-none"
 								onClick={() => setForgotOpen(true)}
 							>
 								Forgot password?
@@ -165,18 +165,18 @@ const Login: React.FC = () => {
 						<button
 							type="submit"
 							disabled={loading}
-							className="w-full flex items-center justify-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-md transition duration-200"
+							className="flex w-full items-center justify-center gap-2 rounded-md bg-emerald-700 px-4 py-2 text-sm font-semibold text-white transition duration-200 hover:bg-emerald-800"
 						>
 							{loading && <BiLoaderAlt className="animate-spin" />}
 							{loading ? "Logging in..." : "Login"}
 						</button>
 					</form>
 
-					<p className="text-sm text-center text-gray-600 mt-4">
+					<p className="mt-4 text-center text-sm text-slate-600">
 						Don’t have an account?{" "}
 						<NavLink
 							to="/signup"
-							className="text-blue-600 hover:underline font-medium"
+							className="font-medium text-emerald-700 hover:underline"
 						>
 							Sign up
 						</NavLink>

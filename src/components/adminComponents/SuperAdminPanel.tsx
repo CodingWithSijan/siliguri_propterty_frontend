@@ -269,7 +269,7 @@ const SuperAdminPanel = () => {
 							value={newUserPhone}
 							onChange={(event) => setNewUserPhone(event.target.value)}
 						/>
-						<div className="flex gap-2">
+						<div className="flex flex-col gap-2 sm:flex-row">
 							<Input
 								type="text"
 								placeholder="Temporary password (optional)"
@@ -280,12 +280,13 @@ const SuperAdminPanel = () => {
 								type="button"
 								variant="outline"
 								onClick={() => setNewUserPassword(generateRandomPassword())}
+								className="w-full sm:w-auto"
 							>
 								Generate
 							</Button>
 						</div>
 					</div>
-					<div className="flex items-center gap-3">
+					<div className="flex flex-col gap-3 sm:flex-row sm:items-center">
 						<label className="text-sm font-medium text-slate-700">
 							Verification method
 						</label>
@@ -300,7 +301,11 @@ const SuperAdminPanel = () => {
 							<option value="otp">OTP Code</option>
 						</select>
 					</div>
-					<Button onClick={handleCreateUser} disabled={isCreatingUser}>
+					<Button
+						onClick={handleCreateUser}
+						disabled={isCreatingUser}
+						className="w-full sm:w-auto"
+					>
 						{isCreatingUser ? "Creating user..." : "Create User"}
 					</Button>
 				</CardContent>
@@ -314,14 +319,18 @@ const SuperAdminPanel = () => {
 					<p className="text-sm text-muted-foreground">
 						This promotes an existing signed-up user to admin using email.
 					</p>
-					<div className="flex flex-col sm:flex-row gap-3">
+					<div className="flex flex-col gap-3 sm:flex-row">
 						<Input
 							type="email"
 							placeholder="name@example.com"
 							value={adminEmailInput}
 							onChange={(event) => setAdminEmailInput(event.target.value)}
 						/>
-						<Button onClick={handlePromoteByEmail} disabled={isPromoting}>
+						<Button
+							onClick={handlePromoteByEmail}
+							disabled={isPromoting}
+							className="w-full sm:w-auto"
+						>
 							{isPromoting ? "Promoting..." : "Promote To Admin"}
 						</Button>
 					</div>
@@ -333,13 +342,15 @@ const SuperAdminPanel = () => {
 					<CardTitle>User Directory</CardTitle>
 				</CardHeader>
 				<CardContent className="space-y-4">
-					<div className="flex flex-col sm:flex-row gap-3">
+					<div className="flex flex-col gap-3 sm:flex-row">
 						<Input
 							placeholder="Search by name or email"
 							value={userSearchInput}
 							onChange={(event) => setUserSearchInput(event.target.value)}
 						/>
-						<Button onClick={handleApplySearch}>Search</Button>
+						<Button onClick={handleApplySearch} className="w-full sm:w-auto">
+							Search
+						</Button>
 					</div>
 
 					<div className="rounded-md border overflow-hidden">

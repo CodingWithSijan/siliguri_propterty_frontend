@@ -358,8 +358,8 @@ const ManagePosts = () => {
 	};
 
 	return (
-		<div className="h-[calc(100vh-2rem)] overflow-auto">
-			<div className="space-y-8 p-4 md:p-8 max-w-[1600px] mx-auto">
+		<div className="w-full">
+			<div className="mx-auto max-w-[1600px] space-y-8 p-3 sm:p-4 md:p-8">
 				{/* Stats */}
 				<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
 					<StatsCard
@@ -389,12 +389,12 @@ const ManagePosts = () => {
 				</div>
 
 				{/* Filter */}
-				<div className="flex flex-col gap-4 bg-muted/50 p-4 rounded-lg">
+				<div className="flex flex-col gap-4 rounded-lg bg-muted/50 p-4">
 					<div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
 						<h2 className="text-lg font-semibold">Posts</h2>
-						<div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+						<div className="grid w-full grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
 							<Select value={selectedStatus} onValueChange={handleStatusChange}>
-								<SelectTrigger className="w-full sm:w-[180px] bg-background">
+								<SelectTrigger className="w-full bg-background">
 									<SelectValue placeholder="Filter by status" />
 								</SelectTrigger>
 								<SelectContent>
@@ -410,7 +410,7 @@ const ManagePosts = () => {
 									setSelectedIntent(value as "all" | "buy" | "sell" | "rent")
 								}
 							>
-								<SelectTrigger className="w-full sm:w-[160px] bg-background">
+								<SelectTrigger className="w-full bg-background">
 									<SelectValue placeholder="Intent" />
 								</SelectTrigger>
 								<SelectContent>
@@ -428,7 +428,7 @@ const ManagePosts = () => {
 									)
 								}
 							>
-								<SelectTrigger className="w-full sm:w-[170px] bg-background">
+								<SelectTrigger className="w-full bg-background">
 									<SelectValue placeholder="Category" />
 								</SelectTrigger>
 								<SelectContent>
@@ -445,7 +445,7 @@ const ManagePosts = () => {
 									handlePhoneFilterChange(value as PhoneFilterOption)
 								}
 							>
-								<SelectTrigger className="w-full sm:w-[220px] bg-background">
+								<SelectTrigger className="w-full bg-background">
 									<SelectValue placeholder="Phone filter" />
 								</SelectTrigger>
 								<SelectContent>
@@ -499,7 +499,7 @@ const ManagePosts = () => {
 						<Button
 							type="button"
 							onClick={handleSearch}
-							className="sm:w-[120px]"
+							className="w-full sm:w-[120px]"
 						>
 							Search
 						</Button>
@@ -507,15 +507,114 @@ const ManagePosts = () => {
 							type="button"
 							variant="outline"
 							onClick={handleResetFilters}
-							className="sm:w-[120px]"
+							className="w-full sm:w-[120px]"
 						>
 							Reset
 						</Button>
 					</div>
 				</div>
 
+				<div className="space-y-3 md:hidden">
+					{isLoadingPosts ? (
+						<div className="rounded-md border bg-card p-4">
+							<Skeleton className="h-4 w-full" />
+						</div>
+					) : !displayPosts?.length ? (
+						<div className="rounded-md border bg-card p-8 text-center">
+							<div className="flex flex-col items-center gap-2 text-muted-foreground">
+								<AlertCircle className="h-8 w-8" />
+								<p>No posts found</p>
+							</div>
+						</div>
+					) : (
+						displayPosts.map((post: Post) => (
+							<div key={post._id} className="rounded-md border bg-card p-4">
+								<div className="flex items-start justify-between gap-3">
+									<div className="min-w-0 flex-1 space-y-2">
+										<p
+											className="line-clamp-2 text-sm font-semibold"
+											title={post.title}
+										>
+											{post.title}
+										</p>
+										<p className="flex items-center gap-1 text-xs text-muted-foreground">
+											<MapPin className="h-3 w-3" />
+											<span className="line-clamp-2">
+												{post.location || "N/A"}
+											</span>
+										</p>
+										<div className="flex flex-wrap items-center gap-2">
+											<Badge variant="secondary" className="capitalize">
+												{post.intent || post.postType || "N/A"}
+											</Badge>
+											<Badge variant="outline" className="capitalize">
+												{post.propertyCategory || post.propertyType || "N/A"}
+											</Badge>
+											{getStatusBadge(post.approvalStatus)}
+										</div>
+									</div>
+									<DropdownMenu>
+										<DropdownMenuTrigger asChild>
+											<Button size="sm" className="h-8 w-8 bg-gray-400 p-1">
+												<MoreVertical className="h-4 w-4" />
+											</Button>
+										</DropdownMenuTrigger>
+										<DropdownMenuContent align="end">
+											<DropdownMenuItem
+												onClick={() =>
+													navigate(`/admin/posts/view-post/${post._id}`)
+												}
+											>
+												View
+											</DropdownMenuItem>
+											<DropdownMenuItem
+												disabled={isActionLoading === post._id}
+												onClick={() => handleApprove(post._id)}
+												className="text-green-600"
+											>
+												{isActionLoading === post._id
+													? "Approving..."
+													: "Approve"}
+											</DropdownMenuItem>
+											<DropdownMenuItem
+												disabled={isActionLoading === post._id}
+												onClick={() => handleReject(post._id)}
+												className="text-red-600"
+											>
+												Reject
+											</DropdownMenuItem>
+											<DropdownMenuItem
+												disabled={isActionLoading === post._id}
+												onClick={() => handleDeletePost(post._id)}
+												className="font-bold text-red-500 hover:text-red-200"
+											>
+												Delete Post
+											</DropdownMenuItem>
+										</DropdownMenuContent>
+									</DropdownMenu>
+								</div>
+								<div className="mt-3 grid grid-cols-1 gap-2 text-xs text-muted-foreground">
+									<p className="flex items-center gap-1">
+										<IndianRupee className="h-3 w-3" />
+										<span className="font-medium text-foreground">
+											{formatPrice(post)}
+										</span>
+									</p>
+									<p className="flex items-center gap-1">
+										<Calendar className="h-3 w-3" />
+										{convert_ISO_Date_to_Normal(post.createdAt ?? "")}
+									</p>
+									<p className="truncate">
+										Creator: {post.user?.name || "Unknown User"}
+									</p>
+								</div>
+							</div>
+						))
+					)}
+				</div>
+
 				{/* Table */}
-				<div className="rounded-md border bg-card overflow-hidden">
+				<div className="hidden overflow-hidden rounded-md border bg-card md:block">
 					<div className="w-full overflow-x-auto">
 						<Table>
 							<TableHeader className="bg-muted/50">

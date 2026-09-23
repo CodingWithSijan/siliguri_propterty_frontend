@@ -17,7 +17,12 @@ const HomeTab: React.FC = () => {
 	const fetchAnalyticsData = useCallback(() => fetchAnalytics(), []);
 	const { data, loading, error } = useFetch(fetchAnalyticsData);
 
-	if (loading) return <div className="p-4">Loading analytics...</div>;
+	if (loading)
+		return (
+			<div className="rounded-2xl border border-emerald-100 bg-white p-6 text-slate-600 shadow-sm">
+				Loading analytics...
+			</div>
+		);
 	if (error) return <div className="text-red-500">{error?.message}</div>;
 	if (!data) return null;
 
@@ -93,6 +98,19 @@ const HomeTab: React.FC = () => {
 
 	return (
 		<div className="space-y-6">
+			<div className="rounded-2xl border border-emerald-100 bg-gradient-to-r from-emerald-50 via-white to-sky-50 p-5 shadow-sm">
+				<p className="text-xs font-semibold uppercase tracking-[0.12em] text-emerald-700">
+					Admin Insights
+				</p>
+				<h2 className="mt-1 text-xl font-bold text-slate-900">
+					Platform health at a glance
+				</h2>
+				<p className="mt-1 text-sm text-slate-600">
+					Use these metrics to prioritize moderation and user verification
+					tasks.
+				</p>
+			</div>
+
 			<div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
 				{cards.map((card) => (
 					<Card
@@ -107,7 +125,7 @@ const HomeTab: React.FC = () => {
 			</div>
 
 			<div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-				<div className="rounded-xl border bg-white p-5 shadow-sm">
+				<div className="rounded-xl border border-emerald-100 bg-white p-5 shadow-sm">
 					<div className="mb-4 flex items-center gap-2 text-slate-800">
 						<TrendingUp className="h-5 w-5" />
 						<h3 className="text-base font-semibold">Post Approval Funnel</h3>
@@ -133,7 +151,7 @@ const HomeTab: React.FC = () => {
 					/>
 				</div>
 
-				<div className="rounded-xl border bg-white p-5 shadow-sm">
+				<div className="rounded-xl border border-emerald-100 bg-white p-5 shadow-sm">
 					<div className="mb-4 flex items-center gap-2 text-slate-800">
 						<ShieldCheck className="h-5 w-5" />
 						<h3 className="text-base font-semibold">
@@ -185,7 +203,7 @@ const Card: React.FC<CardProps> = ({
 	icon,
 }) => (
 	<div
-		className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md"
+		className="rounded-xl border border-emerald-100 bg-white p-5 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-emerald-200 hover:shadow-md"
 		tabIndex={0}
 		role="button"
 		aria-label={title}

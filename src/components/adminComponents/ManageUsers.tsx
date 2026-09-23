@@ -355,8 +355,8 @@ const ManageUsers = () => {
 				</AlertDialogContent>
 			</AlertDialog>
 			{/* Delete User confirmation dialog */}
-			<div className="h-auto w-auto ">
-				<div className="space-y-8 p-4 md:p-8 max-w-[1600px] mx-auto">
+			<div className="h-auto w-full">
+				<div className="mx-auto max-w-[1600px] space-y-8 p-3 sm:p-4 md:p-8">
 					<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
 						<StatsCard
 							title="Total Users"
@@ -378,15 +378,15 @@ const ManageUsers = () => {
 						/>
 					</div>
 
-					<div className="flex flex-col gap-4 bg-muted/50 p-4 rounded-lg">
+					<div className="flex flex-col gap-4 rounded-lg bg-muted/50 p-4">
 						<div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
 							<h2 className="text-lg font-semibold">Users</h2>
-							<div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+							<div className="grid w-full grid-cols-1 gap-3 sm:grid-cols-2">
 								<Select
 									value={selectedStatus}
 									onValueChange={handleStatusChange}
 								>
-									<SelectTrigger className="w-full sm:w-[180px] bg-background">
+									<SelectTrigger className="w-full bg-background">
 										<SelectValue placeholder="Filter by status" />
 									</SelectTrigger>
 									<SelectContent>
@@ -401,7 +401,7 @@ const ManageUsers = () => {
 										handlePhoneFilterChange(value as PhoneFilterOption)
 									}
 								>
-									<SelectTrigger className="w-full sm:w-[220px] bg-background">
+									<SelectTrigger className="w-full bg-background">
 										<SelectValue placeholder="Phone filter" />
 									</SelectTrigger>
 									<SelectContent>
@@ -430,14 +430,143 @@ const ManageUsers = () => {
 							<Button
 								type="button"
 								onClick={handleSearch}
-								className="sm:w-[120px]"
+								className="w-full sm:w-[120px]"
 							>
 								Search
 							</Button>
 						</div>
 					</div>
 
-					<div className="rounded-md border bg-card overflow-hidden">
+					<div className="space-y-3 md:hidden">
+						{isLoadingUsers ? (
+							<div className="rounded-md border bg-card p-4">
+								<Skeleton className="h-4 w-full" />
+							</div>
+						) : !displayUsers?.length ? (
+							<div className="rounded-md border bg-card p-8 text-center">
+								<div className="flex flex-col items-center gap-2 text-muted-foreground">
+									<AlertCircle className="h-8 w-8" />
+									<p>No users found</p>
+								</div>
+							</div>
+						) : (
+							displayUsers.map((user) => (
+								<div key={user._id} className="rounded-md border bg-card p-4">
+									<div className="flex items-start justify-between gap-3">
+										<div className="min-w-0 flex-1">
+											<div className="flex items-center gap-2">
+												{user.avatar ? (
+													<img
+														className="h-9 w-9 rounded-full border border-gray-300"
+														src={user.avatar}
+														alt={user.name}
+													/>
+												) : (
+													<div className="flex h-9 w-9 items-center justify-center rounded-full bg-blue-400 font-bold text-white">
+														{getInitials(user?.name ?? "")}
+													</div>
+												)}
+												<p className="line-clamp-1 text-sm font-semibold">
+													{user.name || "N/A"}
+												</p>
+											</div>
+											<p className="mt-2 truncate text-xs text-muted-foreground">
+												{user.email}
+											</p>
+											<div className="mt-2 flex flex-wrap items-center gap-2">
+												<Badge variant="outline">{user.role}</Badge>
+												<Badge
+													className={`${
+														user.isVerified
+															? "bg-green-100 text-green-800"
+															: "bg-red-100 text-red-800"
+													}`}
+												>
+													{user.isVerified ? "Verified" : "Unverified"}
+												</Badge>
+											</div>
+										</div>
+										<DropdownMenu modal={false}>
+											<DropdownMenuTrigger asChild>
+												<Button size="sm" className="h-8 w-8 bg-gray-400 p-1">
+													<MoreVertical className="h-4 w-4" />
+												</Button>
+											</DropdownMenuTrigger>
+											<DropdownMenuContent align="end">
+												<DropdownMenuItem
+													onClick={() =>
+														navigate(`/admin/users/view-user/${user?._id}`)
+													}
+												>
+													View User
+												</DropdownMenuItem>
+												<DropdownMenuItem
+													onClick={() =>
+														navigate(`/admin/messages?userId=${user?._id}`)
+													}
+												>
+													Message User
+												</DropdownMenuItem>
+												{isSuperAdmin && user._id !== currentUser?.id && (
+													<DropdownMenuItem
+														disabled={roleActionUserId === user._id}
+														onClick={() =>
+															handleRoleUpdate(
+																user._id,
+																user.role === "admin" ? "user" : "admin",
+															)
+														}
+													>
+														{roleActionUserId === user._id
+															? "Updating role..."
+															: user.role === "admin"
+																? "Demote to User"
+																: "Promote to Admin"}
+													</DropdownMenuItem>
+												)}
+												<DropdownMenuItem
+													onClick={() => openResetPasswordDialog(user)}
+												>
+													Reset Password
+												</DropdownMenuItem>
+												{!user.isVerified && (
+													<DropdownMenuItem
+														disabled={verificationActionUserId === user._id}
+														onClick={() => handleSendVerificationLink(user)}
+													>
+														{verificationActionUserId === user._id
+															? "Sending verification..."
+															: "Send Verification Link"}
+													</DropdownMenuItem>
+												)}
+												<DropdownMenuItem
+													onClick={() => setUserToDelete(user._id)}
+													className="text-red-600"
+												>
+													Delete User
+												</DropdownMenuItem>
+												<DropdownMenuItem
+													onClick={() =>
+														showError("Ban user is not available yet")
+													}
+													className="text-red-600"
+												>
+													Ban User
+												</DropdownMenuItem>
+											</DropdownMenuContent>
+										</DropdownMenu>
+									</div>
+									{user.phoneNumber && (
+										<p className="mt-2 text-xs text-muted-foreground">
+											Phone: {user.phoneNumber}
+										</p>
+									)}
+								</div>
+							))
+						)}
+					</div>
+
+					<div className="hidden overflow-hidden rounded-md border bg-card md:block">
 						<div className="w-full overflow-x-auto">
 							<Table>
 								<TableHeader className="bg-muted/50">

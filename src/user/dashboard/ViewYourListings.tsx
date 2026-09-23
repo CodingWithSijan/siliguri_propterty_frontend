@@ -110,42 +110,90 @@ const ViewYourListings = () => {
 
 	const currentTabConfig = TAB_CONFIG.find((tab) => tab.value === activeTab);
 	const currentListings = getListingsForTab(activeTab);
+	const summaryCards = [
+		{
+			label: "Total",
+			value: filteredListings.all.length,
+			accent: "text-sky-800",
+			card: "border-sky-200 bg-sky-50/70",
+		},
+		{
+			label: "Active",
+			value: filteredListings.active.length,
+			accent: "text-emerald-700",
+			card: "border-emerald-200 bg-emerald-50/70",
+		},
+		{
+			label: "Pending",
+			value: filteredListings.pending.length,
+			accent: "text-amber-700",
+			card: "border-amber-200 bg-amber-50/70",
+		},
+		{
+			label: "Rejected",
+			value: filteredListings.rejected.length,
+			accent: "text-rose-700",
+			card: "border-rose-200 bg-rose-50/70",
+		},
+		{
+			label: "Sold",
+			value: filteredListings.sold.length,
+			accent: "text-slate-700",
+			card: "border-slate-200 bg-slate-50",
+		},
+	];
 
 	return (
-		<div className="max-w-7xl mx-auto px-4 py-8">
+		<div className="mx-auto max-w-7xl rounded-2xl border border-emerald-100 bg-gradient-to-br from-white via-emerald-50/40 to-sky-50/40 px-4 py-8">
 			<header className="mb-8 text-center">
-				<h1 className="text-4xl font-bold text-foreground tracking-tight mb-2">
+				<h1 className="mb-2 text-4xl font-bold tracking-tight text-slate-900">
 					Your Property Listings
 				</h1>
-				<p className="text-muted-foreground">
+				<p className="text-slate-600">
 					Manage and track all your property listings
 				</p>
 			</header>
 
+			<div className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+				{summaryCards.map((card) => (
+					<div
+						key={card.label}
+						className={`rounded-xl border px-3 py-3 text-center shadow-sm ${card.card}`}
+					>
+						<p className="text-xs font-semibold uppercase tracking-[0.08em] text-slate-500">
+							{card.label}
+						</p>
+						<p className={`mt-1 text-2xl font-bold ${card.accent}`}>
+							{card.value}
+						</p>
+					</div>
+				))}
+			</div>
+
 			{/* Filter Dropdown */}
-			<div className="flex justify-center mb-8">
+			<div className="mb-8 flex justify-center">
 				<div className="w-full max-w-md">
 					<Select
 						value={activeTab}
 						onValueChange={(value) => setActiveTab(value as ListingStatus)}
 					>
-						<SelectTrigger className="w-full h-12 text-base font-semibold border-2 border-border hover:border-primary/50 transition-all rounded-xl shadow-sm bg-card">
+						<SelectTrigger className="h-12 w-full rounded-xl border-2 border-emerald-200 bg-white text-base font-semibold shadow-sm transition-all hover:border-emerald-400">
 							<SelectValue />
 						</SelectTrigger>
 
-						<SelectContent className="w-full bg-card border-border">
+						<SelectContent className="w-full border-emerald-100 bg-white">
 							{TAB_CONFIG.map((tab) => (
 								<SelectItem
 									key={tab.value}
 									value={tab.value}
-									className="text-base cursor-pointer hover:bg-accent"
+									className="cursor-pointer text-base hover:bg-emerald-50"
 								>
 									<div className="flex items-center justify-between gap-4 w-full">
-										<span className="font-medium text-foreground">
+										<span className="font-medium text-slate-800">
 											{tab.label}
 										</span>
 										{tab.value !== "all" && (
-											<span className="text-xs font-bold bg-primary/20 text-primary px-3 py-1 rounded-full whitespace-nowrap">
+											<span className="whitespace-nowrap rounded-full bg-emerald-100 px-3 py-1 text-xs font-bold text-emerald-800">
 												{getListingsForTab(tab.value).length}
 											</span>
 										)}
