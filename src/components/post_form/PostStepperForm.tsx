@@ -294,6 +294,19 @@ const PostStepperForm: React.FC<PostStepperFormProps> = ({ intent }) => {
 
 	return (
 		<div className="mx-auto w-full max-w-5xl px-2 pb-6 sm:px-4">
+			{loading && (
+				<div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/60 px-4 backdrop-blur-sm">
+					<div className="w-full max-w-sm rounded-2xl border border-slate-200 bg-white p-6 text-center shadow-2xl">
+						<div className="mx-auto mb-3 h-10 w-10 animate-spin rounded-full border-4 border-slate-200 border-t-slate-800" />
+						<h3 className="text-lg font-semibold text-slate-900">
+							Submitting your property
+						</h3>
+						<p className="mt-1 text-sm text-slate-600">
+							Please wait while we upload your files and save your listing.
+						</p>
+					</div>
+				</div>
+			)}
 			<div className="sticky top-2 z-30 mb-3 rounded-xl border border-slate-200 bg-white/95 px-3 py-2 shadow-sm backdrop-blur supports-[backdrop-filter]:bg-white/80 sm:hidden">
 				<div className="mb-2 flex items-center justify-between gap-2">
 					<div className="flex min-w-0 items-center gap-2">
