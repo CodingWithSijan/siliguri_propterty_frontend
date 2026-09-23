@@ -1,9 +1,6 @@
 import React, { SetStateAction } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch, RootState } from "../../app/store";
-import { toggleTheme } from "../../app/slices/themeSlice";
-// Import shadcn switch
-import { Switch } from "../ui/switch";
+import { useSelector } from "react-redux";
+import { RootState } from "../../app/store";
 import { Link, useLocation } from "react-router-dom";
 // Import shadcn sidebar components (adjust path as needed)
 import {
@@ -42,8 +39,6 @@ interface Props {
 	setActiveMenu: React.Dispatch<SetStateAction<number>>;
 }
 const AppSidebar = ({ activeMenu, setActiveMenu }: Props) => {
-	const dispatch = useDispatch<AppDispatch>();
-	const theme = useSelector((state: RootState) => state.theme.mode);
 	const currentUser = useSelector((state: RootState) => state.auth.user);
 	const location = useLocation();
 	const isSuperAdmin = currentUser?.role === "superadmin";
@@ -64,35 +59,12 @@ const AppSidebar = ({ activeMenu, setActiveMenu }: Props) => {
 		const idx = items.findIndex((item) => item.url === location.pathname);
 		setActiveMenu(idx === -1 ? 0 : idx);
 	}, [items, location.pathname, setActiveMenu]);
-	const handleThemeToggle = () => {
-		dispatch(toggleTheme());
-	};
-
 	return (
 		<Sidebar side="left" collapsible="icon">
-			<SidebarHeader>
-				<SidebarMenu>
-					<SidebarMenuItem className="overflow-hidden">
-						{/* Theme toggle switch at top */}
-						<div className="flex items-center gap-2 border-b border-slate-200 bg-slate-50 px-4 py-4 dark:border-slate-700 dark:bg-slate-900">
-							<span className="text-sm font-medium text-slate-700 dark:text-slate-200">
-								Light
-							</span>
-							<Switch
-								checked={theme === "dark"}
-								onCheckedChange={handleThemeToggle}
-								className="data-[state=checked]:bg-gray-800 data-[state=unchecked]:bg-gray-200"
-							/>
-							<span className="text-sm font-medium text-slate-700 dark:text-slate-200">
-								Dark
-							</span>
-						</div>
-					</SidebarMenuItem>
-				</SidebarMenu>
-			</SidebarHeader>
-			<SidebarContent className="bg-white dark:bg-slate-950">
+			<SidebarHeader />
+			<SidebarContent className="bg-white">
 				<SidebarGroup>
-					<SidebarGroupLabel className="text-xs uppercase tracking-[0.12em] text-slate-500 dark:text-slate-400">
+					<SidebarGroupLabel className="text-xs uppercase tracking-[0.12em] text-slate-500">
 						Menu
 					</SidebarGroupLabel>
 					<SidebarGroupContent>
