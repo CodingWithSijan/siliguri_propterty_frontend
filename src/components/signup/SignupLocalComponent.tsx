@@ -77,7 +77,7 @@ const SignupLocalComponent: React.FC = () => {
 			<div>
 				<label
 					htmlFor="name"
-					className="flex items-center gap-2 text-sm font-medium text-gray-700"
+					className="flex items-center gap-2 text-sm font-medium text-slate-700"
 				>
 					<FaUser /> Name
 				</label>
@@ -89,7 +89,7 @@ const SignupLocalComponent: React.FC = () => {
 					onChange={handleChange}
 					required
 					disabled={isLoading}
-					className="w-full px-4 py-2 mt-1 text-sm border rounded-md border-gray-300 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+					className="mt-1 w-full rounded-md border border-slate-300 px-4 py-2 text-sm focus:border-emerald-500 focus:ring-emerald-500 disabled:cursor-not-allowed disabled:opacity-50"
 					placeholder="Your full name"
 				/>
 				{errors.name && <p className="text-sm text-red-500">{errors.name}</p>}
@@ -99,7 +99,7 @@ const SignupLocalComponent: React.FC = () => {
 			<div>
 				<label
 					htmlFor="email"
-					className="flex items-center gap-2 text-sm font-medium text-gray-700"
+					className="flex items-center gap-2 text-sm font-medium text-slate-700"
 				>
 					<FaEnvelope /> Email Address
 				</label>
@@ -111,7 +111,7 @@ const SignupLocalComponent: React.FC = () => {
 					onChange={handleChange}
 					required
 					disabled={isLoading}
-					className="w-full px-4 py-2 mt-1 text-sm border rounded-md border-gray-300 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+					className="mt-1 w-full rounded-md border border-slate-300 px-4 py-2 text-sm focus:border-emerald-500 focus:ring-emerald-500 disabled:cursor-not-allowed disabled:opacity-50"
 					placeholder="you@example.com"
 				/>
 				{errors.email && <p className="text-sm text-red-500">{errors.email}</p>}
@@ -121,12 +121,12 @@ const SignupLocalComponent: React.FC = () => {
 			<div>
 				<label
 					htmlFor="phone"
-					className="flex items-center gap-2 text-sm font-medium text-gray-700"
+					className="flex items-center gap-2 text-sm font-medium text-slate-700"
 				>
 					<FaPhoneAlt /> Phone Number
 				</label>
 				<div className="flex items-center mt-1">
-					<span className="px-3 py-2 border border-r-0 rounded-l-md bg-gray-100 text-gray-700 text-sm">
+					<span className="rounded-l-md border border-r-0 border-slate-300 bg-slate-100 px-3 py-2 text-sm text-slate-700">
 						+91
 					</span>
 					<input
@@ -138,7 +138,7 @@ const SignupLocalComponent: React.FC = () => {
 						onChange={handleChange}
 						required
 						disabled={isLoading}
-						className="w-full px-4 py-2 text-sm border rounded-r-md border-gray-300 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+						className="w-full rounded-r-md border border-slate-300 px-4 py-2 text-sm focus:border-emerald-500 focus:ring-emerald-500 disabled:cursor-not-allowed disabled:opacity-50"
 						placeholder="10-digit number"
 					/>
 				</div>
@@ -156,13 +156,13 @@ const SignupLocalComponent: React.FC = () => {
 						onChange={handleChange}
 						required
 						disabled={isLoading}
-						className="w-full px-4 py-2 pr-10 text-sm border rounded-md border-gray-300 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+						className="w-full rounded-md border border-slate-300 px-4 py-2 pr-10 text-sm focus:border-emerald-500 focus:ring-emerald-500 disabled:cursor-not-allowed disabled:opacity-50"
 						placeholder="Minimum 6 characters"
 					/>
 					<button
 						type="button"
 						onClick={() => setShowPassword(!showPassword)}
-						className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-800 hover:text-gray-400 focus:outline-none disabled:opacity-50"
+						className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-700 hover:text-slate-500 focus:outline-none disabled:opacity-50"
 						disabled={isLoading}
 						aria-label={showPassword ? "Hide password" : "Show password"}
 					>
@@ -183,7 +183,7 @@ const SignupLocalComponent: React.FC = () => {
 			<div>
 				<label
 					htmlFor="confirmPassword"
-					className="flex items-center gap-2 text-sm font-medium text-gray-700"
+					className="flex items-center gap-2 text-sm font-medium text-slate-700"
 				>
 					<FaLock /> Confirm Password
 				</label>
@@ -196,13 +196,13 @@ const SignupLocalComponent: React.FC = () => {
 						onChange={handleChange}
 						required
 						disabled={isLoading}
-						className="w-full px-4 py-2 pr-10 text-sm border rounded-md border-gray-300 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+						className="w-full rounded-md border border-slate-300 px-4 py-2 pr-10 text-sm focus:border-emerald-500 focus:ring-emerald-500 disabled:cursor-not-allowed disabled:opacity-50"
 						placeholder="Re-enter password"
 					/>
 					<button
 						type="button"
 						onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-						className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-800 hover:text-gray-400 focus:outline-none disabled:opacity-50"
+						className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-700 hover:text-slate-500 focus:outline-none disabled:opacity-50"
 						disabled={isLoading}
 						aria-label={showConfirmPassword ? "Hide password" : "Show password"}
 					>
@@ -222,7 +222,7 @@ const SignupLocalComponent: React.FC = () => {
 			<button
 				type="submit"
 				disabled={isLoading}
-				className="relative w-full px-4 py-2 text-white bg-blue-600 hover:bg-blue-700 rounded-md text-sm font-medium transition duration-200 disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+				className="relative flex w-full items-center justify-center gap-2 rounded-md bg-emerald-700 px-4 py-2 text-sm font-medium text-white transition duration-200 hover:bg-emerald-800 disabled:cursor-not-allowed disabled:opacity-60"
 			>
 				{isLoading && (
 					<span

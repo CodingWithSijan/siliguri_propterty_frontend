@@ -41,7 +41,7 @@ const UserProfileCard = () => {
 	}
 
 	return (
-		<div className="min-h-scree p-4 md:p-6 lg:p-8">
+		<div className="min-h-screen p-4 md:p-6 lg:p-8">
 			<div className="max-w-4xl mx-auto">
 				<Card className="h-full  border-0 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm">
 					{/* Header Section */}
@@ -114,7 +114,7 @@ const UserProfileCard = () => {
 					</CardHeader>
 
 					{/* Content Section */}
-					<CardContent className="p-8">
+					<CardContent className="p-5 sm:p-6 md:p-8">
 						<div className="grid grid-cols-1 md:grid-cols-2 gap-8">
 							{/* Personal Information */}
 							<div className="space-y-6">
@@ -131,7 +131,7 @@ const UserProfileCard = () => {
 											<p className="text-sm font-medium text-slate-600 dark:text-slate-400">
 												User ID
 											</p>
-											<p className="text-slate-800 dark:text-slate-200 font-mono text-sm">
+											<p className="break-all text-sm font-mono text-slate-800 dark:text-slate-200">
 												{user?._id || "N/A"}
 											</p>
 										</div>
@@ -251,8 +251,8 @@ const UserProfileCard = () => {
 						</div>
 
 						{/* Additional Actions Section */}
-						<div className="mt-8 pt-6 border-t border-slate-200 dark:border-slate-700">
-							<div className="flex items-center justify-center gap-4 text-sm text-slate-500 dark:text-slate-400">
+						<div className="mt-8 border-t border-slate-200 pt-6 dark:border-slate-700">
+							<div className="flex flex-wrap items-center justify-center gap-4 text-center text-sm text-slate-500 dark:text-slate-400">
 								<span>
 									Profile last updated: {new Date().toLocaleDateString()}
 								</span>

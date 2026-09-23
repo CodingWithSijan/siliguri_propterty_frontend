@@ -7,15 +7,13 @@ import {
 	FiMessageSquare,
 } from "react-icons/fi";
 import { motion } from "framer-motion";
-import { NavLink, useLocation, useNavigate } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { RootState } from "../app/store";
 import siliguri_property_logo_noBG from "../assets/logo_siliguri_property.png";
 import { getInitials } from "../utils/getInitial";
 import { formatFullName } from "../utils/capitalizeName";
 interface SidebarProps {
-	activeMenu: string;
-	setActiveMenu: (menu: string) => void;
 	setSidebarOpen: (open: boolean) => void;
 }
 
@@ -43,9 +41,7 @@ const menuItems = [
 	},
 ];
 
-const Sidebar: React.FC<SidebarProps> = ({ setActiveMenu, setSidebarOpen }) => {
-	const navigate = useNavigate();
-	const location = useLocation();
+const Sidebar: React.FC<SidebarProps> = ({ setSidebarOpen }) => {
 	const { user } = useSelector((state: RootState) => state.auth);
 
 	return (
@@ -54,7 +50,7 @@ const Sidebar: React.FC<SidebarProps> = ({ setActiveMenu, setSidebarOpen }) => {
 			animate={{ x: 0 }}
 			exit={{ x: -300 }}
 			transition={{ type: "spring", stiffness: 100, damping: 20 }}
-			className="h-full w-full flex flex-col border-r border-slate-200 shadow-sm bg-gradient-to-b from-white via-slate-50 to-slate-100"
+			className="flex h-full w-full flex-col border-r border-emerald-100 bg-gradient-to-b from-white via-emerald-50 to-sky-50 shadow-sm"
 		>
 			<div className="flex flex-col flex-1">
 				<div className="border-b border-slate-200 bg-white block">
@@ -67,7 +63,7 @@ const Sidebar: React.FC<SidebarProps> = ({ setActiveMenu, setSidebarOpen }) => {
 					</NavLink>
 				</div>
 
-				<div className="mx-4 mt-4 rounded-2xl border border-slate-200 bg-white p-3 shadow-sm">
+				<div className="mx-4 mt-4 rounded-2xl border border-emerald-100 bg-gradient-to-r from-white to-emerald-50 p-3 shadow-sm">
 					<div className="flex items-center gap-3">
 						{user?.avatar ? (
 							<img
@@ -76,7 +72,7 @@ const Sidebar: React.FC<SidebarProps> = ({ setActiveMenu, setSidebarOpen }) => {
 								alt={user.name}
 							/>
 						) : (
-							<div className="w-11 h-11 rounded-full bg-sky-600 text-white flex items-center justify-center font-bold">
+							<div className="flex h-11 w-11 items-center justify-center rounded-full bg-emerald-700 font-bold text-white">
 								{getInitials(user?.name ?? "")}
 							</div>
 						)}
@@ -89,30 +85,36 @@ const Sidebar: React.FC<SidebarProps> = ({ setActiveMenu, setSidebarOpen }) => {
 					</div>
 				</div>
 
-				<nav className="flex-1 p-4 overflow-y-auto">
+				<nav
+					className="flex-1 overflow-y-auto p-4"
+					aria-label="Dashboard navigation"
+				>
+					<p className="mb-2 px-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-emerald-700">
+						Main Menu
+					</p>
 					<ul className="space-y-2">
 						{menuItems.map((item) => {
-							const isActive = location.pathname === item.path;
 							return (
 								<motion.li
 									key={item.label}
 									whileHover={{ scale: 1.02, x: 4 }}
 									whileTap={{ scale: 0.98 }}
-									className={`flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer transition-all duration-200 ease-in-out font-medium ${
-										isActive
-											? "bg-sky-700 text-white shadow-md"
-											: "text-slate-700 hover:bg-slate-200"
-									}`}
-									onClick={() => {
-										setActiveMenu(item.label);
-										setSidebarOpen(false);
-										if (location.pathname !== item.path) {
-											navigate(item.path);
-										}
-									}}
+									className="rounded-xl"
 								>
-									<span className="text-xl">{item.icon}</span>
-									<span>{item.label}</span>
+									<NavLink
+										to={item.path}
+										onClick={() => setSidebarOpen(false)}
+										className={({ isActive }) =>
+											`flex items-center gap-3 rounded-xl px-4 py-3 font-medium transition-all duration-200 ease-in-out ${
+												isActive
+													? "bg-emerald-700 text-white shadow-md"
+													: "text-slate-700 hover:bg-emerald-100 hover:text-emerald-900"
+											}`
+										}
+									>
+										<span className="text-xl">{item.icon}</span>
+										<span>{item.label}</span>
+									</NavLink>
 								</motion.li>
 							);
 						})}

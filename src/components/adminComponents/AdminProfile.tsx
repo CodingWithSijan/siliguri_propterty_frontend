@@ -29,7 +29,7 @@ const AdminProfile = () => {
 				<SidebarMenuItem>
 					<DropdownMenu>
 						<DropdownMenuTrigger asChild>
-							<SidebarMenuButton>
+							<SidebarMenuButton className="rounded-lg border border-emerald-100 bg-white text-slate-700 hover:bg-emerald-50 hover:text-emerald-800">
 								{user?.avatar ? (
 									<img
 										src={user.avatar}
@@ -37,7 +37,7 @@ const AdminProfile = () => {
 										className="w-7 h-7 rounded-full object-cover"
 									/>
 								) : (
-									<div className="w-7 h-7 rounded-full bg-blue-600 text-white text-xs font-bold flex items-center justify-center">
+									<div className="flex h-7 w-7 items-center justify-center rounded-full bg-emerald-700 text-xs font-bold text-white">
 										{getInitials(user?.name ?? "")}
 									</div>
 								)}
@@ -52,7 +52,7 @@ const AdminProfile = () => {
 							<DropdownMenuItem asChild>
 								<div
 									onClick={handleSignOut}
-									className="w-full px-2 py-2 bg-gray-200 hover:bg-red-200 cursor-pointer rounded flex items-center gap-2"
+									className="flex w-full cursor-pointer items-center gap-2 rounded px-2 py-2 text-slate-700 hover:bg-rose-50 hover:text-rose-700"
 								>
 									<LogOut className="size-4" />
 									<span>Sign out</span>

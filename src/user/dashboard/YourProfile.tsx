@@ -149,8 +149,8 @@ const YourProfile: React.FC = () => {
 	};
 
 	return (
-		<div className="flex justify-center items-start min-h-screen py-4 md:py-8 px-0 md:px-2">
-			<div className="w-full max-w-3xl rounded-2xl border border-slate-200 bg-white p-4 md:p-5 shadow-sm">
+		<div className="flex min-h-screen items-start justify-center px-0 py-4 md:px-2 md:py-8">
+			<div className="w-full max-w-3xl rounded-2xl border border-emerald-100 bg-white p-4 shadow-sm md:p-5">
 				<div className="flex items-center justify-between gap-3">
 					<div>
 						<h2 className="text-xl md:text-2xl font-bold text-slate-900">
@@ -163,14 +163,14 @@ const YourProfile: React.FC = () => {
 					<Button
 						type="button"
 						onClick={openEditProfile}
-						className="inline-flex items-center gap-2 bg-slate-900 hover:bg-slate-800"
+						className="inline-flex items-center gap-2 bg-emerald-700 hover:bg-emerald-800"
 					>
 						<Edit3 className="h-4 w-4" />
 						Edit
 					</Button>
 				</div>
 
-				<div className="mt-4 grid grid-cols-1 gap-4 rounded-xl border border-slate-200 bg-slate-50/70 p-4 md:grid-cols-[auto_1fr_auto] md:items-center">
+				<div className="mt-4 grid grid-cols-1 gap-4 rounded-xl border border-emerald-100 bg-gradient-to-r from-emerald-50/80 to-sky-50/70 p-4 md:grid-cols-[auto_1fr_auto] md:items-center">
 					{user?.avatar ? (
 						<img
 							src={user.avatar}
@@ -178,7 +178,7 @@ const YourProfile: React.FC = () => {
 							className="h-16 w-16 rounded-full border border-slate-200 object-cover"
 						/>
 					) : (
-						<div className="h-16 w-16 rounded-full bg-sky-700 text-white flex items-center justify-center text-xl font-semibold">
+						<div className="flex h-16 w-16 items-center justify-center rounded-full bg-emerald-700 text-xl font-semibold text-white">
 							{getInitials(user?.name)}
 						</div>
 					)}
@@ -195,7 +195,7 @@ const YourProfile: React.FC = () => {
 						</p>
 					</div>
 
-					<div className="flex items-center gap-2 text-xs text-slate-500">
+					<div className="flex items-center gap-2 rounded-full bg-white/80 px-3 py-1 text-xs font-medium text-emerald-700">
 						<Lock className="h-4 w-4" />
 						Secured
 					</div>
@@ -207,7 +207,7 @@ const YourProfile: React.FC = () => {
 						<button
 							type="button"
 							onClick={handleSendVerificationEmail}
-							className="font-semibold text-sky-700 hover:underline"
+							className="font-semibold text-emerald-700 hover:underline"
 						>
 							Resend Link
 						</button>
@@ -218,7 +218,7 @@ const YourProfile: React.FC = () => {
 					<button
 						type="button"
 						onClick={() => setIsChangePasswordOpen(true)}
-						className="text-sm text-sky-700 hover:underline font-medium"
+						className="text-sm font-medium text-emerald-700 hover:underline"
 					>
 						Change Password
 					</button>
@@ -249,11 +249,11 @@ const YourProfile: React.FC = () => {
 										className="h-16 w-16 rounded-full border border-slate-200 object-cover"
 									/>
 								) : (
-									<div className="h-16 w-16 rounded-full bg-sky-700 text-white flex items-center justify-center text-lg font-semibold">
+									<div className="flex h-16 w-16 items-center justify-center rounded-full bg-emerald-700 text-lg font-semibold text-white">
 										{getInitials(fullName || user?.name)}
 									</div>
 								)}
-								<label className="inline-flex cursor-pointer items-center gap-2 rounded-md border border-slate-200 px-3 py-2 text-sm text-slate-700 hover:bg-slate-50">
+								<label className="inline-flex cursor-pointer items-center gap-2 rounded-md border border-emerald-200 px-3 py-2 text-sm text-emerald-800 hover:bg-emerald-50">
 									<Camera className="h-4 w-4" />
 									Upload picture
 									<input
@@ -272,7 +272,7 @@ const YourProfile: React.FC = () => {
 								<div className="relative">
 									<UserRound className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
 									<input
-										className="w-full rounded-md border border-slate-200 bg-slate-50 py-2 pl-10 pr-3 text-sm focus:border-sky-400 focus:outline-none focus:ring-2 focus:ring-sky-200"
+										className="w-full rounded-md border border-slate-200 bg-slate-50 py-2 pl-10 pr-3 text-sm focus:border-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-200"
 										type="text"
 										value={fullName}
 										onChange={(event) => setFullName(event.target.value)}
@@ -287,7 +287,7 @@ const YourProfile: React.FC = () => {
 								<div className="relative">
 									<Phone className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
 									<input
-										className="w-full rounded-md border border-slate-200 bg-slate-50 py-2 pl-10 pr-3 text-sm focus:border-sky-400 focus:outline-none focus:ring-2 focus:ring-sky-200"
+										className="w-full rounded-md border border-slate-200 bg-slate-50 py-2 pl-10 pr-3 text-sm focus:border-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-200"
 										type="text"
 										value={phoneNumber}
 										onChange={(event) => setPhoneNumber(event.target.value)}
@@ -323,7 +323,7 @@ const YourProfile: React.FC = () => {
 								type="button"
 								onClick={handleSaveProfile}
 								disabled={(!isProfileDirty && !selectedFile) || isSavingProfile}
-								className="inline-flex items-center gap-2"
+								className="inline-flex items-center gap-2 bg-emerald-700 hover:bg-emerald-800"
 							>
 								<Save className="h-4 w-4" />
 								{isSavingProfile ? "Saving..." : "Save"}

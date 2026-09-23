@@ -5,9 +5,9 @@ import SocialAuthButtons from "../components/common/SocialAuthButtons";
 
 const Signup: React.FC = () => {
 	return (
-		<div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-blue-50 to-blue-200 px-4">
-			<div className="w-full max-w-lg bg-white rounded-3xl shadow-xl p-10">
-				<h2 className="text-2xl sm:text-4xl font-bold text-center text-blue-700 mb-8">
+		<div className="flex min-h-screen items-center justify-center bg-gradient-to-r from-emerald-50 via-white to-slate-100 px-4">
+			<div className="w-full max-w-lg rounded-3xl border border-slate-200 bg-white p-10 shadow-xl">
+				<h2 className="mb-8 text-center text-2xl font-bold text-emerald-800 sm:text-4xl">
 					Create Your Account
 				</h2>
 
@@ -16,11 +16,11 @@ const Signup: React.FC = () => {
 					<SocialAuthButtons mode="signup" />
 				</div>
 
-				<p className="mt-6 text-sm text-center text-gray-600">
+				<p className="mt-6 text-center text-sm text-slate-600">
 					Already have an account?{" "}
 					<NavLink
 						to="/login"
-						className="text-blue-600 hover:underline font-medium"
+						className="font-medium text-emerald-700 hover:underline"
 					>
 						Login
 					</NavLink>
