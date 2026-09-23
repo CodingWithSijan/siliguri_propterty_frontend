@@ -149,7 +149,7 @@ const SiliguriMapPickerModal: React.FC<SiliguriMapPickerModalProps> = ({
 				placeMarker(initialCoords);
 			}
 		});
-	}, [initialCoords, open]);
+	}, [initialCoords, open, placeMarker]);
 
 	const handleConfirm = () => {
 		if (!selectedCoords) {

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
 	ChevronLeft,
 	ChevronRight,
@@ -36,15 +36,15 @@ const Image_UserDetails: React.FC<{
 			? listing_images
 			: [propertyImagePlaceholder];
 
-	const nextImage = () => {
+	const nextImage = useCallback(() => {
 		setCurrentImageIndex((prev) => (prev + 1) % images.length);
 		setZoomLevel(MIN_ZOOM);
-	};
+	}, [images.length]);
 
-	const prevImage = () => {
+	const prevImage = useCallback(() => {
 		setCurrentImageIndex((prev) => (prev - 1 + images.length) % images.length);
 		setZoomLevel(MIN_ZOOM);
-	};
+	}, [images.length]);
 
 	const handleImageClick = (index: number) => {
 		setCurrentImageIndex(index);
@@ -52,22 +52,22 @@ const Image_UserDetails: React.FC<{
 		setIsModalOpen(true);
 	};
 
-	const closeGallery = () => {
+	const closeGallery = useCallback(() => {
 		setIsModalOpen(false);
 		setZoomLevel(MIN_ZOOM);
-	};
+	}, []);
 
-	const zoomIn = () => {
+	const zoomIn = useCallback(() => {
 		setZoomLevel((prev) =>
 			Math.min(MAX_ZOOM, Number((prev + ZOOM_STEP).toFixed(2))),
 		);
-	};
+	}, []);
 
-	const zoomOut = () => {
+	const zoomOut = useCallback(() => {
 		setZoomLevel((prev) =>
 			Math.max(MIN_ZOOM, Number((prev - ZOOM_STEP).toFixed(2))),
 		);
-	};
+	}, []);
 
 	const handleWheelZoom = (event: React.WheelEvent<HTMLDivElement>) => {
 		event.preventDefault();
@@ -138,7 +138,15 @@ const Image_UserDetails: React.FC<{
 		return () => {
 			window.removeEventListener("keydown", onKeyDown);
 		};
-	}, [isModalOpen, images.length]);
+	}, [
+		isModalOpen,
+		images.length,
+		closeGallery,
+		nextImage,
+		prevImage,
+		zoomIn,
+		zoomOut,
+	]);
 
 	return (
 		<div className="w-full overflow-hidden border border-slate-200 bg-white">

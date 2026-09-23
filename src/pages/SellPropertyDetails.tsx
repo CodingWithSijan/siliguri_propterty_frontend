@@ -24,6 +24,24 @@ const SellPropertyDetails: React.FC = () => {
 				const res = await BASE_URL.get(`/api/user/post/listingDetails/${id}`);
 				setListing(res.data.listingDetails);
 				setListingUserDetails(res.data.listingUser);
+
+				try {
+					const viewRes = await BASE_URL.patch(
+						`/api/user/post/listingDetails/${id}/view`,
+					);
+					setListing((prev) =>
+						prev
+							? {
+									...prev,
+									viewCount: Number(
+										viewRes.data?.viewCount ?? prev.viewCount ?? 0,
+									),
+								}
+							: prev,
+					);
+				} catch {
+					// Ignore view tracking failures to avoid blocking the details page.
+				}
 			} catch {
 				setError("Failed to fetch listing details. Please try again.");
 			} finally {

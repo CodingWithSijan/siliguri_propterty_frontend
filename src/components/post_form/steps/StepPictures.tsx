@@ -7,6 +7,8 @@ import { showError } from "../../../utils/toastUtils";
 
 const MAX_IMAGES = 15;
 const MAX_VIDEOS = 2;
+const MAX_IMAGE_SIZE_MB = 10;
+const MAX_VIDEO_SIZE_MB = 50;
 
 const hasAllowedExtension = (
 	fileName: string,
@@ -110,7 +112,17 @@ const StepPictures = () => {
 
 	const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const incoming = e.target.files ? Array.from(e.target.files) : [];
-		const filtered = incoming.filter((file) => isImageFile(file));
+		const filtered = incoming.filter(
+			(file) =>
+				isImageFile(file) && file.size <= MAX_IMAGE_SIZE_MB * 1024 * 1024,
+		);
+
+		if (filtered.length !== incoming.length) {
+			showError(
+				`Some files were ignored. Use only image files up to ${MAX_IMAGE_SIZE_MB}MB each.`,
+			);
+		}
+
 		const unique = new Map(
 			imageFiles.map((file) => [file.name + file.size, file]),
 		);
@@ -133,7 +145,17 @@ const StepPictures = () => {
 
 	const handleVideoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const incoming = e.target.files ? Array.from(e.target.files) : [];
-		const filtered = incoming.filter((file) => isVideoFile(file));
+		const filtered = incoming.filter(
+			(file) =>
+				isVideoFile(file) && file.size <= MAX_VIDEO_SIZE_MB * 1024 * 1024,
+		);
+
+		if (filtered.length !== incoming.length) {
+			showError(
+				`Some files were ignored. Use MP4/WebM/MOV up to ${MAX_VIDEO_SIZE_MB}MB each.`,
+			);
+		}
+
 		const unique = new Map(
 			videoFiles.map((file) => [file.name + file.size, file]),
 		);
@@ -216,7 +238,7 @@ const StepPictures = () => {
 							</p>
 						)}
 						<p className="mt-1 text-xs text-slate-500">
-							Up to 15 images. JPG, PNG, WEBP recommended.
+							Up to 15 images. JPG, PNG, WEBP recommended (max 10MB each).
 						</p>
 						<p className="mt-1 text-xs text-slate-500">
 							If your phone picker selects one image at a time, reopen and add
@@ -244,7 +266,7 @@ const StepPictures = () => {
 							</p>
 						)}
 						<p className="mt-1 text-xs text-slate-500">
-							Up to 2 videos. MP4/WebM/MOV only.
+							Up to 2 videos. MP4/WebM/MOV only (max 50MB each).
 						</p>
 					</div>
 				</div>

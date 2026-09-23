@@ -12,6 +12,9 @@ import {
 	WEST_BENGAL_LOCATIONS,
 } from "../../../constants/westBengalLocations";
 
+const OTHER_LOCALITY_KEY = "other";
+const SILIGURI_CENTER = { lat: 26.7271, lng: 88.3953 };
+
 const StepPropertyType = () => {
 	const {
 		register,
@@ -26,9 +29,16 @@ const StepPropertyType = () => {
 	const intent = getValues("intent");
 	const selectedAreaKey = watch("wbLocalityKey") as string | undefined;
 	const watchedLocation = watch("location") as string | undefined;
+	const watchedCustomLocality = watch("customLocalityName") as
+		| string
+		| undefined;
 
 	useEffect(() => {
-		if (selectedAreaKey || !watchedLocation) {
+		if (
+			selectedAreaKey === OTHER_LOCALITY_KEY ||
+			selectedAreaKey ||
+			!watchedLocation
+		) {
 			return;
 		}
 
@@ -50,6 +60,39 @@ const StepPropertyType = () => {
 			shouldDirty: false,
 		});
 	}, [selectedAreaKey, setValue, watchedLocation]);
+
+	useEffect(() => {
+		if (selectedAreaKey !== OTHER_LOCALITY_KEY) {
+			return;
+		}
+
+		const customLocation = watchedCustomLocality?.trim() || "";
+		setValue("wbLocalityLabel", customLocation || "Other", {
+			shouldDirty: true,
+		});
+		setValue("location", customLocation, {
+			shouldDirty: true,
+			shouldValidate: true,
+		});
+
+		const currentCoordinates = watch("coordinates") as
+			| { type?: "Point"; coordinates?: [number, number] }
+			| undefined;
+
+		if (
+			!currentCoordinates?.coordinates ||
+			currentCoordinates.coordinates.length !== 2
+		) {
+			setValue(
+				"coordinates",
+				{
+					type: "Point",
+					coordinates: [SILIGURI_CENTER.lng, SILIGURI_CENTER.lat],
+				},
+				{ shouldDirty: true, shouldValidate: true },
+			);
+		}
+	}, [selectedAreaKey, setValue, watch, watchedCustomLocality]);
 
 	// Make sure coordinates is registered
 	useEffect(() => {
@@ -129,6 +172,29 @@ const StepPropertyType = () => {
 									required: "Area is required",
 									onChange: (event) => {
 										const areaKey = String(event.target.value || "");
+
+										if (areaKey === OTHER_LOCALITY_KEY) {
+											setValue("wbLocalityLabel", "Other", {
+												shouldDirty: true,
+											});
+											setValue("location", "", {
+												shouldDirty: true,
+												shouldValidate: true,
+											});
+											setValue(
+												"coordinates",
+												{
+													type: "Point",
+													coordinates: [
+														SILIGURI_CENTER.lng,
+														SILIGURI_CENTER.lat,
+													],
+												},
+												{ shouldDirty: true, shouldValidate: true },
+											);
+											return;
+										}
+
 										const area = WEST_BENGAL_LOCATION_MAP[areaKey];
 										if (!area) {
 											setValue("wbLocalityLabel", "", {
@@ -167,7 +233,32 @@ const StepPropertyType = () => {
 										{area.label}
 									</option>
 								))}
+								<option value={OTHER_LOCALITY_KEY}>Other</option>
 							</select>
+							{selectedAreaKey === OTHER_LOCALITY_KEY && (
+								<div className="mt-2">
+									<Input
+										type="text"
+										placeholder="Type your locality"
+										{...register("customLocalityName", {
+											validate: (value) => {
+												if (selectedAreaKey !== OTHER_LOCALITY_KEY) {
+													return true;
+												}
+
+												return value && value.trim().length > 1
+													? true
+													: "Please enter your preferred locality";
+											},
+										})}
+									/>
+									{typeof errors.customLocalityName?.message === "string" && (
+										<p className="text-sm text-red-500">
+											{errors.customLocalityName.message}
+										</p>
+									)}
+								</div>
+							)}
 							{typeof errors.wbLocalityKey?.message === "string" && (
 								<p className="text-sm text-red-500">
 									{errors.wbLocalityKey.message}
@@ -180,7 +271,9 @@ const StepPropertyType = () => {
 							)}
 							<input
 								type="hidden"
-								{...register("location", { required: "Location is required" })}
+								{...register("location", {
+									required: "Location is required",
+								})}
 							/>
 							{typeof errors.location?.message === "string" && (
 								<p className="text-sm text-red-500">
@@ -201,6 +294,13 @@ const StepPropertyType = () => {
 						<Controller
 							name="alternateLocation"
 							control={control}
+							rules={{
+								maxLength: {
+									value: 140,
+									message:
+										"Address or landmark should be within 140 characters",
+								},
+							}}
 							render={({ field }) => (
 								<AddressInput
 									value={field.value ?? ""}
@@ -247,6 +347,10 @@ const StepPropertyType = () => {
 									value: 10,
 									message: "Title must be atleast 10 characters",
 								},
+								maxLength: {
+									value: 120,
+									message: "Title must be less than 120 characters",
+								},
 							})}
 						/>
 						{errors.title && (
@@ -266,8 +370,12 @@ const StepPropertyType = () => {
 							rules={{
 								required: "Description is required",
 								minLength: {
-									value: 10,
-									message: "Description must be atleast 10 characters",
+									value: 30,
+									message: "Description must be at least 30 characters",
+								},
+								maxLength: {
+									value: 5000,
+									message: "Description is too long",
 								},
 							}}
 							render={({ field }) => (

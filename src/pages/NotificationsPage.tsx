@@ -51,7 +51,7 @@ const NotificationsPage: React.FC = () => {
 				</Button>
 			</div>
 
-			<div className="rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden">
+			<div className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
 				{loading ? (
 					<p className="px-4 py-6 text-sm text-gray-500">
 						Loading notifications...

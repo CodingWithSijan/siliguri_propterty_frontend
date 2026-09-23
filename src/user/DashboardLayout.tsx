@@ -69,22 +69,22 @@ const DashboardLayout: React.FC = () => {
 				)}
 
 				<main className="relative min-w-0 flex-1 overflow-y-auto">
-					<div className="fixed right-3 top-3 z-40 flex items-center gap-2 md:right-6 md:top-5 md:gap-3">
-						<div className="rounded-full border border-slate-200 bg-white/95 p-1 shadow-sm backdrop-blur">
+					<header className="sticky top-0 z-30 flex items-center justify-end gap-2 border-b border-slate-200 bg-white/95 px-3 py-3 shadow-sm backdrop-blur md:px-6">
+						<div className="rounded-full border border-slate-200 bg-white p-1 shadow-sm">
 							<button
 								type="button"
 								onClick={() => navigate("/dashboard/your-profile")}
-								className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-white text-slate-700 transition-colors hover:bg-sky-50 hover:text-sky-700"
+								className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-white text-slate-700 transition-colors hover:bg-emerald-50 hover:text-emerald-700"
 								aria-label="Open profile"
 								title="Profile"
 							>
 								<UserRound className="h-4.5 w-4.5" />
 							</button>
 						</div>
-						<div className="rounded-full border border-slate-200 bg-white/95 p-1 shadow-sm backdrop-blur">
-							<NotificationBell buttonClassName="h-9 w-9 rounded-full bg-white p-2 text-slate-700 hover:bg-sky-50 hover:text-sky-700" />
+						<div className="rounded-full border border-slate-200 bg-white p-1 shadow-sm">
+							<NotificationBell buttonClassName="h-9 w-9 rounded-full bg-white p-2 text-slate-700 hover:bg-emerald-50 hover:text-emerald-700" />
 						</div>
-						<div className="rounded-full border border-rose-200 bg-white/95 p-1 shadow-sm backdrop-blur">
+						<div className="rounded-full border border-rose-200 bg-white p-1 shadow-sm">
 							<button
 								type="button"
 								onClick={() => setShowLogoutConfirm(true)}
@@ -95,9 +95,9 @@ const DashboardLayout: React.FC = () => {
 								<LogOut className="h-4.5 w-4.5" />
 							</button>
 						</div>
-					</div>
+					</header>
 
-					<div className="px-3 pb-4 pt-16 md:px-6 md:pb-6 md:pt-20">
+					<div className="px-3 pb-4 pt-4 md:px-6 md:pb-6 md:pt-5">
 						<Outlet />
 					</div>
 				</main>

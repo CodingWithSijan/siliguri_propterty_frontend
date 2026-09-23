@@ -27,6 +27,7 @@ const ListingsAccordingToIntentType: React.FC<{
 	const [selectedListing, setSelectedListing] =
 		useState<IUniversalListingType | null>(null);
 	const [isDeleting, setIsDeleting] = useState(false);
+	const [isMarkingSold, setIsMarkingSold] = useState(false);
 
 	const handleCardClick = (listing: IUniversalListingType) => {
 		setSelectedListing(listing);
@@ -36,7 +37,7 @@ const ListingsAccordingToIntentType: React.FC<{
 	const handleEdit = () => {
 		if (selectedListing) {
 			navigate(
-				`/dashboard/view-your-listings/edit-post/${selectedListing._id}`
+				`/dashboard/view-your-listings/edit-post/${selectedListing._id}`,
 			);
 			setIsModalOpen(false);
 		}
@@ -58,6 +59,26 @@ const ListingsAccordingToIntentType: React.FC<{
 			showError("Failed to delete listing");
 		} finally {
 			setIsDeleting(false);
+		}
+	};
+
+	const handleMarkAsSold = async () => {
+		if (!selectedListing) return;
+
+		try {
+			setIsMarkingSold(true);
+			await BASE_URL.patch(
+				`/api/user/post/mark-as-sold/${selectedListing._id}`,
+			);
+			showSuccess("Listing marked as sold");
+			setIsModalOpen(false);
+			if (onRefresh) {
+				await onRefresh();
+			}
+		} catch {
+			showError("Failed to mark listing as sold");
+		} finally {
+			setIsMarkingSold(false);
 		}
 	};
 
@@ -109,40 +130,55 @@ const ListingsAccordingToIntentType: React.FC<{
 							<span className="text-sm text-gray-600">Status:</span>
 							<span
 								className={`px-3 py-1 rounded-full text-xs font-medium ${
-									selectedListing?.approvalStatus === "approved"
-										? "bg-green-100 text-green-800"
-										: selectedListing?.approvalStatus === "pending"
-										? "bg-yellow-100 text-yellow-800"
-										: "bg-red-100 text-red-800"
+									selectedListing?.listingStatus === "sold"
+										? "bg-slate-100 text-slate-800"
+										: selectedListing?.approvalStatus === "approved"
+											? "bg-green-100 text-green-800"
+											: selectedListing?.approvalStatus === "pending"
+												? "bg-yellow-100 text-yellow-800"
+												: "bg-red-100 text-red-800"
 								}`}
 							>
-								{selectedListing?.approvalStatus?.toUpperCase()}
+								{selectedListing?.listingStatus === "sold"
+									? "SOLD"
+									: selectedListing?.approvalStatus?.toUpperCase()}
 							</span>
 						</div>
 
 						{/* Edit Button */}
 						<button
 							onClick={handleEdit}
-							disabled={selectedListing?.approvalStatus === "approved"}
-							className={`w-full flex items-center justify-center gap-3 p-4 rounded-xl font-semibold text-white transition-all ${
-								selectedListing?.approvalStatus === "approved"
-									? "bg-gray-400 cursor-not-allowed"
-									: "bg-blue-600 hover:bg-blue-700 hover:shadow-lg transform hover:-translate-y-0.5"
-							}`}
+							className="w-full flex items-center justify-center gap-3 p-4 rounded-xl font-semibold text-white transition-all bg-blue-600 hover:bg-blue-700 hover:shadow-lg transform hover:-translate-y-0.5"
 						>
 							<FaEdit className="w-5 h-5" />
-							{selectedListing?.approvalStatus === "approved"
-								? "Cannot Edit (Approved)"
-								: "Edit Listing"}
+							Edit Listing
 						</button>
 
 						{/* Edit Info */}
-						{selectedListing?.approvalStatus === "approved" && (
+						<div className="flex items-start gap-2 p-3 bg-amber-50 border border-amber-200 rounded-lg">
+							<FaExclamationTriangle className="text-amber-600 w-4 h-4 mt-0.5 flex-shrink-0" />
+							<p className="text-amber-800 text-sm">
+								Every edit will send your listing for admin re-approval.
+							</p>
+						</div>
+
+						{selectedListing?.approvalStatus === "approved" &&
+							selectedListing?.listingStatus !== "sold" && (
+								<button
+									onClick={handleMarkAsSold}
+									disabled={isMarkingSold}
+									className="w-full flex items-center justify-center gap-3 p-4 rounded-xl font-semibold text-white bg-slate-700 hover:bg-slate-800 hover:shadow-lg transform hover:-translate-y-0.5 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+								>
+									{isMarkingSold ? "Marking as sold..." : "Mark as Sold"}
+								</button>
+							)}
+
+						{selectedListing?.listingStatus === "sold" && (
 							<div className="flex items-start gap-2 p-3 bg-amber-50 border border-amber-200 rounded-lg">
 								<FaExclamationTriangle className="text-amber-600 w-4 h-4 mt-0.5 flex-shrink-0" />
 								<p className="text-amber-800 text-sm">
-									Approved listings cannot be edited. Contact support if changes
-									are needed.
+									This listing is marked as sold and no longer appears in public
+									listing feeds.
 								</p>
 							</div>
 						)}

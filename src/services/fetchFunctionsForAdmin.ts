@@ -5,8 +5,27 @@ interface ApiResponse<T> {
 	data: T;
 	message: string;
 }
+
 type Role = "user" | "admin" | "superadmin";
 type AuthProvider = "local" | "google" | "facebook";
+
+export type PhoneFilterOption = "all" | "withPhone" | "withoutPhone";
+
+interface UserManagementFilters {
+	query?: string;
+	phoneFilter?: PhoneFilterOption;
+}
+
+interface PostModerationFilters {
+	query?: string;
+	phoneFilter?: PhoneFilterOption;
+	intent?: "buy" | "sell" | "rent";
+	category?: "land" | "house" | "flat" | "shop";
+	minPrice?: number;
+	maxPrice?: number;
+	location?: string;
+}
+
 interface AnalyticsResponse {
 	message: string;
 	result: {
@@ -60,19 +79,12 @@ export interface Post {
 	approvalStatus: "approved" | "rejected" | "pending";
 	createdAt: string;
 	updatedAt: string;
-
-	// Legacy price field (for backward compatibility)
 	price?: number | string;
-
-	// Sell post specific pricing
 	pricePerUnit?: number;
 	totalPrice?: number;
 	unit?: string;
-
-	// Rent post specific pricing
 	frequency?: "day" | "week" | "month" | "year";
 	pricePerFrequency?: number | string;
-
 	user?: {
 		_id: string;
 		name: string;
@@ -82,16 +94,63 @@ export interface Post {
 		isVerified: boolean;
 	};
 }
+
+const buildUserQuery = (filters?: UserManagementFilters): string => {
+	const params = new URLSearchParams();
+	if (filters?.query?.trim()) {
+		params.set("q", filters.query.trim());
+	}
+	if (filters?.phoneFilter && filters.phoneFilter !== "all") {
+		params.set("phone", filters.phoneFilter);
+	}
+
+	const queryString = params.toString();
+	return queryString ? `?${queryString}` : "";
+};
+
+const buildPostQuery = (filters?: PostModerationFilters): string => {
+	const params = new URLSearchParams();
+	if (filters?.query?.trim()) {
+		params.set("q", filters.query.trim());
+	}
+	if (filters?.phoneFilter && filters.phoneFilter !== "all") {
+		params.set("phone", filters.phoneFilter);
+	}
+	if (filters?.intent) {
+		params.set("intent", filters.intent);
+	}
+	if (filters?.category) {
+		params.set("category", filters.category);
+	}
+	if (
+		typeof filters?.minPrice === "number" &&
+		Number.isFinite(filters.minPrice)
+	) {
+		params.set("minPrice", String(filters.minPrice));
+	}
+	if (
+		typeof filters?.maxPrice === "number" &&
+		Number.isFinite(filters.maxPrice)
+	) {
+		params.set("maxPrice", String(filters.maxPrice));
+	}
+	if (filters?.location?.trim()) {
+		params.set("location", filters.location.trim());
+	}
+
+	const queryString = params.toString();
+	return queryString ? `?${queryString}` : "";
+};
+
 export const deleteUserById = async (userId: string) => {
 	try {
 		const response = await BASE_URL.delete(`/api/admin/delete-user/${userId}`);
 
-		// Axios automatically parses JSON, so response.data contains the parsed data
 		if (response.status >= 200 && response.status < 300) {
 			return response.data;
-		} else {
-			throw new Error(response.data?.message || "Failed to delete user");
 		}
+
+		throw new Error(response.data?.message || "Failed to delete user");
 	} catch (error) {
 		console.error("Error deleting user:", error);
 		throw error;
@@ -127,8 +186,44 @@ export const resetUserPasswordByAdmin = async (
 
 	return response.data.message;
 };
+
 export const fetchAllUsers = async (): Promise<User[]> => {
 	const endpoint = `/api/admin/get-all-users`;
+	const response = await BASE_URL.get<ApiResponse<User[]>>(endpoint);
+
+	if (!response.data.success) {
+		throw new Error(response.data.message || "Failed to fetch users");
+	}
+
+	return response.data.data;
+};
+
+export const fetchUsersForManagement = async (
+	filters?: UserManagementFilters,
+): Promise<User[]> => {
+	const endpoint = `/api/admin/get-all-users${buildUserQuery(filters)}`;
+	const response = await BASE_URL.get<ApiResponse<User[]>>(endpoint);
+
+	if (!response.data.success) {
+		throw new Error(response.data.message || "Failed to fetch users");
+	}
+
+	return response.data.data;
+};
+
+export const fetchUsersByVerification = async (
+	isVerified: boolean,
+	filters?: UserManagementFilters,
+): Promise<User[]> => {
+	const params = new URLSearchParams({ isVerified: String(isVerified) });
+	if (filters?.query?.trim()) {
+		params.set("q", filters.query.trim());
+	}
+	if (filters?.phoneFilter && filters.phoneFilter !== "all") {
+		params.set("phone", filters.phoneFilter);
+	}
+
+	const endpoint = `/api/admin/get-user-by-verification-status?${params.toString()}`;
 	const response = await BASE_URL.get<ApiResponse<User[]>>(endpoint);
 
 	if (!response.data.success) {
@@ -204,6 +299,7 @@ export const resendVerificationLinkByAdmin = async (
 
 	return response.data.message;
 };
+
 export const fetchUserById = async (id: string): Promise<User> => {
 	const endpoint = `/api/admin/view-user/${id}`;
 	const response = await BASE_URL.get<ApiResponse<User>>(endpoint);
@@ -215,8 +311,10 @@ export const fetchUserById = async (id: string): Promise<User> => {
 	return response.data.data;
 };
 
-export const fetchAllPosts = async (): Promise<Post[]> => {
-	const endpoint = `/api/admin/get-all-posts`;
+export const fetchAllPosts = async (
+	filters?: PostModerationFilters,
+): Promise<Post[]> => {
+	const endpoint = `/api/admin/get-all-posts${buildPostQuery(filters)}`;
 	const response = await BASE_URL.get<ApiResponse<Post[]>>(endpoint);
 
 	if (!response.data.success) {
@@ -226,25 +324,44 @@ export const fetchAllPosts = async (): Promise<Post[]> => {
 	return response.data.data;
 };
 
-export const fetchPostsByStatus = async (status: string): Promise<Post[]> => {
-	const endpoint = `/api/admin/get-post-by-status?status=${status}`;
+export const fetchPostsByStatus = async (
+	status: string,
+	filters?: PostModerationFilters,
+): Promise<Post[]> => {
+	const params = new URLSearchParams({ status });
+	if (filters?.query?.trim()) {
+		params.set("q", filters.query.trim());
+	}
+	if (filters?.phoneFilter && filters.phoneFilter !== "all") {
+		params.set("phone", filters.phoneFilter);
+	}
+	if (filters?.intent) {
+		params.set("intent", filters.intent);
+	}
+	if (filters?.category) {
+		params.set("category", filters.category);
+	}
+	if (
+		typeof filters?.minPrice === "number" &&
+		Number.isFinite(filters.minPrice)
+	) {
+		params.set("minPrice", String(filters.minPrice));
+	}
+	if (
+		typeof filters?.maxPrice === "number" &&
+		Number.isFinite(filters.maxPrice)
+	) {
+		params.set("maxPrice", String(filters.maxPrice));
+	}
+	if (filters?.location?.trim()) {
+		params.set("location", filters.location.trim());
+	}
+
+	const endpoint = `/api/admin/get-post-by-status?${params.toString()}`;
 	const response = await BASE_URL.get<ApiResponse<Post[]>>(endpoint);
 
 	if (!response.data.success) {
 		throw new Error(response.data.message || "Failed to fetch posts");
-	}
-
-	return response.data.data;
-};
-
-export const fetchUsersByVerification = async (
-	isVerified: boolean,
-): Promise<User[]> => {
-	const endpoint = `/api/admin/get-user-by-verification-status?isVerified=${isVerified}`;
-	const response = await BASE_URL.get<ApiResponse<User[]>>(endpoint);
-
-	if (!response.data.success) {
-		throw new Error(response.data.message || "Failed to fetch users");
 	}
 
 	return response.data.data;

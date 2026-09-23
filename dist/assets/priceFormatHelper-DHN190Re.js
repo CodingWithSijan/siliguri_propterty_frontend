@@ -1,0 +1,1 @@
+function i(t){return t>=1e7?`${(t/1e7).toLocaleString("en-IN",{minimumFractionDigits:0,maximumFractionDigits:2})} Crore`:t>=1e5?`${(t/1e5).toLocaleString("en-IN",{minimumFractionDigits:0,maximumFractionDigits:2})} Lakh`:t.toLocaleString("en-IN")}export{i as f};

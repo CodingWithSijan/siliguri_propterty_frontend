@@ -5,8 +5,24 @@ export type Theme = "light" | "dark";
 interface ThemeState {
 	mode: Theme;
 }
+
+const getInitialTheme = (): Theme => {
+	if (typeof window === "undefined") {
+		return "light";
+	}
+
+	const savedTheme = window.localStorage.getItem("theme-mode");
+	if (savedTheme === "dark" || savedTheme === "light") {
+		return savedTheme;
+	}
+
+	return window.matchMedia("(prefers-color-scheme: dark)").matches
+		? "dark"
+		: "light";
+};
+
 const initialState: ThemeState = {
-	mode: "light", // default theme
+	mode: getInitialTheme(),
 };
 
 const themeSlice = createSlice({

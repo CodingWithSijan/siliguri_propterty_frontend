@@ -9,17 +9,18 @@ import {
 	Info,
 	User,
 	LogOut,
+	MapPin,
 } from "lucide-react";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import siliguri_property_logo_noBG from "../../assets/logo_siliguri_property.png";
 import { getInitials } from "../../utils/getInitial";
 import { motion } from "framer-motion";
-import { PostYourPropertyButton } from "../common/PostYourPropertyButton";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../app/store";
 import { logout } from "../../app/slices/authSlice";
 import { formatFullName } from "../../utils/capitalizeName";
 import NotificationBell from "../common/NotificationBell";
+import { showInfo } from "../../utils/toastUtils";
 
 const Navbar: React.FC = () => {
 	const mobileMenuRef = useRef<HTMLDivElement>(null);
@@ -79,6 +80,10 @@ const Navbar: React.FC = () => {
 
 	useEffect(() => {
 		const handleClickOutside = (event: MouseEvent) => {
+			if (!window.matchMedia("(min-width: 768px)").matches) {
+				return;
+			}
+
 			const target = event.target as Node;
 			const rentDropdown = document.querySelector(".rent-dropdown-container");
 			const buyDropdown = document.querySelector(".buy-dropdown-container");
@@ -104,37 +109,94 @@ const Navbar: React.FC = () => {
 		navigate("/login");
 	};
 
-	// Close mobile menu and navigate
-	const handleMobileNavClick = (path: string) => {
+	const handleSellMenuClick = () => {
 		setIsOpen(false);
 		setRentDropdownOpen(false);
 		setBuyDropdownOpen(false);
-		if (location.pathname !== path) {
-			navigate(path);
+
+		if (user) {
+			if (user.role === "admin" || user.role === "superadmin") {
+				navigate("/admin/home");
+				showInfo("Use a user account to post property listings.");
+				return;
+			}
+			navigate("/dashboard/new-post/sell");
+			return;
 		}
+
+		navigate("/login");
+		showInfo("Please login or sign up to post your property.");
 	};
 
+	const closeMobileMenu = () => {
+		setIsOpen(false);
+		setRentDropdownOpen(false);
+		setBuyDropdownOpen(false);
+	};
+
+	// Close mobile menu and navigate
+	const handleMobileNavClick = (path: string) => {
+		closeMobileMenu();
+		navigate(path);
+	};
+
+	const mobileNavItemClass =
+		"flex w-full items-center gap-3 rounded-lg px-4 py-3 text-left text-gray-700 transition-colors hover:bg-emerald-50 hover:text-emerald-600";
+	const mobileExpandableTriggerClass =
+		"flex w-full items-center justify-between rounded-lg px-4 py-3 text-gray-700 transition-colors hover:bg-emerald-50 hover:text-emerald-600";
+
 	return (
-		<nav className="bg-white/95 backdrop-blur-md shadow-md sticky top-0 z-50 border-b border-gray-200">
-			<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-				<div className="flex justify-between h-16 items-center">
+		<nav className="bg-white/95 backdrop-blur-md shadow-md sticky top-0 z-50 border-b border-slate-200">
+			<div className="hidden min-h-9 items-center justify-between bg-emerald-950 px-4 text-xs text-emerald-50 md:flex">
+				<div className="mx-auto flex w-full max-w-7xl items-center justify-between">
+					<div className="flex items-center gap-4">
+						<span className="inline-flex items-center gap-1">
+							<MapPin className="h-3.5 w-3.5" />
+							Siliguri, West Bengal
+						</span>
+						<span>Local listings for buy, rent and sale</span>
+					</div>
+				</div>
+			</div>
+			<div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+				<div className="relative flex h-16 items-center justify-between gap-3 md:justify-start">
 					{/* Logo */}
-					<NavLink to="/" className="relative h-14 w-14 sm:h-16 sm:w-16">
-						<img
-							src={siliguri_property_logo_noBG}
-							alt="Logo"
-							className="w-full h-full object-contain"
-						/>
+					<NavLink to="/" className="flex shrink-0 items-center gap-3">
+						<div className="relative h-12 w-12 sm:h-14 sm:w-14">
+							<img
+								src={siliguri_property_logo_noBG}
+								alt="Siliguri Property"
+								className="h-full w-full object-contain"
+							/>
+						</div>
+						<div className="hidden sm:block">
+							<p className="text-lg font-bold leading-none text-slate-800">
+								SiliguriProperty
+							</p>
+							<p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-emerald-700">
+								Find your place each home
+							</p>
+						</div>
 					</NavLink>
 
+					<div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 md:hidden">
+						<button
+							type="button"
+							onClick={handleSellMenuClick}
+							className="inline-flex items-center rounded-full bg-emerald-600 px-3 py-1.5 text-[11px] font-semibold text-white shadow-sm transition-colors hover:bg-emerald-700"
+						>
+							Post your property
+						</button>
+					</div>
+
 					{/* Main navigation links */}
-					<div className="hidden md:flex items-center space-x-8 ml-8">
+					<div className="ml-6 hidden flex-1 items-center gap-6 md:flex">
 						<NavLink
 							to="/properties"
 							className={({ isActive }) =>
 								isActive
-									? "flex items-center space-x-2 text-blue-600 font-semibold border-b-2 border-blue-600 pb-1"
-									: "flex items-center space-x-2 text-gray-700 hover:text-blue-600 font-medium transition-colors duration-200"
+									? "flex items-center space-x-2 text-emerald-700 font-semibold"
+									: "flex items-center space-x-2 text-gray-700 hover:text-emerald-700 font-medium transition-colors duration-200"
 							}
 						>
 							<Building className="h-4 w-4" />
@@ -156,8 +218,8 @@ const Navbar: React.FC = () => {
 								}}
 								className={`flex items-center gap-1 rounded-md px-1 py-1 font-medium transition-colors duration-200 ${
 									isRentPathActive
-										? "text-blue-600"
-										: "text-gray-700 hover:text-blue-600"
+										? "text-emerald-700"
+										: "text-gray-700 hover:text-emerald-700"
 								}`}
 								aria-label="Toggle rent categories"
 							>
@@ -182,28 +244,28 @@ const Navbar: React.FC = () => {
 									<NavLink
 										to="/rentals"
 										onClick={() => setRentDropdownOpen(false)}
-										className="block px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors"
+										className="block px-4 py-2 text-sm text-gray-700 hover:bg-emerald-50 hover:text-emerald-700 transition-colors"
 									>
 										All Rentals
 									</NavLink>
 									<NavLink
 										to="/rentals/house"
 										onClick={() => setRentDropdownOpen(false)}
-										className="block px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors"
+										className="block px-4 py-2 text-sm text-gray-700 hover:bg-emerald-50 hover:text-emerald-700 transition-colors"
 									>
 										House for Rent
 									</NavLink>
 									<NavLink
 										to="/rentals/flat"
 										onClick={() => setRentDropdownOpen(false)}
-										className="block px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors"
+										className="block px-4 py-2 text-sm text-gray-700 hover:bg-emerald-50 hover:text-emerald-700 transition-colors"
 									>
 										Flat for Rent
 									</NavLink>
 									<NavLink
 										to="/rentals/shop"
 										onClick={() => setRentDropdownOpen(false)}
-										className="block px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors"
+										className="block px-4 py-2 text-sm text-gray-700 hover:bg-emerald-50 hover:text-emerald-700 transition-colors"
 									>
 										Shop for Rent
 									</NavLink>
@@ -226,8 +288,8 @@ const Navbar: React.FC = () => {
 								}}
 								className={`flex items-center gap-1 rounded-md px-1 py-1 font-medium transition-colors duration-200 ${
 									isBuyPathActive
-										? "text-blue-600"
-										: "text-gray-700 hover:text-blue-600"
+										? "text-emerald-700"
+										: "text-gray-700 hover:text-emerald-700"
 								}`}
 								aria-label="Toggle buy categories"
 							>
@@ -252,47 +314,57 @@ const Navbar: React.FC = () => {
 									<NavLink
 										to="/buys"
 										onClick={() => setBuyDropdownOpen(false)}
-										className="block px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors"
+										className="block px-4 py-2 text-sm text-gray-700 hover:bg-emerald-50 hover:text-emerald-700 transition-colors"
 									>
 										All For Sale
 									</NavLink>
 									<NavLink
 										to="/buys/house"
 										onClick={() => setBuyDropdownOpen(false)}
-										className="block px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors"
+										className="block px-4 py-2 text-sm text-gray-700 hover:bg-emerald-50 hover:text-emerald-700 transition-colors"
 									>
 										House for Sale
 									</NavLink>
 									<NavLink
 										to="/buys/flat"
 										onClick={() => setBuyDropdownOpen(false)}
-										className="block px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors"
+										className="block px-4 py-2 text-sm text-gray-700 hover:bg-emerald-50 hover:text-emerald-700 transition-colors"
 									>
 										Flat for Sale
 									</NavLink>
 									<NavLink
 										to="/buys/land"
 										onClick={() => setBuyDropdownOpen(false)}
-										className="block px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors"
+										className="block px-4 py-2 text-sm text-gray-700 hover:bg-emerald-50 hover:text-emerald-700 transition-colors"
 									>
 										Land for Sale
 									</NavLink>
 									<NavLink
 										to="/buys/shop"
 										onClick={() => setBuyDropdownOpen(false)}
-										className="block px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors"
+										className="block px-4 py-2 text-sm text-gray-700 hover:bg-emerald-50 hover:text-emerald-700 transition-colors"
 									>
 										Shop for Sale
 									</NavLink>
 								</div>
 							)}
 						</div>
+
+						<button
+							type="button"
+							onClick={handleSellMenuClick}
+							className="flex items-center space-x-2 text-gray-700 hover:text-emerald-700 font-medium transition-colors duration-200"
+						>
+							<Building2 className="h-4 w-4" />
+							<span>Sell</span>
+						</button>
+
 						<NavLink
 							to="/about"
 							className={({ isActive }) =>
 								isActive
-									? "flex items-center space-x-2 text-blue-600 font-semibold border-b-2 border-blue-600 pb-1"
-									: "flex items-center space-x-2 text-gray-700 hover:text-blue-600 font-medium transition-colors duration-200"
+									? "flex items-center space-x-2 text-emerald-700 font-semibold"
+									: "flex items-center space-x-2 text-gray-700 hover:text-emerald-700 font-medium transition-colors duration-200"
 							}
 						>
 							<Info className="h-4 w-4" />
@@ -300,10 +372,8 @@ const Navbar: React.FC = () => {
 						</NavLink>
 					</div>
 
-					<PostYourPropertyButton />
-
 					{/* Desktop Menu */}
-					<div className="hidden md:flex items-center space-x-4">
+					<div className="ml-auto hidden shrink-0 items-center space-x-3 md:flex">
 						{user ? (
 							<>
 								<NotificationBell />
@@ -320,7 +390,7 @@ const Navbar: React.FC = () => {
 												alt={user.name}
 											/>
 										) : (
-											<div className="w-9 h-9 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold">
+											<div className="w-9 h-9 rounded-full bg-emerald-600 text-white flex items-center justify-center font-bold">
 												{getInitials(user?.name ?? "")}
 											</div>
 										)}
@@ -356,7 +426,7 @@ const Navbar: React.FC = () => {
 															alt={user.name}
 														/>
 													) : (
-														<div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 text-white flex items-center justify-center font-bold shadow-sm">
+														<div className="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-500 to-emerald-600 text-white flex items-center justify-center font-bold shadow-sm">
 															{getInitials(user?.name ?? "")}
 														</div>
 													)}
@@ -378,7 +448,7 @@ const Navbar: React.FC = () => {
 															? "/dashboard/your-profile"
 															: "/admin/home"
 													}
-													className="group flex items-center justify-center space-x-2 px-3 py-2.5 text-sm text-gray-700 hover:text-blue-600 bg-gray-50 hover:bg-blue-50 rounded-lg transition-all duration-200 border border-gray-200 hover:border-blue-300 shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 font-medium cursor-pointer"
+													className="group flex items-center justify-center space-x-2 px-3 py-2.5 text-sm text-gray-700 hover:text-emerald-600 bg-gray-50 hover:bg-emerald-50 rounded-lg transition-all duration-200 border border-gray-200 hover:border-emerald-300 shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-opacity-50 font-medium cursor-pointer"
 												>
 													<User className="h-4 w-4 group-hover:scale-110 transition-transform duration-200" />
 													<span>
@@ -403,13 +473,13 @@ const Navbar: React.FC = () => {
 							<>
 								<NavLink
 									to="/login"
-									className="text-gray-700 hover:text-blue-600 px-4 py-2 font-medium"
+									className="rounded-lg px-3 py-2 font-medium text-gray-700 hover:bg-emerald-50 hover:text-emerald-700"
 								>
 									Login
 								</NavLink>
 								<NavLink
 									to="/signup"
-									className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors font-medium"
+									className="rounded-lg bg-emerald-600 px-4 py-2 font-medium text-white shadow-sm transition-colors hover:bg-emerald-700"
 								>
 									Sign Up
 								</NavLink>
@@ -418,7 +488,7 @@ const Navbar: React.FC = () => {
 					</div>
 
 					{/* Mobile Menu Button */}
-					<div className="md:hidden">
+					<div className="ml-auto md:hidden">
 						<div className="flex items-center gap-1">
 							{user && <NotificationBell />}
 							<button
@@ -458,23 +528,26 @@ const Navbar: React.FC = () => {
 									Navigation
 								</p>
 								<div className="space-y-1">
-									<button
-										onClick={() => handleMobileNavClick("/properties")}
-										className="flex items-center space-x-3 px-4 py-3 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors w-full text-left"
+									<NavLink
+										to="/properties"
+										onClick={closeMobileMenu}
+										className={mobileNavItemClass}
 									>
-										<Building className="h-5 w-5" />
-										<span className="font-medium">Available Properties</span>
-									</button>
+										<Building className="h-5 w-5 shrink-0" />
+										<span className="font-medium leading-none">
+											Available Properties
+										</span>
+									</NavLink>
 
 									{/* Rent Expandable Menu */}
 									<div>
 										<button
 											onClick={() => setRentDropdownOpen(!rentDropdownOpen)}
-											className="flex items-center justify-between w-full px-4 py-3 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+											className={mobileExpandableTriggerClass}
 										>
-											<div className="flex items-center space-x-3">
-												<Home className="h-5 w-5" />
-												<span className="font-medium">Rent</span>
+											<div className="flex items-center gap-3">
+												<Home className="h-5 w-5 shrink-0" />
+												<span className="font-medium leading-none">Rent</span>
 											</div>
 											<svg
 												className={`w-4 h-4 transition-transform duration-200 ${
@@ -496,25 +569,25 @@ const Navbar: React.FC = () => {
 											<div className="ml-8 mt-1 space-y-1">
 												<button
 													onClick={() => handleMobileNavClick("/rentals")}
-													className="block w-full text-left px-4 py-2 text-sm text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+													className="block w-full text-left px-4 py-2 text-sm text-gray-600 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors"
 												>
 													All Rentals
 												</button>
 												<button
 													onClick={() => handleMobileNavClick("/rentals/house")}
-													className="block w-full text-left px-4 py-2 text-sm text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+													className="block w-full text-left px-4 py-2 text-sm text-gray-600 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors"
 												>
 													House for Rent
 												</button>
 												<button
 													onClick={() => handleMobileNavClick("/rentals/flat")}
-													className="block w-full text-left px-4 py-2 text-sm text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+													className="block w-full text-left px-4 py-2 text-sm text-gray-600 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors"
 												>
 													Flat for Rent
 												</button>
 												<button
 													onClick={() => handleMobileNavClick("/rentals/shop")}
-													className="block w-full text-left px-4 py-2 text-sm text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+													className="block w-full text-left px-4 py-2 text-sm text-gray-600 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors"
 												>
 													Shop for Rent
 												</button>
@@ -526,11 +599,11 @@ const Navbar: React.FC = () => {
 									<div>
 										<button
 											onClick={() => setBuyDropdownOpen(!buyDropdownOpen)}
-											className="flex items-center justify-between w-full px-4 py-3 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+											className={mobileExpandableTriggerClass}
 										>
-											<div className="flex items-center space-x-3">
-												<Building2 className="h-5 w-5" />
-												<span className="font-medium">Buy</span>
+											<div className="flex items-center gap-3">
+												<Building2 className="h-5 w-5 shrink-0" />
+												<span className="font-medium leading-none">Buy</span>
 											</div>
 											<svg
 												className={`w-4 h-4 transition-transform duration-200 ${
@@ -552,31 +625,31 @@ const Navbar: React.FC = () => {
 											<div className="ml-8 mt-1 space-y-1">
 												<button
 													onClick={() => handleMobileNavClick("/buys")}
-													className="block w-full text-left px-4 py-2 text-sm text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+													className="block w-full text-left px-4 py-2 text-sm text-gray-600 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors"
 												>
 													All For Sale
 												</button>
 												<button
 													onClick={() => handleMobileNavClick("/buys/house")}
-													className="block w-full text-left px-4 py-2 text-sm text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+													className="block w-full text-left px-4 py-2 text-sm text-gray-600 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors"
 												>
 													House for Sale
 												</button>
 												<button
 													onClick={() => handleMobileNavClick("/buys/flat")}
-													className="block w-full text-left px-4 py-2 text-sm text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+													className="block w-full text-left px-4 py-2 text-sm text-gray-600 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors"
 												>
 													Flat for Sale
 												</button>
 												<button
 													onClick={() => handleMobileNavClick("/buys/land")}
-													className="block w-full text-left px-4 py-2 text-sm text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+													className="block w-full text-left px-4 py-2 text-sm text-gray-600 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors"
 												>
 													Land for Sale
 												</button>
 												<button
 													onClick={() => handleMobileNavClick("/buys/shop")}
-													className="block w-full text-left px-4 py-2 text-sm text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+													className="block w-full text-left px-4 py-2 text-sm text-gray-600 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors"
 												>
 													Shop for Sale
 												</button>
@@ -585,12 +658,21 @@ const Navbar: React.FC = () => {
 									</div>
 
 									<button
-										onClick={() => handleMobileNavClick("/about")}
-										className="flex items-center space-x-3 px-4 py-3 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors w-full text-left"
+										onClick={handleSellMenuClick}
+										type="button"
+										className={mobileNavItemClass}
 									>
-										<Info className="h-5 w-5" />
-										<span className="font-medium">About Us</span>
+										<Building2 className="h-5 w-5 shrink-0" />
+										<span className="font-medium leading-none">Sell</span>
 									</button>
+									<NavLink
+										to="/about"
+										onClick={closeMobileMenu}
+										className={mobileNavItemClass}
+									>
+										<Info className="h-5 w-5 shrink-0" />
+										<span className="font-medium leading-none">About Us</span>
+									</NavLink>
 								</div>
 							</div>
 							<div className="pt-2 border-t border-gray-200">
@@ -610,7 +692,7 @@ const Navbar: React.FC = () => {
 													alt={user.name}
 												/>
 											) : (
-												<div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 text-white flex items-center justify-center font-bold shadow-sm">
+												<div className="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-500 to-emerald-600 text-white flex items-center justify-center font-bold shadow-sm">
 													{getInitials(user?.name ?? "")}
 												</div>
 											)}
@@ -632,7 +714,7 @@ const Navbar: React.FC = () => {
 													: "/admin/home",
 											)
 										}
-										className="group flex items-center justify-center space-x-2 px-3 py-2.5 text-gray-700 hover:text-blue-600 bg-gray-50 hover:bg-blue-50 rounded-lg transition-all duration-200 border border-gray-200 hover:border-blue-300 shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 font-medium cursor-pointer w-full"
+										className="group flex items-center justify-center space-x-2 px-3 py-2.5 text-gray-700 hover:text-emerald-600 bg-gray-50 hover:bg-emerald-50 rounded-lg transition-all duration-200 border border-gray-200 hover:border-emerald-300 shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-opacity-50 font-medium cursor-pointer w-full"
 									>
 										<User className="h-4 w-4 group-hover:scale-110 transition-transform duration-200" />
 										<span>
@@ -656,23 +738,26 @@ const Navbar: React.FC = () => {
 									Navigation
 								</p>
 								<div className="space-y-1">
-									<button
-										onClick={() => handleMobileNavClick("/properties")}
-										className="flex items-center space-x-3 px-4 py-3 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors w-full text-left"
+									<NavLink
+										to="/properties"
+										onClick={closeMobileMenu}
+										className={mobileNavItemClass}
 									>
-										<Building className="h-5 w-5" />
-										<span className="font-medium">Available Properties</span>
-									</button>
+										<Building className="h-5 w-5 shrink-0" />
+										<span className="font-medium leading-none">
+											Available Properties
+										</span>
+									</NavLink>
 
 									{/* Rent Expandable Menu */}
 									<div>
 										<button
 											onClick={() => setRentDropdownOpen(!rentDropdownOpen)}
-											className="flex items-center justify-between w-full px-4 py-3 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+											className={mobileExpandableTriggerClass}
 										>
-											<div className="flex items-center space-x-3">
-												<Home className="h-5 w-5" />
-												<span className="font-medium">Rent</span>
+											<div className="flex items-center gap-3">
+												<Home className="h-5 w-5 shrink-0" />
+												<span className="font-medium leading-none">Rent</span>
 											</div>
 											<svg
 												className={`w-4 h-4 transition-transform duration-200 ${
@@ -694,25 +779,25 @@ const Navbar: React.FC = () => {
 											<div className="ml-8 mt-1 space-y-1">
 												<button
 													onClick={() => handleMobileNavClick("/rentals")}
-													className="block w-full text-left px-4 py-2 text-sm text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+													className="block w-full text-left px-4 py-2 text-sm text-gray-600 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors"
 												>
 													All Rentals
 												</button>
 												<button
 													onClick={() => handleMobileNavClick("/rentals/house")}
-													className="block w-full text-left px-4 py-2 text-sm text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+													className="block w-full text-left px-4 py-2 text-sm text-gray-600 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors"
 												>
 													House for Rent
 												</button>
 												<button
 													onClick={() => handleMobileNavClick("/rentals/flat")}
-													className="block w-full text-left px-4 py-2 text-sm text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+													className="block w-full text-left px-4 py-2 text-sm text-gray-600 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors"
 												>
 													Flat for Rent
 												</button>
 												<button
 													onClick={() => handleMobileNavClick("/rentals/shop")}
-													className="block w-full text-left px-4 py-2 text-sm text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+													className="block w-full text-left px-4 py-2 text-sm text-gray-600 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors"
 												>
 													Shop for Rent
 												</button>
@@ -724,11 +809,11 @@ const Navbar: React.FC = () => {
 									<div>
 										<button
 											onClick={() => setBuyDropdownOpen(!buyDropdownOpen)}
-											className="flex items-center justify-between w-full px-4 py-3 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+											className={mobileExpandableTriggerClass}
 										>
-											<div className="flex items-center space-x-3">
-												<Building2 className="h-5 w-5" />
-												<span className="font-medium">Buy</span>
+											<div className="flex items-center gap-3">
+												<Building2 className="h-5 w-5 shrink-0" />
+												<span className="font-medium leading-none">Buy</span>
 											</div>
 											<svg
 												className={`w-4 h-4 transition-transform duration-200 ${
@@ -750,31 +835,31 @@ const Navbar: React.FC = () => {
 											<div className="ml-8 mt-1 space-y-1">
 												<button
 													onClick={() => handleMobileNavClick("/buys")}
-													className="block w-full text-left px-4 py-2 text-sm text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+													className="block w-full text-left px-4 py-2 text-sm text-gray-600 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors"
 												>
 													All For Sale
 												</button>
 												<button
 													onClick={() => handleMobileNavClick("/buys/house")}
-													className="block w-full text-left px-4 py-2 text-sm text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+													className="block w-full text-left px-4 py-2 text-sm text-gray-600 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors"
 												>
 													House for Sale
 												</button>
 												<button
 													onClick={() => handleMobileNavClick("/buys/flat")}
-													className="block w-full text-left px-4 py-2 text-sm text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+													className="block w-full text-left px-4 py-2 text-sm text-gray-600 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors"
 												>
 													Flat for Sale
 												</button>
 												<button
 													onClick={() => handleMobileNavClick("/buys/land")}
-													className="block w-full text-left px-4 py-2 text-sm text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+													className="block w-full text-left px-4 py-2 text-sm text-gray-600 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors"
 												>
 													Land for Sale
 												</button>
 												<button
 													onClick={() => handleMobileNavClick("/buys/shop")}
-													className="block w-full text-left px-4 py-2 text-sm text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+													className="block w-full text-left px-4 py-2 text-sm text-gray-600 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors"
 												>
 													Shop for Sale
 												</button>
@@ -783,12 +868,21 @@ const Navbar: React.FC = () => {
 									</div>
 
 									<button
-										onClick={() => handleMobileNavClick("/about")}
-										className="flex items-center space-x-3 px-4 py-3 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors w-full text-left"
+										onClick={handleSellMenuClick}
+										type="button"
+										className={mobileNavItemClass}
 									>
-										<Info className="h-5 w-5" />
-										<span className="font-medium">About Us</span>
+										<Building2 className="h-5 w-5 shrink-0" />
+										<span className="font-medium leading-none">Sell</span>
 									</button>
+									<NavLink
+										to="/about"
+										onClick={closeMobileMenu}
+										className={mobileNavItemClass}
+									>
+										<Info className="h-5 w-5 shrink-0" />
+										<span className="font-medium leading-none">About Us</span>
+									</NavLink>
 								</div>
 							</div>
 							<div className="pt-2 border-t border-gray-200">
@@ -796,18 +890,20 @@ const Navbar: React.FC = () => {
 									Account
 								</p>
 								<div className="space-y-3">
-									<button
-										onClick={() => handleMobileNavClick("/login")}
-										className="flex items-center justify-center px-4 py-3 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors font-medium w-full"
+									<NavLink
+										to="/login"
+										onClick={closeMobileMenu}
+										className="flex items-center justify-center px-4 py-3 text-gray-700 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors font-medium w-full"
 									>
 										Login
-									</button>
-									<button
-										onClick={() => handleMobileNavClick("/signup")}
-										className="flex items-center justify-center px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium w-full"
+									</NavLink>
+									<NavLink
+										to="/signup"
+										onClick={closeMobileMenu}
+										className="flex items-center justify-center px-4 py-3 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors font-medium w-full"
 									>
 										Sign Up
-									</button>
+									</NavLink>
 								</div>
 							</div>
 						</div>

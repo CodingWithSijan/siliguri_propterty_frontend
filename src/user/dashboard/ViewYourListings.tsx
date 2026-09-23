@@ -12,7 +12,7 @@ import {
 	SelectValue,
 } from "../../components/ui/select";
 
-type ListingStatus = "all" | "active" | "pending" | "rejected";
+type ListingStatus = "all" | "active" | "pending" | "rejected" | "sold";
 
 interface TabConfig {
 	value: ListingStatus;
@@ -26,6 +26,7 @@ interface FilteredListings {
 	active: IUniversalListingType[];
 	pending: IUniversalListingType[];
 	rejected: IUniversalListingType[];
+	sold: IUniversalListingType[];
 }
 
 const TAB_CONFIG: TabConfig[] = [
@@ -53,6 +54,12 @@ const TAB_CONFIG: TabConfig[] = [
 		colorClass: "red",
 		spinnerColor: "red-400",
 	},
+	{
+		value: "sold",
+		label: "Sold",
+		colorClass: "slate",
+		spinnerColor: "slate-400",
+	},
 ];
 
 const ViewYourListings = () => {
@@ -73,14 +80,19 @@ const ViewYourListings = () => {
 			active: [],
 			pending: [],
 			rejected: [],
+			sold: [],
 		};
 
 		if (!listings) return defaultFilters;
 
 		return {
-			active: listings.filter((item) => item?.approvalStatus === "approved"),
+			active: listings.filter(
+				(item) =>
+					item?.approvalStatus === "approved" && item?.listingStatus !== "sold",
+			),
 			pending: listings.filter((item) => item?.approvalStatus === "pending"),
 			rejected: listings.filter((item) => item?.approvalStatus === "rejected"),
+			sold: listings.filter((item) => item?.listingStatus === "sold"),
 			all: listings,
 		};
 	}, [listings]);
@@ -186,6 +198,7 @@ const EmptyState = ({ status }: { status: ListingStatus }) => {
 		active: "You don't have any active listings.",
 		pending: "You don't have any pending listings.",
 		rejected: "You don't have any rejected listings.",
+		sold: "You don't have any sold listings yet.",
 	};
 
 	return (

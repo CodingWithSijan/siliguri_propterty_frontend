@@ -25,7 +25,7 @@ export default function NewPost() {
 			<Dialog open={dialogOpen} onOpenChange={handleDialogOpenChange}>
 				<DialogContent
 					showClose={false}
-					className={`max-w-md w-full rounded-2xl shadow-xl p-8 bg-gradient-to-br from-white via-slate-50 to-slate-100 border border-gray-200 
+					className={`max-w-md w-full rounded-2xl shadow-xl p-8 bg-gradient-to-br from-white via-slate-50 to-slate-100 border border-gray-200
 					}`}
 				>
 					<DialogHeader>
@@ -44,12 +44,12 @@ export default function NewPost() {
 											navigate("/dashboard/new-post/sell");
 											setDialogOpen(false);
 										}}
-										className={`group flex flex-col items-center justify-center p-6 rounded-xl border-2 transition-all shadow-sm cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary-500 
+										className={`group flex flex-col items-center justify-center p-6 rounded-xl border-2 border-emerald-200 bg-emerald-50/60 transition-all shadow-sm cursor-pointer focus:outline-none focus:ring-2 focus:ring-emerald-500 hover:-translate-y-0.5 hover:shadow-md
 										}`}
 										aria-label="Sell Property"
 									>
-										<Home className="w-8 h-8 mb-2 text-primary-500 group-hover:scale-110 transition-transform" />
-										<span className="font-semibold text-lg text-primary-700">
+										<Home className="w-8 h-8 mb-2 text-emerald-600 group-hover:scale-110 transition-transform" />
+										<span className="font-semibold text-lg text-emerald-800">
 											Sell
 										</span>
 										<span className="text-xs text-gray-500 mt-1">
@@ -62,7 +62,7 @@ export default function NewPost() {
 											navigate("/dashboard/new-post/rent");
 											setDialogOpen(false);
 										}}
-										className={`group flex flex-col items-center justify-center p-6 rounded-xl border-2 transition-all shadow-sm cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 
+										className={`group flex flex-col items-center justify-center p-6 rounded-xl border-2 border-blue-200 bg-blue-50/60 transition-all shadow-sm cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 hover:-translate-y-0.5 hover:shadow-md
 										}`}
 										aria-label="Rent Property"
 									>
