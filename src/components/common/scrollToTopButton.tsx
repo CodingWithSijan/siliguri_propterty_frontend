@@ -1,8 +1,14 @@
 import { useEffect, useState } from "react";
 import { FaArrowUp } from "react-icons/fa";
+import { useLocation } from "react-router-dom";
 
 const ScrollToTopButton = () => {
 	const [visible, setVisible] = useState(false);
+	const { pathname } = useLocation();
+
+	useEffect(() => {
+		window.scrollTo(0, 0);
+	}, [pathname]);
 
 	useEffect(() => {
 		const toggleVisibility = () => {

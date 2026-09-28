@@ -1,132 +1,257 @@
 import React from "react";
 import {
-	FaRegEdit,
-	FaRegUserCircle,
-	FaBullhorn,
-	FaRocket,
+	FaArrowRight,
 	FaHandshake,
 	FaEnvelope,
-	FaPhoneAlt,
 	FaFacebook,
 	FaInstagram,
+	FaMapMarkerAlt,
+	FaSearch,
 } from "react-icons/fa";
+import { Link } from "react-router-dom";
 import Navbar from "../components/header_and_footer/Navbar";
 import Footer from "../components/header_and_footer/Footer";
 
+const approach = [
+	{
+		icon: FaMapMarkerAlt,
+		iconColor: "text-amber-700",
+		title: "Start with the area",
+		description:
+			"Use locality and property type to narrow the search to places worth a closer look.",
+	},
+	{
+		icon: FaSearch,
+		iconColor: "text-emerald-700",
+		title: "Compare the details",
+		description:
+			"See the listed price, photos, amenities, and property facts together.",
+	},
+	{
+		icon: FaHandshake,
+		iconColor: "text-rose-700",
+		title: "Talk to the listing owner",
+		description:
+			"Send an enquiry through the platform when you want more information.",
+	},
+];
+
+const searchSteps = [
+	"Choose buy or rent and narrow the search by locality and property type.",
+	"Review the listing details, photos, and price information.",
+	"Contact the listing owner when you find a place worth exploring.",
+];
+
+const ownerSteps = [
+	"Create a listing with the property information and photos.",
+	"Keep track of your posts from your personal dashboard.",
+	"Respond to interested people through the platform's message flow.",
+];
+
 const AboutUs: React.FC = () => {
 	return (
-		<div className="flex flex-col min-h-screen bg-gray-50">
+		<div className="flex min-h-screen flex-col bg-white text-slate-900">
 			<Navbar />
 
-			<main className="flex-1 w-full max-w-6xl mx-auto px-4 py-16">
-				{/* Heading */}
-				<h1 className="text-4xl md:text-5xl font-extrabold text-gray-800 mb-6 text-center">
-					About Siliguri Property
-				</h1>
-				<p className="text-lg md:text-xl text-gray-600 mb-12 text-center max-w-3xl mx-auto">
-					Siliguri Property is your trusted real estate platform dedicated to
-					making property search, posting, and management effortless for
-					everyone in Siliguri and beyond. Whether you are looking to rent, buy,
-					or sell, our modern web app connects property owners and seekers with
-					ease, transparency, and security.
-				</p>
-
-				{/* Features Section */}
-				<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
-					{/* Feature Card */}
-					{[
-						{
-							icon: <FaRegEdit className="text-blue-600 text-4xl" />,
-							title: "Easy Ad Posting",
-							desc: "Post your property ad in just a few clicks. Our intuitive form makes it simple for anyone to list their property quickly and efficiently.",
-						},
-						{
-							icon: <FaRegUserCircle className="text-green-600 text-4xl" />,
-							title: "Personal Dashboard",
-							desc: "Manage all your listings in one place. Edit, update, or remove your posts anytime from your own dashboard.",
-						},
-						{
-							icon: <FaBullhorn className="text-pink-600 text-4xl" />,
-							title: "Promote for High Visibility",
-							desc: "Boost your posts to reach more buyers and renters. Get your property noticed with our promotion features.",
-						},
-						{
-							icon: <FaRocket className="text-yellow-500 text-4xl" />,
-							title: "Fast & Secure",
-							desc: "Enjoy a fast, secure, and modern experience. Your data and listings are always protected with us.",
-						},
-					].map((feature, index) => (
-						<div
-							key={index}
-							className="bg-white rounded-2xl shadow-sm p-6 flex flex-col items-center border border-gray-200 text-center"
-						>
-							{feature.icon}
-							<h3 className="text-xl font-semibold text-gray-800 mt-4 mb-2">
-								{feature.title}
-							</h3>
-							<p className="text-gray-600 text-sm">{feature.desc}</p>
+			<main className="w-full flex-1">
+				<section className="bg-[#f1f5f1]">
+					<div className="mx-auto grid max-w-7xl gap-10 px-4 py-16 sm:px-6 sm:py-20 lg:grid-cols-[1.1fr_0.9fr] lg:items-end lg:px-8">
+						<div>
+							<p className="text-xs font-bold uppercase tracking-[0.14em] text-emerald-800">
+								A local property marketplace
+							</p>
+							<h1 className="mt-5 max-w-3xl text-4xl font-extrabold leading-tight text-slate-950">
+								Siliguri property, made easier to navigate.
+							</h1>
+							<p className="mt-5 max-w-2xl text-base leading-relaxed text-slate-700 sm:text-lg">
+								Browse homes and land for sale or rent in Siliguri and nearby
+								areas. Compare the details, then contact the person who listed
+								the property.
+							</p>
 						</div>
-					))}
-				</div>
 
-				{/* Mission Section */}
-				<div className="bg-white rounded-2xl p-8 shadow-md text-center mb-16 border border-gray-200">
-					<FaHandshake className="mx-auto text-3xl text-blue-600 mb-3" />
-					<h2 className="text-2xl font-bold text-gray-800 mb-2">Our Mission</h2>
-					<p className="text-gray-600 text-base max-w-2xl mx-auto">
-						To empower the people of Siliguri and nearby regions with a
-						seamless, transparent, and user-friendly real estate platform. We
-						believe in connecting people, simplifying property transactions, and
-						building trust in every deal.
-					</p>
-				</div>
-
-				{/* Call to Action */}
-				<div className="bg-blue-600 rounded-2xl p-8 shadow-lg text-center mb-16">
-					<h2 className="text-2xl font-bold text-white mb-2">
-						Ready to get started?
-					</h2>
-					<p className="text-white text-base mb-4">
-						Join Siliguri Property today and experience the easiest way to rent,
-						buy, or sell property in Siliguri.
-					</p>
-					<a
-						href="/signup"
-						className="inline-block bg-white text-blue-600 font-semibold px-6 py-3 rounded-full shadow hover:bg-gray-100 transition"
-					>
-						Create Your Free Account
-					</a>
-				</div>
-
-				{/* Contact Info */}
-				<div className="flex flex-col items-center mb-12">
-					<h3 className="text-lg font-bold text-gray-800 mb-2">Contact Us</h3>
-					<div className="flex flex-col md:flex-row gap-6 items-center text-gray-700">
-						<span className="flex items-center gap-2">
-							<FaEnvelope /> siliguriproperty@gmail.com
-						</span>
-						<span className="flex items-center gap-2">
-							<FaPhoneAlt /> +91 81015 43210
-							<FaPhoneAlt /> +91 81012 43210
-						</span>
-					</div>
-					<div className="flex gap-4 mt-4">
-						<a
-							href="https://www.facebook.com/landmarkinfratechproperty/"
-							aria-label="Facebook"
-							className="text-blue-600 text-xl"
+						<nav
+							aria-label="Explore Siliguri Property"
+							className="border-y border-emerald-900/20"
 						>
-							<FaFacebook />
-						</a>
-						<a
-							href="https://www.instagram.com/linfratech"
-							aria-label="Instagram"
-							className="text-pink-500 text-xl"
-						>
-							<FaInstagram />
-						</a>
+							<Link
+								to="/properties"
+								className="group flex items-center justify-between gap-4 border-b border-emerald-900/20 py-5 text-slate-900 transition-colors hover:text-emerald-800"
+							>
+								<span>
+									<span className="block text-xs font-semibold uppercase tracking-wide text-emerald-800">
+										For buyers and renters
+									</span>
+									<span className="mt-1 block text-lg font-bold">
+										Explore properties
+									</span>
+								</span>
+								<FaArrowRight
+									className="shrink-0 transition-transform group-hover:translate-x-1"
+									aria-hidden="true"
+								/>
+							</Link>
+							<Link
+								to="/dashboard/new-post"
+								className="group flex items-center justify-between gap-4 py-5 text-slate-900 transition-colors hover:text-emerald-800"
+							>
+								<span>
+									<span className="block text-xs font-semibold uppercase tracking-wide text-emerald-800">
+										For property owners
+									</span>
+									<span className="mt-1 block text-lg font-bold">
+										Create a listing
+									</span>
+								</span>
+								<FaArrowRight
+									className="shrink-0 transition-transform group-hover:translate-x-1"
+									aria-hidden="true"
+								/>
+							</Link>
+						</nav>
 					</div>
-				</div>
+				</section>
+
+				<section className="mx-auto grid max-w-7xl gap-8 px-4 py-16 sm:px-6 lg:grid-cols-[0.85fr_1.15fr] lg:gap-16 lg:px-8">
+					<div>
+						<p className="text-xs font-bold uppercase tracking-[0.14em] text-emerald-700">
+							What matters
+						</p>
+						<h2 className="mt-3 max-w-md text-3xl font-bold leading-tight text-slate-950">
+							Useful details beat big promises.
+						</h2>
+						<p className="mt-4 max-w-md leading-relaxed text-slate-600">
+							A search often starts with a budget, an area, or a type of home.
+							We make those details easier to find and compare.
+						</p>
+					</div>
+					<div className="divide-y divide-slate-200 border-y border-slate-200">
+						{approach.map((item) => {
+							const Icon = item.icon;
+							return (
+								<div key={item.title} className="flex gap-4 py-5">
+									<Icon
+										className={`mt-1 shrink-0 ${item.iconColor}`}
+										aria-hidden="true"
+									/>
+									<div>
+										<h3 className="font-bold text-slate-900">{item.title}</h3>
+										<p className="mt-1 text-sm leading-relaxed text-slate-600">
+											{item.description}
+										</p>
+									</div>
+								</div>
+							);
+						})}
+					</div>
+				</section>
+
+				<section className="bg-[#f4f6f3]">
+					<div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
+						<p className="text-xs font-bold uppercase tracking-[0.14em] text-emerald-700">
+							How it works
+						</p>
+						<h2 className="mt-3 max-w-2xl text-3xl font-bold leading-tight text-slate-950">
+							Looking for a place? Listing one?
+						</h2>
+						<div className="mt-8 grid gap-8 md:grid-cols-2 md:gap-12">
+							<article className="border-t-2 border-emerald-700 pt-5">
+								<p className="text-xs font-bold uppercase tracking-wide text-emerald-800">
+									Find a property
+								</p>
+								<h3 className="mt-2 text-xl font-bold text-slate-950">
+									For buyers and renters
+								</h3>
+								<ol className="mt-5 space-y-3">
+									{searchSteps.map((step, index) => (
+										<li
+											key={step}
+											className="flex gap-3 text-sm leading-relaxed text-slate-700"
+										>
+											<span className="font-medium text-emerald-800">
+												{index + 1}.
+											</span>
+											<span>{step}</span>
+										</li>
+									))}
+								</ol>
+								<Link
+									to="/properties"
+									className="mt-6 inline-flex items-center gap-2 text-sm font-bold text-emerald-800 hover:text-emerald-950"
+								>
+									Browse listings <FaArrowRight aria-hidden="true" />
+								</Link>
+							</article>
+							<article className="border-t-2 border-amber-600 pt-5">
+								<p className="text-xs font-bold uppercase tracking-wide text-amber-800">
+									List a property
+								</p>
+								<h3 className="mt-2 text-xl font-bold text-slate-950">
+									For property owners
+								</h3>
+								<ol className="mt-5 space-y-3">
+									{ownerSteps.map((step, index) => (
+										<li
+											key={step}
+											className="flex gap-3 text-sm leading-relaxed text-slate-700"
+										>
+											<span className="font-medium text-amber-800">
+												{index + 1}.
+											</span>
+											<span>{step}</span>
+										</li>
+									))}
+								</ol>
+								<Link
+									to="/dashboard/new-post"
+									className="mt-6 inline-flex items-center gap-2 text-sm font-bold text-amber-800 hover:text-amber-950"
+								>
+									List a property <FaArrowRight aria-hidden="true" />
+								</Link>
+							</article>
+						</div>
+					</div>
+				</section>
+
+				<section className="bg-emerald-950 text-white">
+					<div className="mx-auto flex max-w-7xl flex-col gap-8 px-4 py-12 sm:px-6 md:flex-row md:items-center md:justify-between lg:px-8">
+						<div>
+							<p className="text-xs font-bold uppercase tracking-[0.14em] text-emerald-300">
+								Get in touch
+							</p>
+							<h2 className="mt-2 text-3xl font-bold">
+								Need a hand? Get in touch.
+							</h2>
+							<a
+								href="mailto:siliguriproperty@gmail.com"
+								className="mt-4 inline-flex items-center gap-3 text-base text-white transition-colors hover:text-emerald-200"
+							>
+								<FaEnvelope aria-hidden="true" />
+								siliguriproperty@gmail.com
+							</a>
+						</div>
+						<div className="flex items-center gap-3">
+							<a
+								href="https://www.facebook.com/landmarkinfratechproperty/"
+								aria-label="Siliguri Property on Facebook"
+								target="_blank"
+								rel="noreferrer"
+								className="flex h-11 w-11 items-center justify-center rounded-md border border-white/25 text-lg text-white transition-colors hover:bg-white/10"
+							>
+								<FaFacebook aria-hidden="true" />
+							</a>
+							<a
+								href="https://www.instagram.com/linfratech"
+								aria-label="Siliguri Property on Instagram"
+								target="_blank"
+								rel="noreferrer"
+								className="flex h-11 w-11 items-center justify-center rounded-md border border-white/25 text-lg text-white transition-colors hover:bg-white/10"
+							>
+								<FaInstagram aria-hidden="true" />
+							</a>
+						</div>
+					</div>
+				</section>
 			</main>
 
 			<Footer />
