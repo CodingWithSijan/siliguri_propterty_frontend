@@ -13,7 +13,7 @@ export function getDaysAgoTextFromObjectId(objectId?: string): string {
 	const days = getDaysAgoFromObjectId(objectId);
 	if (days === null) return "-";
 
-	if (days === 0) return "New today";
+	if (days === 0) return "Today";
 	if (days === 1) return "Yesterday";
 	if (days < 7) return `${days} days ago`;
 

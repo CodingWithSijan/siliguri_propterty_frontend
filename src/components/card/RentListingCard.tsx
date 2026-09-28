@@ -61,7 +61,7 @@ const RentListingCard: React.FC<{
 			<motion.article
 				transition={{ type: "spring", stiffness: 110, damping: 18 }}
 				onClick={handleClick}
-				className="group overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:shadow-md cursor-pointer md:h-[272px]"
+				className="group overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:shadow-md cursor-pointer md:min-h-[272px] lg:h-[272px] lg:min-h-0"
 			>
 				<div className="flex flex-col md:h-full md:flex-row">
 					<div className="relative h-52 w-full overflow-hidden md:h-full md:w-64 md:shrink-0">
@@ -123,26 +123,29 @@ const RentListingCard: React.FC<{
 							))}
 						</div>
 
-						<div className="mt-3 flex items-center justify-between border-t border-slate-200 pt-3">
-							<div className="inline-flex items-center gap-2 text-xs text-slate-600">
+						<div className="mt-2 text-xs text-slate-600">
+							<RenderListingFeaturesRent listing={listing} />
+						</div>
+
+						<div className="mt-3 flex flex-col gap-2 border-t border-slate-200 pt-3 lg:flex-row lg:items-center lg:justify-between">
+							<div className="inline-flex min-w-0 items-center gap-2 text-xs text-slate-600">
 								<CalendarDays className="h-3.5 w-3.5 text-slate-500" />
 								{listing.availableForDuration
 									? `Available for ${listing.availableForDuration} ${listing.availableForDurationUnit ?? "units"}`
 									: "Duration not specified"}
 							</div>
-							<div className="flex items-center gap-2">
-								<span className="inline-flex items-center gap-1 rounded-md bg-slate-100 px-2.5 py-1 text-[11px] font-semibold text-slate-600">
-									<Eye className="h-3.5 w-3.5" />
-									{viewCount.toLocaleString("en-IN")} views
+							<div className="flex min-w-0 flex-col items-start gap-2 text-xs text-slate-600 lg:flex-row lg:flex-wrap lg:items-center lg:gap-x-3 lg:gap-y-1">
+								<span className="inline-flex w-fit min-w-0 max-w-full items-start gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 font-medium text-emerald-800">
+									<Eye className="mt-0.5 h-3.5 w-3.5 shrink-0 text-emerald-700" />
+									<span>
+										{viewCount.toLocaleString("en-IN")}{" "}
+										{viewCount === 1 ? "person" : "people"} viewed this property
+									</span>
 								</span>
-								<span className="rounded-md bg-slate-100 px-2.5 py-1 text-[11px] font-semibold text-slate-600">
+								<span className="self-end rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-medium text-slate-600 lg:self-auto">
 									Posted {postedAgoText}
 								</span>
 							</div>
-						</div>
-
-						<div className="mt-2 text-xs text-slate-600">
-							<RenderListingFeaturesRent listing={listing} />
 						</div>
 					</div>
 				</div>

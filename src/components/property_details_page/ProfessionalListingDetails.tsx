@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
 	Bath,
 	BedDouble,
@@ -113,6 +113,10 @@ const getPostedAgoLabel = (value?: string): string => {
 
 	const dayMs = 24 * 60 * 60 * 1000;
 	const days = Math.floor(diffMs / dayMs);
+
+	if (days === 0) {
+		return "Posted Today";
+	}
 
 	if (days < 7) {
 		return `Posted ${days} day${days === 1 ? "" : "s"} ago`;
@@ -314,6 +318,25 @@ const ProfessionalListingDetails: React.FC<ProfessionalListingDetailsProps> = ({
 	const [expandedDescription, setExpandedDescription] = useState(false);
 	const [isGalleryOpen, setIsGalleryOpen] = useState(false);
 	const [zoomLevel, setZoomLevel] = useState(1);
+	const [imageOffset, setImageOffset] = useState({ x: 0, y: 0 });
+	const [isTouchInteracting, setIsTouchInteracting] = useState(false);
+	const touchStart = useRef<{ x: number; y: number } | null>(null);
+	const panStart = useRef<{
+		x: number;
+		y: number;
+		offsetX: number;
+		offsetY: number;
+	} | null>(null);
+	const pinchStart = useRef<{
+		distance: number;
+		zoom: number;
+		offsetX: number;
+		offsetY: number;
+		centerX: number;
+		centerY: number;
+	} | null>(null);
+	const galleryViewportRef = useRef<HTMLDivElement>(null);
+	const galleryImageRef = useRef<HTMLImageElement>(null);
 	const [isImageFullscreen, setIsImageFullscreen] = useState(false);
 	const [inquiryName, setInquiryName] = useState("");
 	const [inquiryPhone, setInquiryPhone] = useState("");
@@ -333,6 +356,31 @@ const ProfessionalListingDetails: React.FC<ProfessionalListingDetailsProps> = ({
 	const selectedImage =
 		images[Math.min(selectedIndex, images.length - 1)] ??
 		propertyImagePlaceholder;
+	const clampImageOffset = (offset: { x: number; y: number }, zoom: number) => {
+		const viewport = galleryViewportRef.current;
+		const image = galleryImageRef.current;
+		if (!viewport || !image?.naturalWidth || !image.naturalHeight) {
+			return offset;
+		}
+
+		const fitScale = Math.min(
+			viewport.clientWidth / image.naturalWidth,
+			viewport.clientHeight / image.naturalHeight,
+		);
+		const maxX = Math.max(
+			0,
+			(image.naturalWidth * fitScale * zoom - viewport.clientWidth) / 2,
+		);
+		const maxY = Math.max(
+			0,
+			(image.naturalHeight * fitScale * zoom - viewport.clientHeight) / 2,
+		);
+
+		return {
+			x: Math.max(-maxX, Math.min(maxX, offset.x)),
+			y: Math.max(-maxY, Math.min(maxY, offset.y)),
+		};
+	};
 	const facts = useMemo(() => getPrimaryFacts(listing), [listing]);
 	const displayPrice = useMemo(() => getDisplayPrice(listing), [listing]);
 	const { sanitizedHTML, shouldTruncate } = processDescription(
@@ -504,28 +552,182 @@ const ProfessionalListingDetails: React.FC<ProfessionalListingDetailsProps> = ({
 	const previousImage = () => {
 		setSelectedIndex((prev) => (prev - 1 + images.length) % images.length);
 		setZoomLevel(MIN_ZOOM);
+		setImageOffset({ x: 0, y: 0 });
 	};
 
 	const nextImage = () => {
 		setSelectedIndex((prev) => (prev + 1) % images.length);
 		setZoomLevel(MIN_ZOOM);
+		setImageOffset({ x: 0, y: 0 });
+	};
+
+	const handleGalleryTouchStart = (event: React.TouchEvent<HTMLDivElement>) => {
+		if (event.touches.length === 2) {
+			touchStart.current = null;
+			panStart.current = null;
+			const first = event.touches[0];
+			const second = event.touches[1];
+			const rect = galleryViewportRef.current?.getBoundingClientRect();
+			if (!rect) return;
+
+			pinchStart.current = {
+				distance: Math.max(
+					1,
+					Math.hypot(
+						second.clientX - first.clientX,
+						second.clientY - first.clientY,
+					),
+				),
+				zoom: zoomLevel,
+				offsetX: imageOffset.x,
+				offsetY: imageOffset.y,
+				centerX: (first.clientX + second.clientX) / 2 - rect.left,
+				centerY: (first.clientY + second.clientY) / 2 - rect.top,
+			};
+			setIsTouchInteracting(true);
+			return;
+		}
+
+		if (event.touches.length !== 1) {
+			touchStart.current = null;
+			panStart.current = null;
+			return;
+		}
+
+		pinchStart.current = null;
+		const touch = event.touches[0];
+		if (zoomLevel > MIN_ZOOM) {
+			touchStart.current = null;
+			panStart.current = {
+				x: touch.clientX,
+				y: touch.clientY,
+				offsetX: imageOffset.x,
+				offsetY: imageOffset.y,
+			};
+			setIsTouchInteracting(true);
+			return;
+		}
+
+		panStart.current = null;
+		touchStart.current = { x: touch.clientX, y: touch.clientY };
+	};
+
+	const handleGalleryTouchMove = (event: React.TouchEvent<HTMLDivElement>) => {
+		const rect = galleryViewportRef.current?.getBoundingClientRect();
+		if (!rect) return;
+
+		if (event.touches.length === 2 && pinchStart.current) {
+			event.preventDefault();
+			const first = event.touches[0];
+			const second = event.touches[1];
+			const start = pinchStart.current;
+			const distance = Math.hypot(
+				second.clientX - first.clientX,
+				second.clientY - first.clientY,
+			);
+			const zoom = Math.max(
+				MIN_ZOOM,
+				Math.min(MAX_ZOOM, start.zoom * (distance / start.distance)),
+			);
+			const centerX = (first.clientX + second.clientX) / 2 - rect.left;
+			const centerY = (first.clientY + second.clientY) / 2 - rect.top;
+			const scaleRatio = zoom / start.zoom;
+			const offset = clampImageOffset(
+				{
+					x:
+						centerX -
+						rect.width / 2 -
+						scaleRatio * (start.centerX - rect.width / 2 - start.offsetX),
+					y:
+						centerY -
+						rect.height / 2 -
+						scaleRatio * (start.centerY - rect.height / 2 - start.offsetY),
+				},
+				zoom,
+			);
+			setZoomLevel(zoom);
+			setImageOffset(offset);
+			return;
+		}
+
+		if (event.touches.length === 1 && panStart.current) {
+			event.preventDefault();
+			const touch = event.touches[0];
+			setImageOffset(
+				clampImageOffset(
+					{
+						x: panStart.current.offsetX + touch.clientX - panStart.current.x,
+						y: panStart.current.offsetY + touch.clientY - panStart.current.y,
+					},
+					zoomLevel,
+				),
+			);
+		}
+	};
+
+	const handleGalleryTouchEnd = (event: React.TouchEvent<HTMLDivElement>) => {
+		if (event.touches.length === 1 && pinchStart.current) {
+			pinchStart.current = null;
+			const touch = event.touches[0];
+			panStart.current =
+				zoomLevel > MIN_ZOOM
+					? {
+							x: touch.clientX,
+							y: touch.clientY,
+							offsetX: imageOffset.x,
+							offsetY: imageOffset.y,
+						}
+					: null;
+			return;
+		}
+
+		const start = touchStart.current;
+		touchStart.current = null;
+		if (event.touches.length > 0) return;
+		if (pinchStart.current || panStart.current) {
+			pinchStart.current = null;
+			panStart.current = null;
+			setIsTouchInteracting(false);
+			return;
+		}
+
+		if (!start || event.changedTouches.length === 0) {
+			return;
+		}
+
+		const touch = event.changedTouches[0];
+		const deltaX = touch.clientX - start.x;
+		const deltaY = touch.clientY - start.y;
+		if (Math.abs(deltaX) < 48 || Math.abs(deltaX) <= Math.abs(deltaY)) {
+			return;
+		}
+
+		if (deltaX < 0) {
+			nextImage();
+		} else {
+			previousImage();
+		}
+	};
+
+	const applyZoom = (zoom: number) => {
+		setZoomLevel(zoom);
+		setImageOffset((current) =>
+			zoom <= MIN_ZOOM ? { x: 0, y: 0 } : clampImageOffset(current, zoom),
+		);
 	};
 
 	const zoomIn = () => {
-		setZoomLevel((prev) =>
-			Math.min(MAX_ZOOM, Number((prev + ZOOM_STEP).toFixed(2))),
-		);
+		applyZoom(Math.min(MAX_ZOOM, Number((zoomLevel + ZOOM_STEP).toFixed(2))));
 	};
 
 	const zoomOut = () => {
-		setZoomLevel((prev) =>
-			Math.max(MIN_ZOOM, Number((prev - ZOOM_STEP).toFixed(2))),
-		);
+		applyZoom(Math.max(MIN_ZOOM, Number((zoomLevel - ZOOM_STEP).toFixed(2))));
 	};
 
 	const closeGallery = () => {
 		setIsGalleryOpen(false);
 		setZoomLevel(MIN_ZOOM);
+		setImageOffset({ x: 0, y: 0 });
 	};
 
 	const handleWheelZoom = (event: React.WheelEvent<HTMLDivElement>) => {
@@ -569,18 +771,21 @@ const ProfessionalListingDetails: React.FC<ProfessionalListingDetailsProps> = ({
 			if (event.key === "Escape") {
 				setIsGalleryOpen(false);
 				setZoomLevel(MIN_ZOOM);
+				setImageOffset({ x: 0, y: 0 });
 				return;
 			}
 
 			if (event.key === "ArrowLeft") {
 				setSelectedIndex((prev) => (prev - 1 + images.length) % images.length);
 				setZoomLevel(MIN_ZOOM);
+				setImageOffset({ x: 0, y: 0 });
 				return;
 			}
 
 			if (event.key === "ArrowRight") {
 				setSelectedIndex((prev) => (prev + 1) % images.length);
 				setZoomLevel(MIN_ZOOM);
+				setImageOffset({ x: 0, y: 0 });
 				return;
 			}
 
@@ -589,6 +794,7 @@ const ProfessionalListingDetails: React.FC<ProfessionalListingDetailsProps> = ({
 				setZoomLevel((prev) =>
 					Math.min(MAX_ZOOM, Number((prev + ZOOM_STEP).toFixed(2))),
 				);
+				setImageOffset({ x: 0, y: 0 });
 				return;
 			}
 
@@ -597,11 +803,13 @@ const ProfessionalListingDetails: React.FC<ProfessionalListingDetailsProps> = ({
 				setZoomLevel((prev) =>
 					Math.max(MIN_ZOOM, Number((prev - ZOOM_STEP).toFixed(2))),
 				);
+				setImageOffset({ x: 0, y: 0 });
 				return;
 			}
 
 			if (event.key.toLowerCase() === "r") {
 				setZoomLevel(MIN_ZOOM);
+				setImageOffset({ x: 0, y: 0 });
 			}
 		};
 
@@ -778,11 +986,8 @@ const ProfessionalListingDetails: React.FC<ProfessionalListingDetailsProps> = ({
 										{locationSummary}
 									</p>
 								</div>
-								<div className="rounded-2xl border border-emerald-300 bg-gradient-to-br from-emerald-50 to-white px-4 py-3 md:min-w-[280px]">
-									<p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-emerald-800">
-										Price
-									</p>
-									<p className="mt-1 text-3xl font-extrabold leading-tight text-slate-950">
+								<div className="w-full text-right md:w-auto md:min-w-[220px] md:self-start md:pt-1">
+									<p className="text-xl font-semibold leading-tight text-emerald-700 sm:text-2xl">
 										{displayPrice}
 									</p>
 								</div>
@@ -868,6 +1073,7 @@ const ProfessionalListingDetails: React.FC<ProfessionalListingDetailsProps> = ({
 								setIsGalleryOpen(open);
 								if (!open) {
 									setZoomLevel(MIN_ZOOM);
+									setImageOffset({ x: 0, y: 0 });
 								}
 							}}
 						>
@@ -883,8 +1089,18 @@ const ProfessionalListingDetails: React.FC<ProfessionalListingDetailsProps> = ({
 								</DialogDescription>
 
 								<div
-									className="relative flex h-[calc(100vh-96px)] items-center justify-center overflow-hidden rounded-xl border border-white/10 bg-black/60 sm:h-[calc(100vh-120px)]"
+									ref={galleryViewportRef}
+									className="relative flex h-[calc(100vh-96px)] touch-none items-center justify-center overflow-hidden rounded-xl border border-white/10 bg-black/60 sm:h-[calc(100vh-120px)]"
 									onWheel={handleWheelZoom}
+									onTouchStart={handleGalleryTouchStart}
+									onTouchMove={handleGalleryTouchMove}
+									onTouchEnd={handleGalleryTouchEnd}
+									onTouchCancel={() => {
+										touchStart.current = null;
+										panStart.current = null;
+										pinchStart.current = null;
+										setIsTouchInteracting(false);
+									}}
 								>
 									<div className="absolute right-2 top-2 z-20 flex flex-col gap-2 sm:right-3 sm:top-3">
 										<button
@@ -934,10 +1150,14 @@ const ProfessionalListingDetails: React.FC<ProfessionalListingDetailsProps> = ({
 									</div>
 
 									<img
+										ref={galleryImageRef}
 										src={selectedImage}
 										alt={`${listing.title} image ${selectedIndex + 1}`}
-										className="h-full w-full cursor-zoom-in object-contain transition-transform duration-200 ease-out"
-										style={{ transform: `scale(${zoomLevel})` }}
+										className={`h-full w-full cursor-zoom-in object-contain ${isTouchInteracting ? "transition-none" : "transition-transform duration-200 ease-out"}`}
+										style={{
+											transform: `translate(${imageOffset.x}px, ${imageOffset.y}px) scale(${zoomLevel})`,
+											transformOrigin: "center center",
+										}}
 										onDoubleClick={() => {
 											setZoomLevel((prev) =>
 												prev === MIN_ZOOM ? 2 : MIN_ZOOM,
@@ -991,6 +1211,7 @@ const ProfessionalListingDetails: React.FC<ProfessionalListingDetailsProps> = ({
 												onClick={() => {
 													setSelectedIndex(index);
 													setZoomLevel(MIN_ZOOM);
+													setImageOffset({ x: 0, y: 0 });
 												}}
 												className={`overflow-hidden rounded-lg border ${
 													index === selectedIndex
@@ -1029,15 +1250,6 @@ const ProfessionalListingDetails: React.FC<ProfessionalListingDetailsProps> = ({
 
 					<aside className="space-y-4 lg:sticky lg:top-24">
 						<section className="rounded-3xl border border-slate-200 bg-white p-5 shadow-md shadow-slate-200/40 sm:p-6">
-							<div className="mb-5 rounded-2xl border border-emerald-200 bg-emerald-50/70 p-4">
-								<p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-emerald-800">
-									Price
-								</p>
-								<p className="mt-1 text-2xl font-extrabold text-slate-950">
-									{displayPrice}
-								</p>
-							</div>
-
 							<div className="flex items-center gap-3 border-b border-slate-200 pb-4">
 								<div className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-full bg-emerald-600 text-sm font-semibold text-white">
 									{listingUserDetails?.avatar ? (
