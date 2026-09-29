@@ -45,6 +45,7 @@ import {
 } from "../components/ui/sheet";
 import { showError, showInfo } from "../utils/toastUtils";
 import { getDaysAgoFromObjectId } from "../utils/getDaysAgo";
+import { applySeoMeta } from "../utils/seo";
 
 interface AllListingsProps {
 	forcedIntent?: "rent" | "sell";
@@ -593,10 +594,71 @@ const AllListings: React.FC<AllListingsProps> = ({
 		return `Median listing age: ${median} day${median > 1 ? "s" : ""}`;
 	}, [filteredPosts]);
 
+	useEffect(() => {
+		const intentLabel =
+			effectiveIntent === "sell"
+				? "for Sale"
+				: effectiveIntent === "rent"
+					? "for Rent"
+					: "";
+
+		const categoryLabel =
+			normalizedState.category === "all"
+				? "Properties"
+				: normalizedState.category === "land"
+					? "Land"
+					: normalizedState.category === "house"
+						? "Houses"
+						: normalizedState.category === "flat"
+							? "Flats"
+							: "Shops";
+
+		const locationLabel = activeAreaLabel || "Siliguri";
+		const pageTitle =
+			`${categoryLabel} ${intentLabel} in ${locationLabel} | Siliguri Property`
+				.replace(/\s+/g, " ")
+				.trim();
+
+		const baseDescription =
+			effectiveIntent === "rent"
+				? `Browse verified ${categoryLabel.toLowerCase()} for rent in ${locationLabel}, Siliguri and surrounding localities.`
+				: `Explore verified ${categoryLabel.toLowerCase()} for sale in ${locationLabel}, Siliguri and nearby areas.`;
+		const description = `${baseDescription} Compare prices, view photos, and connect directly with owners on Siliguri Property.`;
+
+		const canonicalParams = new URLSearchParams();
+		if (effectiveIntent !== "all") {
+			canonicalParams.set("intent", effectiveIntent);
+		}
+		if (normalizedState.category !== "all") {
+			canonicalParams.set("category", normalizedState.category);
+		}
+		if (normalizedState.locationKey) {
+			canonicalParams.set("location", normalizedState.locationKey);
+		}
+
+		const canonicalPath =
+			canonicalParams.toString().length > 0
+				? `/properties?${canonicalParams.toString()}`
+				: "/properties";
+
+		applySeoMeta({
+			title: pageTitle,
+			description,
+			canonicalPath,
+			keywords:
+				"properties in siliguri, siliguri property, land for sale in siliguri, house for sale in siliguri, flats in siliguri, rent property siliguri, siliguri localities",
+		});
+	}, [
+		activeAreaLabel,
+		effectiveIntent,
+		normalizedState.category,
+		normalizedState.locationKey,
+	]);
+
 	return (
 		<>
 			<Navbar />
-			<section className="sticky top-[66px] z-30 border-y border-slate-200 bg-white/95 backdrop-blur md:top-[104px]">
+			<section className="sticky top-16 z-30 border-y border-slate-200 bg-white/95 backdrop-blur md:top-[100px]">
 				<div className="mx-auto w-full max-w-7xl px-4 py-3 md:px-6">
 					<div className="grid grid-cols-1 gap-2 md:hidden">
 						<div className="grid grid-cols-[1fr_auto] gap-2">

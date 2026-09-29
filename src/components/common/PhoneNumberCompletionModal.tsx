@@ -13,6 +13,16 @@ import { Button } from "../ui/button";
 import BASE_URL from "../../services";
 import { showError, showSuccess } from "../../utils/toastUtils";
 
+const normalizeIndianPhone = (value: string): string | null => {
+	const digits = value.trim();
+
+	if (!/^[6-9]\d{9}$/.test(digits)) {
+		return null;
+	}
+
+	return `+91${digits}`;
+};
+
 const PhoneNumberCompletionModal: React.FC = () => {
 	const dispatch = useDispatch<AppDispatch>();
 	const { isAuthenticated, user } = useSelector(
@@ -43,9 +53,9 @@ const PhoneNumberCompletionModal: React.FC = () => {
 	}, [dismissed, isAuthenticated, user]);
 
 	const handleSavePhone = async () => {
-		const normalizedPhone = phone.trim();
-		if (!/^\+?[0-9]{10,15}$/.test(normalizedPhone)) {
-			showError("Please enter a valid phone number");
+		const normalizedPhone = normalizeIndianPhone(phone);
+		if (!normalizedPhone) {
+			showError("Please enter a valid Indian phone number");
 			return;
 		}
 
@@ -95,13 +105,36 @@ const PhoneNumberCompletionModal: React.FC = () => {
 					<p className="text-xs font-medium text-blue-700 bg-blue-50 border border-blue-100 rounded-md px-3 py-2">
 						Add your phone number now to finish first-time signup setup.
 					</p>
-					<Input
-						type="tel"
-						placeholder="Enter phone number (e.g. +919876543210)"
-						value={phone}
-						onChange={(event) => setPhone(event.target.value)}
-						disabled={saving}
-					/>
+					<div className="space-y-1">
+						<label
+							htmlFor="phone-completion"
+							className="text-xs font-medium text-slate-700"
+						>
+							Phone Number
+						</label>
+						<div className="flex items-center">
+							<span className="rounded-l-md border border-r-0 border-slate-300 bg-slate-100 px-3 py-2 text-sm text-slate-700">
+								+91
+							</span>
+							<Input
+								id="phone-completion"
+								type="tel"
+								inputMode="numeric"
+								placeholder="9876543210"
+								value={phone}
+								onChange={(event) => {
+									const digitsOnly = event.target.value.replace(/\D/g, "");
+									setPhone(digitsOnly.slice(0, 10));
+								}}
+								maxLength={10}
+								disabled={saving}
+								className="rounded-l-none"
+							/>
+						</div>
+					</div>
+					<p className="text-[11px] text-slate-500">
+						Use a 10-digit Indian mobile number starting with 6-9.
+					</p>
 					<Button
 						type="button"
 						onClick={handleSavePhone}

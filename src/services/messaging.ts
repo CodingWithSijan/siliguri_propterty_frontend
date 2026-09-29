@@ -56,6 +56,14 @@ export interface NotificationItem {
 	createdAt: string;
 }
 
+export interface MessageRecipient {
+	_id: string;
+	name: string;
+	email: string;
+	avatar?: string;
+	role: "user" | "admin" | "superadmin";
+}
+
 export const fetchConversations = async (): Promise<ConversationSummary[]> => {
 	const response = await BASE_URL.get<{ data: ConversationSummary[] }>(
 		"/api/messages/conversations",
@@ -78,6 +86,17 @@ export const sendMessage = async (payload: {
 	listingId?: string;
 }): Promise<void> => {
 	await BASE_URL.post("/api/messages/send", payload);
+};
+
+export const fetchMessageRecipients = async (
+	query = "",
+): Promise<MessageRecipient[]> => {
+	const trimmedQuery = query.trim();
+	const endpoint = trimmedQuery
+		? `/api/messages/recipients?q=${encodeURIComponent(trimmedQuery)}`
+		: "/api/messages/recipients";
+	const response = await BASE_URL.get<{ data: MessageRecipient[] }>(endpoint);
+	return response.data.data;
 };
 
 export const fetchNotifications = async (): Promise<NotificationItem[]> => {

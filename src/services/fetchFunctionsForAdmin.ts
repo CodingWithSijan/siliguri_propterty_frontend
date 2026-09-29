@@ -21,6 +21,7 @@ interface PostModerationFilters {
 	phoneFilter?: PhoneFilterOption;
 	intent?: "buy" | "sell" | "rent";
 	category?: "land" | "house" | "flat" | "shop";
+	featured?: "featured" | "notFeatured";
 	minPrice?: number;
 	maxPrice?: number;
 	location?: string;
@@ -71,20 +72,42 @@ export interface CreateUserBySuperAdminResponse {
 export interface Post {
 	_id: string;
 	title: string;
+	description?: string;
 	location: string;
+	alternateLocation?: string;
+	wbLocalityLabel?: string;
+	pictures?: string[];
+	videos?: string[];
 	propertyType?: string;
 	postType?: "rent" | "sell";
 	intent: "rent" | "sell";
 	propertyCategory: "land" | "house" | "flat" | "shop";
 	approvalStatus: "approved" | "rejected" | "pending";
+	listingStatus?: "available" | "sold";
+	isFeaturedOnHomepage?: boolean;
+	featuredRank?: number | null;
 	createdAt: string;
 	updatedAt: string;
 	price?: number | string;
 	pricePerUnit?: number;
 	totalPrice?: number;
 	unit?: string;
+	furnishing?: string;
 	frequency?: "day" | "week" | "month" | "year";
 	pricePerFrequency?: number | string;
+	availableFrom?: string;
+	availableForDuration?: number;
+	availableForDurationUnit?: "day" | "week" | "month" | "year";
+	bedrooms?: number;
+	bathrooms?: number;
+	floor?: number;
+	builtUpArea?: number;
+	shopArea?: number;
+	parking?: boolean;
+	attachedBathroom?: boolean;
+	hasShutter?: boolean;
+	availableLandSpace?: string;
+	availableLandSpaceUnit?: string;
 	user?: {
 		_id: string;
 		name: string;
@@ -121,6 +144,9 @@ const buildPostQuery = (filters?: PostModerationFilters): string => {
 	}
 	if (filters?.category) {
 		params.set("category", filters.category);
+	}
+	if (filters?.featured) {
+		params.set("featured", filters.featured);
 	}
 	if (
 		typeof filters?.minPrice === "number" &&
@@ -406,4 +432,17 @@ export const deletePost = async (id: string) => {
 		throw new Error(response.data.message || "Failed to delete post");
 	}
 	return response.data.result;
+};
+
+export const setHomepageFeaturedPosts = async (postIds: string[]) => {
+	const endpoint = `/api/admin/homepage-featured-posts`;
+	const response = await BASE_URL.put(endpoint, { postIds });
+
+	if (!response.data.success) {
+		throw new Error(
+			response.data.message || "Failed to update homepage featured posts",
+		);
+	}
+
+	return response.data.data;
 };

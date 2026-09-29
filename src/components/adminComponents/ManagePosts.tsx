@@ -358,7 +358,7 @@ const ManagePosts = () => {
 	};
 
 	return (
-		<div className="w-full">
+		<div className="w-full min-w-0 overflow-x-hidden">
 			<div className="mx-auto max-w-[1600px] space-y-8 p-3 sm:p-4 md:p-8">
 				{/* Stats */}
 				<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
@@ -390,9 +390,9 @@ const ManagePosts = () => {
 
 				{/* Filter */}
 				<div className="flex flex-col gap-4 rounded-lg bg-muted/50 p-4">
-					<div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+					<div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
 						<h2 className="text-lg font-semibold">Posts</h2>
-						<div className="grid w-full grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
+						<div className="grid w-full min-w-0 gap-3 sm:flex-1 sm:grid-cols-2 xl:grid-cols-4">
 							<Select value={selectedStatus} onValueChange={handleStatusChange}>
 								<SelectTrigger className="w-full bg-background">
 									<SelectValue placeholder="Filter by status" />
@@ -614,8 +614,8 @@ const ManagePosts = () => {
 				</div>
 
 				{/* Table */}
-				<div className="hidden overflow-hidden rounded-md border bg-card md:block">
-					<div className="w-full overflow-x-auto">
+				<div className="hidden max-w-full overflow-hidden rounded-md border bg-card md:block">
+					<div className="w-full max-w-full overflow-x-auto">
 						<Table>
 							<TableHeader className="bg-muted/50">
 								<TableRow>
