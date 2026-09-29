@@ -39,6 +39,7 @@ const Navbar: React.FC = () => {
 		location.pathname.startsWith("/rentals/");
 	const isBuyPathActive =
 		location.pathname === "/buys" || location.pathname.startsWith("/buys/");
+	const isHomepagePath = location.pathname === "/";
 
 	useEffect(() => {
 		const handleClickOutside = (event: MouseEvent) => {
@@ -179,15 +180,17 @@ const Navbar: React.FC = () => {
 						</div>
 					</NavLink>
 
-					<div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 md:hidden">
-						<button
-							type="button"
-							onClick={handleSellMenuClick}
-							className="inline-flex items-center rounded-full bg-emerald-600 px-3 py-1.5 text-[11px] font-semibold text-white shadow-sm transition-colors hover:bg-emerald-700"
-						>
-							Post your property
-						</button>
-					</div>
+					{!isHomepagePath && (
+						<div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 md:hidden">
+							<button
+								type="button"
+								onClick={handleSellMenuClick}
+								className="inline-flex items-center rounded-full bg-emerald-600 px-3 py-1.5 text-[11px] font-semibold text-white shadow-sm transition-colors hover:bg-emerald-700"
+							>
+								Post your property
+							</button>
+						</div>
+					)}
 
 					{/* Main navigation links */}
 					<div className="ml-6 hidden flex-1 items-center gap-6 md:flex">

@@ -27,6 +27,24 @@ import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../app/store";
 import { login, User as AuthUser } from "../../app/slices/authSlice";
 
+const isValidIndianPhone = (value: string): boolean => {
+	let digits = value.trim().replace(/\s+/g, "");
+
+	if (digits.startsWith("+")) {
+		digits = digits.slice(1);
+	}
+
+	if (!/^\d+$/.test(digits)) {
+		return false;
+	}
+
+	if (digits.length === 12 && digits.startsWith("91")) {
+		digits = digits.slice(2);
+	}
+
+	return /^[6-9]\d{9}$/.test(digits);
+};
+
 const YourProfile: React.FC = () => {
 	const { user } = useSelector((state: RootState) => state.auth);
 	const dispatch = useDispatch<AppDispatch>();
@@ -99,8 +117,8 @@ const YourProfile: React.FC = () => {
 			return;
 		}
 
-		if (trimmedPhone && !/^\+?[0-9]{10,15}$/.test(trimmedPhone)) {
-			showError("Enter a valid phone number");
+		if (trimmedPhone && !isValidIndianPhone(trimmedPhone)) {
+			showError("Enter a valid Indian phone number");
 			return;
 		}
 

@@ -3,13 +3,13 @@ import BASE_URL from "../services";
 
 interface SiteStats {
 	propertiesListed: number;
-	happyCustomers: number;
+	totalUsers: number;
 }
 
 export const useSiteStats = () => {
 	const [stats, setStats] = useState<SiteStats>({
 		propertiesListed: 0,
-		happyCustomers: 0,
+		totalUsers: 0,
 	});
 	const [loading, setLoading] = useState<boolean>(true);
 	const [error, setError] = useState<string | null>(null);
@@ -19,10 +19,11 @@ export const useSiteStats = () => {
 			setLoading(true);
 			setError(null);
 			const response = await BASE_URL.get("/api/user/post/hero-section-stats");
-			// Assuming the API returns { propertiesListed, happyCustomers }
+			// API returns overall listing and user counts for homepage stats.
 			setStats({
 				propertiesListed: response.data?.totalApprovedListing ?? 0,
-				happyCustomers: response.data?.totalVerifiedUsers ?? 0,
+				totalUsers:
+					response.data?.totalUsers ?? response.data?.totalVerifiedUsers ?? 0,
 			});
 		} catch (err) {
 			const message =

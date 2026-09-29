@@ -19,6 +19,11 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 			subtitle:
 				"Review, approve or reject posts quickly with clear status cues.",
 		},
+		"/admin/featured-properties": {
+			title: "Featured Properties",
+			subtitle:
+				"Select up to 6 approved listings to highlight on the homepage.",
+		},
 		"/admin/users": {
 			title: "User Management",
 			subtitle: "Manage verification, roles and support actions for all users.",
@@ -47,7 +52,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 	return (
 		<SidebarProvider defaultOpen={true}>
 			<AppSidebar activeMenu={activeMenu} setActiveMenu={setActiveMenu} />
-			<div className="flex min-h-screen w-full flex-col bg-gradient-to-br from-slate-50 via-emerald-50/35 to-sky-50/45">
+			<div className="flex min-h-screen min-w-0 w-full flex-col overflow-x-hidden bg-gradient-to-br from-slate-50 via-emerald-50/35 to-sky-50/45">
 				<header className="sticky top-0 z-30 border-b border-emerald-100 bg-white/95 px-3 py-3 shadow-sm backdrop-blur md:px-4">
 					<div className="flex items-start justify-between gap-3">
 						<div className="flex min-w-0 items-start gap-2">
@@ -78,7 +83,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 					</div>
 				</header>
 
-				<main className="flex-1 overflow-auto p-3 md:p-4">{children}</main>
+				<main className="flex-1 min-w-0 overflow-y-auto overflow-x-hidden p-3 md:p-4">
+					{children}
+				</main>
 			</div>
 		</SidebarProvider>
 	);

@@ -70,6 +70,21 @@ const Footer: React.FC = () => {
 									Commercial
 								</Link>
 							</li>
+							<li>
+								<Link to="/locality/siliguri" className="hover:text-white">
+									Siliguri Locality Guide
+								</Link>
+							</li>
+							<li>
+								<Link to="/locality/matigara" className="hover:text-white">
+									Property in Matigara
+								</Link>
+							</li>
+							<li>
+								<Link to="/locality/bagdogra" className="hover:text-white">
+									Property in Bagdogra
+								</Link>
+							</li>
 						</ul>
 					</div>
 

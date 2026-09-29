@@ -48,6 +48,9 @@ const HomeTab = lazy(() => import("./components/adminComponents/HomeTab"));
 const ManagePosts = lazy(
 	() => import("./components/adminComponents/ManagePosts"),
 );
+const FeaturedProperties = lazy(
+	() => import("./components/adminComponents/FeaturedProperties"),
+);
 const ManageUsers = lazy(
 	() => import("./components/adminComponents/ManageUsers"),
 );
@@ -61,6 +64,7 @@ const PrivacyPolicy = lazy(() => import("./pages/PrivacyPolicy"));
 const Terms = lazy(() => import("./pages/Terms"));
 const MessagesPage = lazy(() => import("./pages/MessagesPage"));
 const NotificationsPage = lazy(() => import("./pages/NotificationsPage"));
+const LocalityLandingPage = lazy(() => import("./pages/LocalityLandingPage"));
 
 const LegacySellRedirect: React.FC = () => {
 	const { category, id } = useParams();
@@ -105,6 +109,7 @@ const App: React.FC = () => {
 					<Route path="/about" element={<AboutUs />} />
 					<Route path="/privacy" element={<PrivacyPolicy />} />
 					<Route path="/terms" element={<Terms />} />
+					<Route path="/locality/:slug" element={<LocalityLandingPage />} />
 
 					{/* Rental Property Routes */}
 					<Route path="/rentals" element={<RentalProperties />} />
@@ -188,6 +193,10 @@ const App: React.FC = () => {
 						<Route index element={<HomeTab />} />
 						<Route path="home" element={<HomeTab />} />
 						<Route path="posts" element={<ManagePosts />} />
+						<Route
+							path="featured-properties"
+							element={<FeaturedProperties />}
+						/>
 						<Route path="posts/view-post/:id" element={<ViewPost />} />
 						<Route path="users" element={<ManageUsers />} />
 						<Route path="super-admin" element={<SuperAdminPanel />} />

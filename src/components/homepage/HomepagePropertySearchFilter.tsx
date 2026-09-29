@@ -21,6 +21,10 @@ interface IHomepageSearchFilters {
 	maxPrice: number;
 }
 
+interface HomepagePropertySearchFilterProps {
+	compact?: boolean;
+}
+
 const allPropertyTypes = [
 	{ value: "", label: "Any Type" },
 	{ value: "house", label: "House" },
@@ -42,9 +46,12 @@ const formatReadablePrice = (value: number): string => {
 	return `₹${safeValue.toLocaleString("en-IN")} (${formatIndianCurrency(safeValue)})`;
 };
 
-const HomepagePropertySearchFilter: React.FC = () => {
+const HomepagePropertySearchFilter: React.FC<
+	HomepagePropertySearchFilterProps
+> = ({ compact = false }) => {
 	const navigate = useNavigate();
 	const [geoLoading, setGeoLoading] = useState(false);
+	const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
 	const OTHER_LOCATION_VALUE = "other";
 	const defaultLimits = getPriceLimits("sell");
 	const [filters, setFilters] = useState<IHomepageSearchFilters>({
@@ -250,29 +257,37 @@ const HomepagePropertySearchFilter: React.FC = () => {
 		});
 	};
 
+	const shouldShowAdvancedToggle = true;
+
 	return (
 		<form
 			onSubmit={handleSearch}
-			className="w-full rounded-2xl border border-slate-200 bg-white/95 px-4 py-4 shadow-[0_20px_55px_-35px_rgba(15,23,42,0.9)] backdrop-blur md:px-6 md:py-5"
+			className={`w-full rounded-2xl border border-slate-200 bg-white/95 shadow-[0_20px_55px_-35px_rgba(15,23,42,0.9)] backdrop-blur ${
+				compact ? "px-3 py-3 md:px-4 md:py-4" : "px-4 py-4 md:px-6 md:py-5"
+			}`}
 		>
-			<div className="mb-4 flex flex-wrap items-start justify-between gap-3 border-b border-slate-200 pb-3">
+			<div className="mb-3 flex flex-wrap items-start justify-between gap-2 border-b border-slate-200 pb-3">
 				<div>
 					<p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-emerald-700">
-						Smart Property Search
+						{compact ? "Quick Property Search" : "Smart Property Search"}
 					</p>
-					<h3 className="mt-1 text-base font-semibold text-slate-900">
-						Find the right property faster
+					<h3 className="mt-1 text-sm font-semibold text-slate-900 sm:text-base">
+						{compact
+							? "Search by locality first"
+							: "Start with location and intent"}
 					</h3>
-					<p className="mt-1 text-xs text-slate-600">
-						Set location, type and budget to narrow listings instantly.
-					</p>
+					{!compact && (
+						<p className="mt-1 text-[11px] text-slate-600 sm:text-xs">
+							Quick search now. Add filters only if needed.
+						</p>
+					)}
 				</div>
-				<span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700">
+				<span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-1 text-[11px] font-medium text-emerald-700 sm:px-3 sm:text-xs">
 					<FaFilter className="text-[10px]" /> Refine search
 				</span>
 			</div>
 
-			<div className="mb-4 rounded-xl border border-slate-200 bg-slate-50 p-1">
+			<div className="mb-3 rounded-xl border border-slate-200 bg-slate-50 p-1">
 				<p className="mb-1 px-2 pt-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-slate-500">
 					Looking to
 				</p>
@@ -313,29 +328,11 @@ const HomepagePropertySearchFilter: React.FC = () => {
 				</div>
 			</div>
 
-			<div className="grid grid-cols-1 gap-3 md:grid-cols-12 md:gap-4">
-				<div className="md:col-span-4">
-					<label
-						htmlFor="propertyType"
-						className="mb-1 block text-xs font-medium text-slate-600"
-					>
-						Property Type
-					</label>
-					<select
-						name="propertyType"
-						id="propertyType"
-						value={filters.propertyType}
-						onChange={handleChange}
-						className="h-11 w-full rounded-lg border border-slate-200 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-300"
-					>
-						{getPropertyTypes().map((type) => (
-							<option key={type.value} value={type.value}>
-								{type.label}
-							</option>
-						))}
-					</select>
-				</div>
-
+			<div
+				className={`grid grid-cols-1 gap-3 ${
+					compact ? "md:grid-cols-6 md:gap-3" : "md:grid-cols-12 md:gap-4"
+				}`}
+			>
 				<div className="md:col-span-4">
 					<label
 						htmlFor="location"
@@ -369,7 +366,76 @@ const HomepagePropertySearchFilter: React.FC = () => {
 					)}
 				</div>
 
-				<div className="md:col-span-4">
+				<div className="md:col-span-2">
+					<label
+						htmlFor="propertyType"
+						className="mb-1 block text-xs font-medium text-slate-600"
+					>
+						Property Type
+					</label>
+					<select
+						name="propertyType"
+						id="propertyType"
+						value={filters.propertyType}
+						onChange={handleChange}
+						className="h-11 w-full rounded-lg border border-slate-200 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-300"
+					>
+						{getPropertyTypes().map((type) => (
+							<option key={type.value} value={type.value}>
+								{type.label}
+							</option>
+						))}
+					</select>
+				</div>
+
+				<div className={compact ? "md:col-span-6" : "md:col-span-4"}>
+					<div className="flex w-full items-end gap-2">
+						<div className="w-full">
+							<label className="mb-1 block text-xs font-medium text-slate-600 md:sr-only">
+								Search
+							</label>
+							<button
+								type="submit"
+								className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-lg bg-emerald-600 px-4 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700"
+							>
+								<FaSearch className="text-sm" />
+								<span>Find Properties</span>
+							</button>
+						</div>
+						{hasActiveFilters && (
+							<button
+								type="button"
+								onClick={resetFilters}
+								className="inline-flex h-11 items-center justify-center rounded-lg border border-slate-300 bg-white px-3 text-sm font-medium text-slate-700"
+							>
+								Reset
+							</button>
+						)}
+					</div>
+				</div>
+
+				{shouldShowAdvancedToggle && (
+					<div className={compact ? "md:col-span-6" : "md:col-span-12"}>
+						<div className="flex items-center justify-between rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5">
+							<p className="text-xs font-medium text-slate-700">
+								Need more control?
+							</p>
+							<button
+								type="button"
+								onClick={() => setShowAdvancedFilters((prev) => !prev)}
+								className="text-xs font-semibold text-emerald-700"
+							>
+								{showAdvancedFilters ? "Hide Filters" : "More Filters"}
+							</button>
+						</div>
+					</div>
+				)}
+
+				<div
+					className={`rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 ${
+						compact ? "md:col-span-6" : "md:col-span-4"
+					} ${showAdvancedFilters ? "block" : "hidden"}`}
+				>
 					<label className="mb-1 block text-xs font-medium text-slate-600">
 						Nearby Search
 					</label>
@@ -401,7 +467,12 @@ const HomepagePropertySearchFilter: React.FC = () => {
 					</div>
 				</div>
 
-				<div className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 md:col-span-8">
+				<div
+					className={`rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 ${
+						compact ? "md:col-span-6" : "md:col-span-8"
+					} ${showAdvancedFilters ? "block" : "hidden"}
+					}`}
+				>
 					<label className="mb-1 block text-xs font-medium text-slate-600">
 						Budget Range
 					</label>
@@ -457,27 +528,19 @@ const HomepagePropertySearchFilter: React.FC = () => {
 					</div>
 				</div>
 
-				<div className="md:col-span-4 flex gap-2 md:items-end">
-					<div className="flex w-full gap-2">
-						{hasActiveFilters && (
-							<button
-								type="button"
-								onClick={resetFilters}
-								className="inline-flex h-11 items-center justify-center rounded-lg border border-slate-300 bg-white px-3 text-sm font-medium text-slate-700"
-							>
-								Reset
-							</button>
-						)}
-
+				{showAdvancedFilters && (
+					<div
+						className={`flex gap-2 md:items-end ${compact ? "md:col-span-6" : "md:col-span-12"}`}
+					>
 						<button
 							type="submit"
 							className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-lg bg-emerald-600 px-4 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700"
 						>
 							<FaSearch className="text-sm" />
-							<span>Search</span>
+							<span>Apply Filters & Search</span>
 						</button>
 					</div>
-				</div>
+				)}
 			</div>
 		</form>
 	);

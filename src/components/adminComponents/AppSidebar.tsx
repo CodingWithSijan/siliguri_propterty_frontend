@@ -18,6 +18,7 @@ import {
 import {
 	Home,
 	Edit,
+	Star,
 	UserPenIcon,
 	ChartNoAxesCombined,
 	MessageSquare,
@@ -30,6 +31,11 @@ import AdminProfile from "./AdminProfile";
 const BASE_ITEMS = [
 	{ title: "Overview", url: "/admin/home", icon: ChartNoAxesCombined },
 	{ title: "Post Moderation", url: "/admin/posts", icon: Edit },
+	{
+		title: "Featured Properties",
+		url: "/admin/featured-properties",
+		icon: Star,
+	},
 	{ title: "User Management", url: "/admin/users", icon: UserPenIcon },
 	{ title: "Messages", url: "/admin/messages", icon: MessageSquare },
 	{ title: "Notifications", url: "/admin/notifications", icon: Bell },

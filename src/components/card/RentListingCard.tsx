@@ -45,6 +45,9 @@ const RentListingCard: React.FC<{
 	const postedAgoText = getDaysAgoTextFromObjectId(listing._id);
 	const searchMetrics = buildRentSearchMetrics(listing);
 	const viewCount = Math.max(0, Number(listing.viewCount ?? 0));
+	const ownerName = listing.user?.name?.trim() || "Listing Owner";
+	const ownerAvatar = listing.user?.avatar?.trim() || "";
+	const ownerInitial = ownerName.charAt(0).toUpperCase();
 	const thumbnail = listing.pictures?.find((url) => isImageUrl(url));
 	const localityText =
 		listing.wbLocalityLabel?.trim() || listing.location?.trim() || "";
@@ -61,7 +64,7 @@ const RentListingCard: React.FC<{
 			<motion.article
 				transition={{ type: "spring", stiffness: 110, damping: 18 }}
 				onClick={handleClick}
-				className="group overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:shadow-md cursor-pointer md:min-h-[272px] lg:h-[272px] lg:min-h-0"
+				className="group cursor-pointer overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg md:min-h-[272px] lg:h-[272px] lg:min-h-0"
 			>
 				<div className="flex flex-col md:h-full md:flex-row">
 					<div className="relative h-52 w-full overflow-hidden md:h-full md:w-64 md:shrink-0">
@@ -70,6 +73,7 @@ const RentListingCard: React.FC<{
 							alt={listing.title}
 							className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.02]"
 						/>
+						<div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-slate-900/75 via-slate-900/35 to-transparent" />
 						<div className="absolute left-3 top-3 rounded bg-blue-900 px-2 py-1 text-[10px] font-semibold tracking-wide text-white">
 							FOR RENT
 						</div>
@@ -78,6 +82,26 @@ const RentListingCard: React.FC<{
 								<ActionButtons listing={listing} />
 							</div>
 						)}
+						<div className="absolute bottom-3 left-3 right-3 z-10">
+							<div className="inline-flex max-w-full items-center gap-2 rounded-full border border-white/30 bg-black/35 px-2.5 py-1 text-white backdrop-blur-sm">
+								<div className="h-6 w-6 shrink-0 overflow-hidden rounded-full bg-emerald-100 text-[10px] font-semibold text-emerald-800">
+									{ownerAvatar ? (
+										<img
+											src={ownerAvatar}
+											alt={`${ownerName} avatar`}
+											className="h-full w-full object-cover"
+										/>
+									) : (
+										<div className="flex h-full w-full items-center justify-center">
+											{ownerInitial}
+										</div>
+									)}
+								</div>
+								<p className="line-clamp-1 min-w-0 text-xs font-medium text-white/95">
+									{ownerName}
+								</p>
+							</div>
+						</div>
 					</div>
 
 					<div className="flex min-w-0 flex-1 flex-col p-4 md:h-full md:p-5">
@@ -93,7 +117,7 @@ const RentListingCard: React.FC<{
 							</div>
 
 							<div className="shrink-0 text-right">
-								<p className="inline-flex items-center text-2xl font-bold text-emerald-700">
+								<p className="inline-flex items-center text-xl font-bold text-emerald-700">
 									<BiRupee className="text-xl" />
 									{listing.pricePerFrequency
 										? formatIndianCurrency(listing.pricePerFrequency)
@@ -111,7 +135,7 @@ const RentListingCard: React.FC<{
 							{searchMetrics.map((metric) => (
 								<div
 									key={metric.label}
-									className="rounded-lg bg-slate-50 px-2.5 py-2"
+									className="rounded-lg border border-slate-100 bg-slate-50/70 px-2.5 py-2"
 								>
 									<p className="text-[10px] font-semibold uppercase tracking-wide text-slate-500">
 										{metric.label}
@@ -121,10 +145,6 @@ const RentListingCard: React.FC<{
 									</p>
 								</div>
 							))}
-						</div>
-
-						<div className="mt-2 text-xs text-slate-600">
-							<RenderListingFeaturesRent listing={listing} />
 						</div>
 
 						<div className="mt-3 flex flex-col gap-2 border-t border-slate-200 pt-3 lg:flex-row lg:items-center lg:justify-between">
@@ -157,7 +177,7 @@ const RentListingCard: React.FC<{
 		<motion.div
 			transition={{ type: "spring", stiffness: 100, damping: 18 }}
 			onClick={handleClick}
-			className={`relative bg-white rounded-xl shadow-sm hover:shadow-md border border-gray-200/70 group w-full cursor-pointer overflow-hidden ${
+			className={`relative overflow-hidden rounded-xl border border-gray-200/80 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg group w-full cursor-pointer ${
 				isRow
 					? "mx-0 flex flex-col md:flex-row"
 					: "mx-auto flex max-w-sm flex-col"
@@ -224,6 +244,26 @@ const RentListingCard: React.FC<{
 
 				{/* gradient overlay to improve title readability */}
 				<div className="absolute left-0 right-0 bottom-0 h-36 bg-gradient-to-t from-black/70 to-transparent" />
+				<div className="absolute left-3 right-3 bottom-12 z-10">
+					<div className="inline-flex max-w-full items-center gap-2 rounded-full border border-white/25 bg-slate-900/45 px-2.5 py-1 text-white backdrop-blur-md">
+						<div className="h-6 w-6 shrink-0 overflow-hidden rounded-full bg-emerald-100 text-[10px] font-semibold text-emerald-800">
+							{ownerAvatar ? (
+								<img
+									src={ownerAvatar}
+									alt={`${ownerName} avatar`}
+									className="h-full w-full object-cover"
+								/>
+							) : (
+								<div className="flex h-full w-full items-center justify-center">
+									{ownerInitial}
+								</div>
+							)}
+						</div>
+						<p className="line-clamp-1 min-w-0 text-xs font-medium text-white/95">
+							{ownerName}
+						</p>
+					</div>
+				</div>
 				{/* Title pinned to the bottom of the image */}
 				<div className="absolute left-3 right-3 bottom-0 text-white pb-1">
 					<h3
@@ -258,7 +298,7 @@ const RentListingCard: React.FC<{
 				{/* Price moved below location */}
 				{listing.pricePerFrequency && (
 					<div className="mt-2">
-						<span className="text-green-700 font-bold text-base flex items-center gap-1">
+						<span className="flex items-center gap-1 text-sm font-bold text-green-700">
 							<BiRupee className="text-base" />
 							{formatIndianCurrency(listing.pricePerFrequency)}
 							{listing.frequency && (
