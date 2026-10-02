@@ -9,8 +9,7 @@ import { applySeoMeta } from "../utils/seo";
 const Homepage = () => {
 	useEffect(() => {
 		applySeoMeta({
-			title:
-				"Siliguri Property | Buy, Rent, Sell Houses, Flats and Land in Siliguri",
+			title: "Properties in Siliguri | Buy, Rent & Sell | Siliguri Property",
 			description:
 				"Search properties in Siliguri including houses for sale, land for sale, flats, shops and rentals across nearby localities like Matigara, Bagdogra, Pradhan Nagar and Sevoke Road.",
 			canonicalPath: "/",

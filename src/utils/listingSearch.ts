@@ -28,8 +28,22 @@ const toNumber = (value: unknown): number | null => {
 	}
 
 	if (typeof value === "string") {
-		const parsed = Number(value);
-		return Number.isFinite(parsed) ? parsed : null;
+		const directParsed = Number(value);
+		if (Number.isFinite(directParsed)) {
+			return directParsed;
+		}
+
+		// Support values like "25,000", "₹25000", or "Rs. 25000".
+		const normalized = value
+			.replace(/,/g, "")
+			.replace(/[^\d.-]/g, "")
+			.trim();
+		if (!normalized) {
+			return null;
+		}
+
+		const normalizedParsed = Number(normalized);
+		return Number.isFinite(normalizedParsed) ? normalizedParsed : null;
 	}
 
 	return null;
@@ -39,7 +53,10 @@ export const getListingPrice = (
 	listing: IUniversalListingType,
 ): number | null => {
 	if ("pricePerFrequency" in listing) {
-		return toNumber(listing.pricePerFrequency);
+		const rentPrice = toNumber(listing.pricePerFrequency);
+		if (rentPrice !== null) {
+			return rentPrice;
+		}
 	}
 
 	return (

@@ -158,11 +158,23 @@ const toStateFromParams = (
 	};
 };
 
-const stateToSearchParams = (state: IListingSearchState): URLSearchParams => {
+const stateToSearchParams = (
+	state: IListingSearchState,
+	options?: {
+		forcedIntent?: "rent" | "sell";
+		forcedCategory?: "house" | "flat" | "shop" | "land";
+	},
+): URLSearchParams => {
 	const params = new URLSearchParams();
+	const forcedIntent = options?.forcedIntent;
+	const forcedCategory = options?.forcedCategory;
 	if (state.query) params.set("q", state.query);
-	if (state.intent !== "all") params.set("intent", state.intent);
-	if (state.category !== "all") params.set("category", state.category);
+	if (state.intent !== "all" && state.intent !== forcedIntent) {
+		params.set("intent", state.intent);
+	}
+	if (state.category !== "all" && state.category !== forcedCategory) {
+		params.set("category", state.category);
+	}
 	if (state.minPrice !== null) params.set("minPrice", String(state.minPrice));
 	if (state.maxPrice !== null) params.set("maxPrice", String(state.maxPrice));
 	if (state.locationKey) params.set("location", state.locationKey);
@@ -239,12 +251,24 @@ const AllListings: React.FC<AllListingsProps> = ({
 	}, []);
 
 	useEffect(() => {
-		const currentParams = stateToSearchParams(state).toString();
-		const normalizedParams = stateToSearchParams(normalizedState).toString();
+		const currentParams = searchParams.toString();
+		const normalizedParams = stateToSearchParams(normalizedState, {
+			forcedIntent,
+			forcedCategory,
+		}).toString();
 		if (currentParams !== normalizedParams) {
-			setSearchParams(stateToSearchParams(normalizedState), { replace: true });
+			setSearchParams(
+				stateToSearchParams(normalizedState, { forcedIntent, forcedCategory }),
+				{ replace: true },
+			);
 		}
-	}, [normalizedState, setSearchParams, state]);
+	}, [
+		forcedCategory,
+		forcedIntent,
+		normalizedState,
+		searchParams,
+		setSearchParams,
+	]);
 
 	const searchFilters = useMemo<IListingSearchFilters>(
 		() => ({
@@ -287,16 +311,63 @@ const AllListings: React.FC<AllListingsProps> = ({
 	useEffect(() => {
 		if (normalizedState.page > totalPages) {
 			const nextState = { ...normalizedState, page: totalPages };
-			setSearchParams(stateToSearchParams(nextState), { replace: true });
+			setSearchParams(
+				stateToSearchParams(nextState, { forcedIntent, forcedCategory }),
+				{ replace: true },
+			);
 		}
-	}, [normalizedState, setSearchParams, totalPages]);
+	}, [
+		forcedCategory,
+		forcedIntent,
+		normalizedState,
+		setSearchParams,
+		totalPages,
+	]);
 
 	const paginatedPosts = useMemo(() => {
 		const start = (currentPage - 1) * ITEMS_PER_PAGE;
 		return filteredPosts.slice(start, start + ITEMS_PER_PAGE);
 	}, [currentPage, filteredPosts]);
 
+	const navigateWithState = (
+		targetIntent: IListingSearchState["intent"],
+		overrides?: Partial<IListingSearchState>,
+	) => {
+		const routePath =
+			targetIntent === "rent"
+				? "/rentals"
+				: targetIntent === "sell"
+					? "/buys"
+					: "/properties";
+
+		const nextState = normalizeSearchState(
+			{
+				...normalizedState,
+				...overrides,
+				intent: targetIntent,
+				page: 1,
+			},
+			targetIntent === "all" ? undefined : targetIntent,
+			undefined,
+		);
+
+		const params = stateToSearchParams(nextState, {
+			forcedIntent: targetIntent === "all" ? undefined : targetIntent,
+		});
+		const query = params.toString();
+		navigate(query ? `${routePath}?${query}` : routePath);
+	};
+
 	const updateState = (patch: Partial<IListingSearchState>) => {
+		if (
+			forcedIntent &&
+			patch.intent !== undefined &&
+			patch.intent !== forcedIntent
+		) {
+			navigateWithState(patch.intent, patch);
+			return;
+		}
+
 		const nextState = normalizeSearchState(
 			{
 				...normalizedState,
@@ -308,7 +379,9 @@ const AllListings: React.FC<AllListingsProps> = ({
 			forcedCategory,
 		);
 
-		setSearchParams(stateToSearchParams(nextState));
+		setSearchParams(
+			stateToSearchParams(nextState, { forcedIntent, forcedCategory }),
+		);
 	};
 
 	const onUseCurrentLocation = () => {
@@ -370,7 +443,9 @@ const AllListings: React.FC<AllListingsProps> = ({
 			radiusKm: 12,
 			page: 1,
 		};
-		setSearchParams(stateToSearchParams(resetState));
+		setSearchParams(
+			stateToSearchParams(resetState, { forcedIntent, forcedCategory }),
+		);
 	};
 
 	const goToPage = (page: number) => {
@@ -438,11 +513,11 @@ const AllListings: React.FC<AllListingsProps> = ({
 				: `${filteredPosts.length} Properties in ${activeAreaLabel}`;
 
 	const activeFilterChips = [
-		normalizedState.intent !== "all"
+		!forcedIntent && normalizedState.intent !== "all"
 			? {
 					key: "intent",
 					label: normalizedState.intent === "sell" ? "Buy" : "Rent",
-					onClear: () => updateState({ intent: "all", page: 1 }),
+					onClear: () => navigateWithState("all"),
 				}
 			: null,
 		normalizedState.category !== "all"
@@ -641,18 +716,37 @@ const AllListings: React.FC<AllListingsProps> = ({
 				? `/properties?${canonicalParams.toString()}`
 				: "/properties";
 
+		const isIndexableListingCollection =
+			normalizedState.query.trim().length === 0 &&
+			normalizedState.minPrice === null &&
+			normalizedState.maxPrice === null &&
+			normalizedState.sortBy === "newest" &&
+			normalizedState.lat === null &&
+			normalizedState.lng === null &&
+			normalizedState.page <= 1;
+
 		applySeoMeta({
 			title: pageTitle,
 			description,
 			canonicalPath,
+			robots: isIndexableListingCollection
+				? "index, follow"
+				: "noindex, follow",
 			keywords:
 				"properties in siliguri, siliguri property, land for sale in siliguri, house for sale in siliguri, flats in siliguri, rent property siliguri, siliguri localities",
 		});
 	}, [
 		activeAreaLabel,
 		effectiveIntent,
+		normalizedState.lat,
+		normalizedState.lng,
+		normalizedState.maxPrice,
+		normalizedState.minPrice,
+		normalizedState.page,
+		normalizedState.query,
 		normalizedState.category,
 		normalizedState.locationKey,
+		normalizedState.sortBy,
 	]);
 
 	return (
@@ -698,13 +792,10 @@ const AllListings: React.FC<AllListingsProps> = ({
 									<button
 										key={intentOption.value}
 										type="button"
-										disabled={Boolean(forcedIntent)}
 										onClick={() =>
-											updateState({
-												intent:
-													intentOption.value as IListingSearchState["intent"],
-												page: 1,
-											})
+											navigateWithState(
+												intentOption.value as IListingSearchState["intent"],
+											)
 										}
 										className={`rounded-full border px-3 py-1 text-xs font-semibold ${
 											active
@@ -930,13 +1021,10 @@ const AllListings: React.FC<AllListingsProps> = ({
 								<button
 									key={intentOption.value}
 									type="button"
-									disabled={Boolean(forcedIntent)}
 									onClick={() =>
-										updateState({
-											intent:
-												intentOption.value as IListingSearchState["intent"],
-											page: 1,
-										})
+										navigateWithState(
+											intentOption.value as IListingSearchState["intent"],
+										)
 									}
 									className={`rounded-full border px-3 py-1 text-xs font-semibold ${
 										active

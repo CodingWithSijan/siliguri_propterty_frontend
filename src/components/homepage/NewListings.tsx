@@ -1,7 +1,14 @@
 import React, { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { Bath, BedDouble, Images, MapPin } from "lucide-react";
+import {
+	Bath,
+	BedDouble,
+	ImageIcon,
+	Images,
+	MapPin,
+	Video,
+} from "lucide-react";
 import Autoplay from "embla-carousel-autoplay";
 import BASE_URL from "../../services";
 import {
@@ -22,6 +29,16 @@ const SILIGURI_FALLBACK_SELL_IMAGE =
 	"https://commons.wikimedia.org/wiki/Special:FilePath/The_mighty_Mountains_Siliguri.jpg";
 const SILIGURI_FALLBACK_RENT_IMAGE =
 	"https://commons.wikimedia.org/wiki/Special:FilePath/Tourism_3.jpg";
+
+const isVideoUrl = (url: string): boolean => {
+	const lower = url.toLowerCase();
+	if (lower.includes("/video/upload/")) return true;
+	if (lower.includes("/image/upload/")) return false;
+	return /\.(mp4|webm|mov|m4v|ogg)(\?|$)/i.test(lower);
+};
+
+const toCategoryLabel = (value: string): string =>
+	value ? value.charAt(0).toUpperCase() + value.slice(1) : "Property";
 
 const NewListings: React.FC = () => {
 	const navigate = useNavigate();
@@ -398,6 +415,15 @@ const NewListings: React.FC = () => {
 									>
 										{(() => {
 											const listingPrice = getListingPrice(listing);
+											const photoCount = listing.pictures?.length ?? 0;
+											const videoCount =
+												listing.videos?.filter((url) => isVideoUrl(url))
+													.length ?? 0;
+											const categoryLabel = toCategoryLabel(
+												listing.propertyCategory,
+											);
+											const intentLabel =
+												listing.intent === "rent" ? "For Rent" : "For Sale";
 											return (
 												<button
 													type="button"
@@ -413,6 +439,28 @@ const NewListings: React.FC = () => {
 															className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
 														/>
 														<div className="absolute inset-0 bg-gradient-to-t from-black/30 via-black/0 to-transparent" />
+														<div className="absolute left-2 top-2 rounded bg-slate-900/80 px-2 py-1 text-[10px] font-semibold uppercase tracking-wide text-white">
+															{intentLabel}
+														</div>
+														<div className="absolute left-2 top-9 rounded-full border border-white/25 bg-black/45 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-white backdrop-blur-sm">
+															{categoryLabel}
+														</div>
+														{(photoCount > 0 || videoCount > 0) && (
+															<div className="absolute right-2 top-2 inline-flex items-center gap-1.5 rounded-full bg-black/60 px-2 py-1 text-[10px] font-semibold text-white backdrop-blur-sm">
+																{photoCount > 0 && (
+																	<span className="inline-flex items-center gap-1">
+																		<ImageIcon className="h-3 w-3" />
+																		{photoCount}
+																	</span>
+																)}
+																{videoCount > 0 && (
+																	<span className="inline-flex items-center gap-1">
+																		<Video className="h-3 w-3" />
+																		{videoCount}
+																	</span>
+																)}
+															</div>
+														)}
 													</div>
 													<div className="flex flex-1 flex-col p-3.5 sm:p-4">
 														<p className="text-base font-bold text-slate-900 sm:text-lg">
@@ -430,9 +478,12 @@ const NewListings: React.FC = () => {
 															<MapPin className="h-3.5 w-3.5" />
 															{listing.wbLocalityLabel || listing.location}
 														</p>
-														<div className="mt-auto pt-3 text-xs text-slate-500">
+														<div className="mt-auto flex items-center justify-between pt-3 text-xs text-slate-500">
 															<span className="rounded-md border border-slate-200 bg-slate-50 px-2 py-1 capitalize">
-																{listing.propertyCategory}
+																{listing.intent === "rent" ? "Rental" : "Sale"}
+															</span>
+															<span className="text-[11px] font-medium text-slate-500">
+																Explore details
 															</span>
 														</div>
 													</div>

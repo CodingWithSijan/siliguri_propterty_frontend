@@ -13,6 +13,7 @@ export interface IBaseListingType {
 	title: string;
 	description: string;
 	pictures?: string[];
+	videos?: string[];
 	location: string;
 	alternateLocation: string;
 	wbLocalityKey?: string;

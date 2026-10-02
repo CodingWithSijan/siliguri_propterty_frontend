@@ -1,0 +1,1 @@
+const d=/res\.cloudinary\.com/i,u=(t,o)=>{if(!t||!d.test(t))return t;const n="/image/upload/",e=t.indexOf(n);if(e===-1)return t;const s=e+n.length,a=t.slice(s),i=a.indexOf("/");if(i===-1)return t;const c=a.slice(i+1),r=o.crop??"fill",f=`f_auto,q_${o.quality??"auto:good"},dpr_auto,c_${r},w_${o.width},h_${o.height}`;return`${t.slice(0,s)}${f}/${c}`};export{u as o};

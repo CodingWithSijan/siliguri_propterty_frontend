@@ -3,10 +3,53 @@
 	"buildCommand": "npm run build",
 	"outputDirectory": "dist",
 	"installCommand": "npm install",
+	"cleanUrls": true,
+	"trailingSlash": false,
+	"redirects": [
+		{
+			"source": "/:path*",
+			"has": [
+				{
+					"type": "host",
+					"value": "www.siliguriproperty.in"
+				}
+			],
+			"destination": "https://siliguriproperty.in/:path*",
+			"permanent": true
+		}
+	],
 	"rewrites": [
 		{
-			"source": "/(.*)",
-			"destination": "/"
+			"source": "/dashboard/:path*",
+			"destination": "/index.html"
+		},
+		{
+			"source": "/admin/:path*",
+			"destination": "/index.html"
+		},
+		{
+			"source": "/signup",
+			"destination": "/index.html"
+		},
+		{
+			"source": "/login",
+			"destination": "/index.html"
+		},
+		{
+			"source": "/reset-password/:path*",
+			"destination": "/index.html"
+		},
+		{
+			"source": "/verify-email",
+			"destination": "/index.html"
+		},
+		{
+			"source": "/auth/social-callback",
+			"destination": "/index.html"
+		},
+		{
+			"source": "/access-denied",
+			"destination": "/index.html"
 		}
 	]
 }
