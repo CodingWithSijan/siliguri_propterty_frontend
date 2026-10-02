@@ -11,7 +11,8 @@ import { getDaysAgoTextFromObjectId } from "../../utils/getDaysAgo";
 import RenderListingFeaturesSell from "./RenderListingFeaturesSell";
 import { useNavigate } from "react-router-dom";
 import { buildSellSearchMetrics } from "./searchCardMetrics";
-import { Eye } from "lucide-react";
+import { Eye, ImageIcon, Video } from "lucide-react";
+import { optimizeCloudinaryImage } from "../../utils/optimizeCloudinaryImage";
 
 const capitalize = (str: string | undefined) =>
 	str ? str.charAt(0).toUpperCase() + str.slice(1) : "";
@@ -36,6 +37,13 @@ const isImageUrl = (url: string): boolean => {
 	if (lower.includes("/image/upload/")) return true;
 	if (lower.includes("/video/upload/")) return false;
 	return /\.(jpg|jpeg|png|webp|gif|avif)(\?|$)/i.test(lower);
+};
+
+const isVideoUrl = (url: string): boolean => {
+	const lower = url.toLowerCase();
+	if (lower.includes("/video/upload/")) return true;
+	if (lower.includes("/image/upload/")) return false;
+	return /\.(mp4|webm|mov|m4v|ogg)(\?|$)/i.test(lower);
 };
 
 const SellListingCard: React.FC<{
@@ -79,6 +87,34 @@ const SellListingCard: React.FC<{
 	const ownerAvatar = listing.user?.avatar?.trim() || "";
 	const ownerInitial = ownerName.charAt(0).toUpperCase();
 	const thumbnail = listing.pictures?.find((url) => isImageUrl(url));
+	const photoCount =
+		listing.pictures?.filter((url) => isImageUrl(url)).length ?? 0;
+	const videos = listing.videos?.filter((url) => isVideoUrl(url)) ?? [];
+	const videoCount = videos.length;
+	const primaryVideo = videos[0];
+	const categoryLabel = capitalize(listing.propertyCategory as string);
+	const getCardImageSrc = (): string => {
+		const source = thumbnail || "";
+		if (!source) {
+			return "";
+		}
+		if (isSearch) {
+			return optimizeCloudinaryImage(source, {
+				width: 960,
+				height: 720,
+				crop: "fill",
+				quality: "auto:good",
+			});
+		}
+
+		return optimizeCloudinaryImage(source, {
+			width: 1100,
+			height: 720,
+			crop: "fill",
+			quality: "auto:good",
+		});
+	};
+	const listingImageSrc = getCardImageSrc();
 	const localityText =
 		listing.wbLocalityLabel?.trim() || listing.location?.trim() || "";
 	const exactAddressText = listing.alternateLocation?.trim() || "";
@@ -98,15 +134,51 @@ const SellListingCard: React.FC<{
 			>
 				<div className="flex flex-col md:h-full md:flex-row">
 					<div className="relative h-52 w-full overflow-hidden md:h-full md:w-64 md:shrink-0">
-						<img
-							src={thumbnail || propertyImagePlaceholder}
-							alt={listing.title}
-							className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.02]"
-						/>
+						{listingImageSrc ? (
+							<img
+								src={listingImageSrc}
+								alt={listing.title}
+								className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.02]"
+							/>
+						) : primaryVideo ? (
+							<video
+								src={primaryVideo}
+								className="h-full w-full object-cover"
+								poster={propertyImagePlaceholder}
+								muted
+								playsInline
+								preload="metadata"
+							/>
+						) : (
+							<img
+								src={propertyImagePlaceholder}
+								alt={listing.title}
+								className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.02]"
+							/>
+						)}
 						<div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-slate-900/75 via-slate-900/35 to-transparent" />
 						<div className="absolute left-3 top-3 rounded bg-emerald-700 px-2 py-1 text-[10px] font-semibold tracking-wide text-white">
 							FOR SALE
 						</div>
+						<div className="absolute left-3 top-10 rounded-full border border-white/25 bg-black/45 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide text-white backdrop-blur-sm">
+							{categoryLabel}
+						</div>
+						{(photoCount > 0 || videoCount > 0) && (
+							<div className="absolute right-3 bottom-3 inline-flex items-center gap-2 rounded-full bg-black/60 px-2.5 py-1 text-[10px] font-semibold text-white backdrop-blur-sm">
+								{photoCount > 0 && (
+									<span className="inline-flex items-center gap-1">
+										<ImageIcon className="h-3 w-3" />
+										{photoCount}
+									</span>
+								)}
+								{videoCount > 0 && (
+									<span className="inline-flex items-center gap-1">
+										<Video className="h-3 w-3" />
+										{videoCount}
+									</span>
+								)}
+							</div>
+						)}
 						{userOrGlobal === "global" && (
 							<div className="absolute right-3 top-3 z-20">
 								<ActionButtons listing={listing} />
@@ -275,11 +347,44 @@ const SellListingCard: React.FC<{
 				className={`overflow-hidden relative ${isRow ? "w-full md:w-72 shrink-0" : "w-full"}`}
 				style={{ height: isRow ? 220 : 240 }}
 			>
-				<img
-					src={thumbnail || propertyImagePlaceholder}
-					alt={listing.title}
-					className="w-full h-full object-cover mx-auto"
-				/>
+				{listingImageSrc ? (
+					<img
+						src={listingImageSrc}
+						alt={listing.title}
+						className="w-full h-full object-cover mx-auto"
+					/>
+				) : primaryVideo ? (
+					<video
+						src={primaryVideo}
+						className="w-full h-full object-cover mx-auto"
+						poster={propertyImagePlaceholder}
+						muted
+						playsInline
+						preload="metadata"
+					/>
+				) : (
+					<img
+						src={propertyImagePlaceholder}
+						alt={listing.title}
+						className="w-full h-full object-cover mx-auto"
+					/>
+				)}
+				{(photoCount > 0 || videoCount > 0) && (
+					<div className="absolute right-3 bottom-3 z-20 inline-flex items-center gap-2 rounded-full bg-black/60 px-2.5 py-1 text-[10px] font-semibold text-white backdrop-blur-sm">
+						{photoCount > 0 && (
+							<span className="inline-flex items-center gap-1">
+								<ImageIcon className="h-3 w-3" />
+								{photoCount}
+							</span>
+						)}
+						{videoCount > 0 && (
+							<span className="inline-flex items-center gap-1">
+								<Video className="h-3 w-3" />
+								{videoCount}
+							</span>
+						)}
+					</div>
+				)}
 				{/* Share button moved to top-right of card (show for global view to avoid overlap with user-status pill) */}
 				{userOrGlobal === "global" && (
 					// keep action buttons inside image area but slightly inset so they don't overlap status pills

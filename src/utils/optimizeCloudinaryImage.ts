@@ -2,6 +2,7 @@ type CloudinaryOptimizeOptions = {
 	width: number;
 	height: number;
 	crop?: "fill" | "fit" | "limit";
+	quality?: "auto" | "auto:eco" | "auto:good" | "auto:best" | number;
 };
 
 const CLOUDINARY_HOST_PATTERN = /res\.cloudinary\.com/i;
@@ -31,7 +32,8 @@ export const optimizeCloudinaryImage = (
 
 	const pathAfterTransforms = rest.slice(firstSlash + 1);
 	const crop = options.crop ?? "fill";
-	const transform = `f_auto,q_auto,dpr_auto,c_${crop},w_${options.width},h_${options.height}`;
+	const quality = options.quality ?? "auto:good";
+	const transform = `f_auto,q_${quality},dpr_auto,c_${crop},w_${options.width},h_${options.height}`;
 
 	return `${url.slice(0, existingTransformStart)}${transform}/${pathAfterTransforms}`;
 };

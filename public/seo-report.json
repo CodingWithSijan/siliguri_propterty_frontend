@@ -1,0 +1,544 @@
+{
+  "generatedAt": "2026-10-02T09:55:37.118Z",
+  "siteOrigin": "https://siliguriproperty.in",
+  "backendBase": "http://localhost:5000",
+  "pageCount": 107,
+  "listingCount": 54,
+  "routes": [
+    {
+      "path": "/",
+      "title": "Properties in Siliguri | Buy, Rent & Sell | Siliguri Property",
+      "robots": "index, follow"
+    },
+    {
+      "path": "/properties",
+      "title": "All Property Listings in Siliguri | Buy & Rent",
+      "robots": "index, follow"
+    },
+    {
+      "path": "/buys",
+      "title": "Property for Sale in Siliguri | Houses, Flats, Land",
+      "robots": "index, follow"
+    },
+    {
+      "path": "/rentals",
+      "title": "Rental Properties in Siliguri | Flats, Houses & Shops",
+      "robots": "index, follow"
+    },
+    {
+      "path": "/about",
+      "title": "About Siliguri Property",
+      "robots": "index, follow"
+    },
+    {
+      "path": "/privacy",
+      "title": "Privacy Policy | Siliguri Property",
+      "robots": "index, follow"
+    },
+    {
+      "path": "/terms",
+      "title": "Terms of Service | Siliguri Property",
+      "robots": "index, follow"
+    },
+    {
+      "path": "/buys/house",
+      "title": "House for Sale in Siliguri | Prices & Localities",
+      "robots": "index, follow"
+    },
+    {
+      "path": "/buys/flat",
+      "title": "Flat for Sale in Siliguri | Prices & Localities",
+      "robots": "index, follow"
+    },
+    {
+      "path": "/buys/shop",
+      "title": "Shop for Sale in Siliguri | Prices & Localities",
+      "robots": "index, follow"
+    },
+    {
+      "path": "/buys/land",
+      "title": "Land for Sale in Siliguri | Prices & Localities",
+      "robots": "index, follow"
+    },
+    {
+      "path": "/rentals/house",
+      "title": "House for Rent in Siliguri | Listings & Areas",
+      "robots": "index, follow"
+    },
+    {
+      "path": "/rentals/flat",
+      "title": "Flat for Rent in Siliguri | Listings & Areas",
+      "robots": "index, follow"
+    },
+    {
+      "path": "/rentals/shop",
+      "title": "Shop for Rent in Siliguri | Listings & Areas",
+      "robots": "index, follow"
+    },
+    {
+      "path": "/locality/siliguri",
+      "title": "Property in Siliguri, Siliguri | Flats, Houses & Land",
+      "robots": "index, follow"
+    },
+    {
+      "path": "/locality/matigara",
+      "title": "Property in Matigara, Siliguri | Flats, Houses & Land",
+      "robots": "index, follow"
+    },
+    {
+      "path": "/locality/bagdogra",
+      "title": "Property in Bagdogra, Siliguri | Flats, Houses & Land",
+      "robots": "index, follow"
+    },
+    {
+      "path": "/locality/pradhan-nagar",
+      "title": "Property in Pradhan Nagar, Siliguri | Flats, Houses & Land",
+      "robots": "index, follow"
+    },
+    {
+      "path": "/locality/sevoke-road",
+      "title": "Property in Sevoke Road, Siliguri | Flats, Houses & Land",
+      "robots": "index, follow"
+    },
+    {
+      "path": "/locality/eastern-bypass",
+      "title": "Property in Eastern Bypass, Siliguri | Flats, Houses & Land",
+      "robots": "index, follow"
+    },
+    {
+      "path": "/locality/new-jalpaiguri",
+      "title": "Property in New Jalpaiguri, Siliguri | Flats, Houses & Land",
+      "robots": "index, follow"
+    },
+    {
+      "path": "/locality/salugara",
+      "title": "Property in Salugara, Siliguri | Flats, Houses & Land",
+      "robots": "index, follow"
+    },
+    {
+      "path": "/locality/dagapur",
+      "title": "Property in Dagapur, Siliguri | Flats, Houses & Land",
+      "robots": "index, follow"
+    },
+    {
+      "path": "/locality/fulbari",
+      "title": "Property in Fulbari, Siliguri | Flats, Houses & Land",
+      "robots": "index, follow"
+    },
+    {
+      "path": "/locality/hakimpara",
+      "title": "Property in Hakimpara, Siliguri | Flats, Houses & Land",
+      "robots": "index, follow"
+    },
+    {
+      "path": "/locality/hill-cart-road",
+      "title": "Property in Hill Cart Road, Siliguri | Flats, Houses & Land",
+      "robots": "index, follow"
+    },
+    {
+      "path": "/locality/khalpara",
+      "title": "Property in Khalpara, Siliguri | Flats, Houses & Land",
+      "robots": "index, follow"
+    },
+    {
+      "path": "/locality/deshbandhu-para",
+      "title": "Property in Deshbandhu Para, Siliguri | Flats, Houses & Land",
+      "robots": "index, follow"
+    },
+    {
+      "path": "/locality/sf-road",
+      "title": "Property in Sf Road, Siliguri | Flats, Houses & Land",
+      "robots": "index, follow"
+    },
+    {
+      "path": "/locality/ashram-para",
+      "title": "Property in Ashram Para, Siliguri | Flats, Houses & Land",
+      "robots": "index, follow"
+    },
+    {
+      "path": "/locality/champasari",
+      "title": "Property in Champasari, Siliguri | Flats, Houses & Land",
+      "robots": "index, follow"
+    },
+    {
+      "path": "/locality/uttorayon",
+      "title": "Property in Uttorayon, Siliguri | Flats, Houses & Land",
+      "robots": "index, follow"
+    },
+    {
+      "path": "/locality/haiderpara",
+      "title": "Property in Haiderpara, Siliguri | Flats, Houses & Land",
+      "robots": "index, follow"
+    },
+    {
+      "path": "/locality/iskon-road",
+      "title": "Property in Iskon Road, Siliguri | Flats, Houses & Land",
+      "robots": "index, follow"
+    },
+    {
+      "path": "/locality/shiv-mandir",
+      "title": "Property in Shiv Mandir, Siliguri | Flats, Houses & Land",
+      "robots": "index, follow"
+    },
+    {
+      "path": "/locality/bidhan-market",
+      "title": "Property in Bidhan Market, Siliguri | Flats, Houses & Land",
+      "robots": "index, follow"
+    },
+    {
+      "path": "/locality/court-more",
+      "title": "Property in Court More, Siliguri | Flats, Houses & Land",
+      "robots": "index, follow"
+    },
+    {
+      "path": "/locality/college-para",
+      "title": "Property in College Para, Siliguri | Flats, Houses & Land",
+      "robots": "index, follow"
+    },
+    {
+      "path": "/locality/2-no-milan-more",
+      "title": "Property in 2 No Milan More, Siliguri | Flats, Houses & Land",
+      "robots": "index, follow"
+    },
+    {
+      "path": "/locality/rabindra-sarani",
+      "title": "Property in Rabindra Sarani, Siliguri | Flats, Houses & Land",
+      "robots": "index, follow"
+    },
+    {
+      "path": "/locality/ghogomali",
+      "title": "Property in Ghogomali, Siliguri | Flats, Houses & Land",
+      "robots": "index, follow"
+    },
+    {
+      "path": "/locality/jyotinagar",
+      "title": "Property in Jyotinagar, Siliguri | Flats, Houses & Land",
+      "robots": "index, follow"
+    },
+    {
+      "path": "/locality/sushrutanagar",
+      "title": "Property in Sushrutanagar, Siliguri | Flats, Houses & Land",
+      "robots": "index, follow"
+    },
+    {
+      "path": "/locality/babupara",
+      "title": "Property in Babupara, Siliguri | Flats, Houses & Land",
+      "robots": "index, follow"
+    },
+    {
+      "path": "/locality/subhashpally",
+      "title": "Property in Subhashpally, Siliguri | Flats, Houses & Land",
+      "robots": "index, follow"
+    },
+    {
+      "path": "/locality/satellite-township",
+      "title": "Property in Satellite Township, Siliguri | Flats, Houses & Land",
+      "robots": "index, follow"
+    },
+    {
+      "path": "/locality/kadamtala",
+      "title": "Property in Kadamtala, Siliguri | Flats, Houses & Land",
+      "robots": "index, follow"
+    },
+    {
+      "path": "/locality/bhaktinagar",
+      "title": "Property in Bhaktinagar, Siliguri | Flats, Houses & Land",
+      "robots": "index, follow"
+    },
+    {
+      "path": "/locality/tinbatti-more",
+      "title": "Property in Tinbatti More, Siliguri | Flats, Houses & Land",
+      "robots": "index, follow"
+    },
+    {
+      "path": "/locality/panitanki-more",
+      "title": "Property in Panitanki More, Siliguri | Flats, Houses & Land",
+      "robots": "index, follow"
+    },
+    {
+      "path": "/locality/ward-37",
+      "title": "Property in Ward 37, Siliguri | Flats, Houses & Land",
+      "robots": "index, follow"
+    },
+    {
+      "path": "/locality/ward-42",
+      "title": "Property in Ward 42, Siliguri | Flats, Houses & Land",
+      "robots": "index, follow"
+    },
+    {
+      "path": "/locality/ward-45",
+      "title": "Property in Ward 45, Siliguri | Flats, Houses & Land",
+      "robots": "index, follow"
+    },
+    {
+      "path": "/buys/land/6abf60fc82aeaedde2f57e3c",
+      "title": "30 KATHA PLOT FOR SALE | Siliguri Property",
+      "robots": "index, follow"
+    },
+    {
+      "path": "/buys/land/6abf603b82aeaedde2f57e19",
+      "title": "4 KATHA TRIBAL PLOT FOR SALE | Siliguri Property",
+      "robots": "index, follow"
+    },
+    {
+      "path": "/buys/land/6abf5bdf82aeaedde2f57864",
+      "title": "4 KATHA TRIBAL PLOT FOR SALE | Siliguri Property",
+      "robots": "index, follow"
+    },
+    {
+      "path": "/buys/land/6abf5acf82aeaedde2f5783b",
+      "title": "30 KATHA PLOT FOR SALE | Siliguri Property",
+      "robots": "index, follow"
+    },
+    {
+      "path": "/buys/land/6abf4f8b82aeaedde2f5769b",
+      "title": "10 KHATTA GENERAL REGISTERED LAND | Siliguri Property",
+      "robots": "index, follow"
+    },
+    {
+      "path": "/buys/land/6abf4be782aeaedde2f57469",
+      "title": "Prime Commercial Land for Sale 25 Bighas (Available in 15 + 10 Bigha | Siliguri Property",
+      "robots": "index, follow"
+    },
+    {
+      "path": "/buys/land/6abe161282aeaedde2f57032",
+      "title": "10 KATHA LAND FOR SALE | Siliguri Property",
+      "robots": "index, follow"
+    },
+    {
+      "path": "/buys/land/6abe027782aeaedde2f56a75",
+      "title": "3 Bigha General Register Land for Sale | Siliguri Property",
+      "robots": "index, follow"
+    },
+    {
+      "path": "/buys/land/6abe00ff82aeaedde2f56a3c",
+      "title": "1000 Bigha General Register Land for Sale | Siliguri Property",
+      "robots": "index, follow"
+    },
+    {
+      "path": "/buys/land/6abe001882aeaedde2f56a10",
+      "title": "5 Bigha Land for Sale — Near The Selva Resort, Murti | Siliguri Property",
+      "robots": "index, follow"
+    },
+    {
+      "path": "/buys/land/6abcbe9e82aeaedde2f559af",
+      "title": "11 KATHA GENERAL LAND FOR SALE | Siliguri Property",
+      "robots": "index, follow"
+    },
+    {
+      "path": "/buys/land/6abcb81c82aeaedde2f55894",
+      "title": "3 KHATTA GENERAL LAND FOR SALE | Siliguri Property",
+      "robots": "index, follow"
+    },
+    {
+      "path": "/buys/land/6abca08582aeaedde2f55218",
+      "title": "15 Bigha (Approx. 4.84 Acres) 📜 Land Status: General Register (GR) | Siliguri Property",
+      "robots": "index, follow"
+    },
+    {
+      "path": "/buys/land/6abc9e0382aeaedde2f551c6",
+      "title": "3 Bigha General Register (GR) | Siliguri Property",
+      "robots": "index, follow"
+    },
+    {
+      "path": "/buys/land/6abb72adffec261e5e77cdd6",
+      "title": "3KATHA COMMERCIAL PLOT | Siliguri Property",
+      "robots": "index, follow"
+    },
+    {
+      "path": "/buys/land/6abb65d7ffec261e5e77ca08",
+      "title": "7 KATHA GENERAL PROPERTY | Siliguri Property",
+      "robots": "index, follow"
+    },
+    {
+      "path": "/buys/land/6abb60a3ffec261e5e77c77d",
+      "title": "2.5 BIGHA GENERAL REGISTERED PLOT | Siliguri Property",
+      "robots": "index, follow"
+    },
+    {
+      "path": "/buys/land/6abb5f44ffec261e5e77c6ee",
+      "title": "14.5 BIGHA GENERAL REGISTERED LAND WITH GARDEN FOR SALE | Siliguri Property",
+      "robots": "index, follow"
+    },
+    {
+      "path": "/buys/land/6aba3e7f5aea997d3e65bf8a",
+      "title": "10 KATHA GENERAL REGISTER PLOT FOR SALE | Siliguri Property",
+      "robots": "index, follow"
+    },
+    {
+      "path": "/buys/flat/6aba2e405aea997d3e65bb19",
+      "title": "2 BHK FLAT FOR SALE | Siliguri Property",
+      "robots": "index, follow"
+    },
+    {
+      "path": "/buys/land/6aba2a4c5aea997d3e65b8b9",
+      "title": "3 KATHA GENERAL LAND | Siliguri Property",
+      "robots": "index, follow"
+    },
+    {
+      "path": "/buys/land/6ab794d95aea997d3e65a672",
+      "title": "5 KATHA GENERAL REGISTERED PROPERTY | Siliguri Property",
+      "robots": "index, follow"
+    },
+    {
+      "path": "/buys/land/6ab762325aea997d3e65968d",
+      "title": "2 PLOTS NEAR HATIGHISA 3 KATHA EACH (Contact-85093 76980) | Siliguri Property",
+      "robots": "index, follow"
+    },
+    {
+      "path": "/buys/house/6ab622235aea997d3e6583f2",
+      "title": "3 BHK HOUSE FOR SALE NEAR NAYA NAGAR, NEPALI BUSTY | Siliguri Property",
+      "robots": "index, follow"
+    },
+    {
+      "path": "/buys/land/6ab4b38a5aea997d3e656fb3",
+      "title": "PLOT AVAILABLE AS PER REQUIRED | Siliguri Property",
+      "robots": "index, follow"
+    },
+    {
+      "path": "/buys/land/6ab220ed76fb21c14a7c57f9",
+      "title": "100 BIGHA LAND NEAR BAGDOGRA AIRPORT | Siliguri Property",
+      "robots": "index, follow"
+    },
+    {
+      "path": "/buys/land/6ab2198976fb21c14a7c571a",
+      "title": "11 KATHA ST TRIBAL LAND RS REGISTERED | Siliguri Property",
+      "robots": "index, follow"
+    },
+    {
+      "path": "/buys/house/6ab0f1fd76fb21c14a7c52e6",
+      "title": "Built on 3 Katha Land | Siliguri Property",
+      "robots": "index, follow"
+    },
+    {
+      "path": "/buys/land/6ab0e71576fb21c14a7c51ab",
+      "title": "14 Bigha Land Near Khoribari Market | Siliguri Property",
+      "robots": "index, follow"
+    },
+    {
+      "path": "/buys/land/6ab0e33476fb21c14a7c5139",
+      "title": "2 Bigha General Land All Located Near Naxalbari | Siliguri Property",
+      "robots": "index, follow"
+    },
+    {
+      "path": "/buys/land/6ab0cac076fb21c14a7c4ea5",
+      "title": "3.5 KATHA/ 2.5 KATHA (2 PLOT FOR SALE) | Siliguri Property",
+      "robots": "index, follow"
+    },
+    {
+      "path": "/buys/land/6ab0c52876fb21c14a7c4e14",
+      "title": "10 Katha Number 1 General Land | Siliguri Property",
+      "robots": "index, follow"
+    },
+    {
+      "path": "/buys/house/6ab0c26076fb21c14a7c4db0",
+      "title": "Built on 4 Katha General Land | Siliguri Property",
+      "robots": "index, follow"
+    },
+    {
+      "path": "/buys/house/6aae4aaa76fb21c14a7c4952",
+      "title": "3 BHK HOUSE FOR SALE | Siliguri Property",
+      "robots": "index, follow"
+    },
+    {
+      "path": "/buys/land/6aae48f776fb21c14a7c490c",
+      "title": "4 KATHA PLOT RS GENERAL REGISTERED | Siliguri Property",
+      "robots": "index, follow"
+    },
+    {
+      "path": "/buys/house/6aae40ca76fb21c14a7c480e",
+      "title": "3BHK INDEPENDENT HOUSE FOR SALE | Siliguri Property",
+      "robots": "index, follow"
+    },
+    {
+      "path": "/buys/house/6aae3b8a76fb21c14a7c4748",
+      "title": "EAST FACING HOUSE WITH 2 STOREY COMPLETED BUILDING | Siliguri Property",
+      "robots": "index, follow"
+    },
+    {
+      "path": "/buys/land/6aae317d76fb21c14a7c446f",
+      "title": "6 Katha Tribal Land | Siliguri Property",
+      "robots": "index, follow"
+    },
+    {
+      "path": "/buys/land/6aae2f8a76fb21c14a7c4401",
+      "title": "7.5 Katha Registered Land | Siliguri Property",
+      "robots": "index, follow"
+    },
+    {
+      "path": "/buys/house/6aae252276fb21c14a7c425d",
+      "title": "2 BHK Registered House For Sale | Siliguri Property",
+      "robots": "index, follow"
+    },
+    {
+      "path": "/buys/land/6aae1ec276fb21c14a7c40df",
+      "title": "5 katha exclusive plot for sale siliguri | Siliguri Property",
+      "robots": "index, follow"
+    },
+    {
+      "path": "/buys/land/6aad0e0d76fb21c14a7c3cde",
+      "title": "General Registered plot in prime location | Siliguri Property",
+      "robots": "index, follow"
+    },
+    {
+      "path": "/rentals/flat/6aad0b5276fb21c14a7c3c07",
+      "title": "Spacious 2 BHK for rent with Covered Parking and Lift Facilities | Siliguri Property",
+      "robots": "index, follow"
+    },
+    {
+      "path": "/buys/land/6aabb12276fb21c14a7c33a4",
+      "title": "Premium Plots (Measurement as per requirement) | Siliguri Property",
+      "robots": "index, follow"
+    },
+    {
+      "path": "/buys/land/6aabb06276fb21c14a7c3386",
+      "title": "Plots for Sale at Ashapur, Near Naxalbari - Panighata Highway | Siliguri Property",
+      "robots": "index, follow"
+    },
+    {
+      "path": "/buys/land/6aaa67bc76fb21c14a7c30df",
+      "title": "3 katha with boundary wall(contact- 7063373395) | Siliguri Property",
+      "robots": "index, follow"
+    },
+    {
+      "path": "/buys/land/6aaa4ba076fb21c14a7c2c20",
+      "title": "limited plots available (contact-9332554409) | Siliguri Property",
+      "robots": "index, follow"
+    },
+    {
+      "path": "/buys/house/6aaa401b76fb21c14a7c2ac5",
+      "title": "House on 3katha Registered Plot (contact-8637588578) | Siliguri Property",
+      "robots": "index, follow"
+    },
+    {
+      "path": "/buys/house/6aa9007776fb21c14a7c1e77",
+      "title": "2KATHA GENERAL LAND (CONTACT-8637588578) | Siliguri Property",
+      "robots": "index, follow"
+    },
+    {
+      "path": "/buys/land/6aa8de9976fb21c14a7c173d",
+      "title": "15 bighas, general land (Contact - 9046741354) | Siliguri Property",
+      "robots": "index, follow"
+    },
+    {
+      "path": "/buys/house/6982ae245e5b3c910d8bcf05",
+      "title": "3 BHK HOUSE FOR SALE NEAR NAXALBARI AT NEPAL BUSTY HATTIGHISA MANGALSINGH 40 LAKHS | Siliguri Property",
+      "robots": "index, follow"
+    },
+    {
+      "path": "/buys/house/6982acec5e5b3c910d8bcefc",
+      "title": "1 BHK HOUSE FOR SALE NEAR NAXALBARI SURROUNDED BY TEA GARDEN | Siliguri Property",
+      "robots": "index, follow"
+    },
+    {
+      "path": "/buys/land/6965f5718145e815443ad24b",
+      "title": "4 katha land for sale Near khaprial | Siliguri Property",
+      "robots": "index, follow"
+    },
+    {
+      "path": "/buys/flat/6965f4fe8145e815443ad246",
+      "title": "Flat for Sale 3BHK at Salbari | Siliguri Property",
+      "robots": "index, follow"
+    }
+  ]
+}

@@ -21,7 +21,6 @@ import {
 	Store,
 	MessageSquare,
 	X,
-	XCircle,
 	ZoomIn,
 	ZoomOut,
 } from "lucide-react";
@@ -49,11 +48,18 @@ import { showError, showInfo, showSuccess } from "../../utils/toastUtils";
 import { useSelector } from "react-redux";
 import { RootState } from "../../app/store";
 import { useNavigate } from "react-router-dom";
+import { applySeoMeta } from "../../utils/seo";
+import { optimizeCloudinaryImage } from "../../utils/optimizeCloudinaryImage";
 
 interface FeatureItem {
 	label: string;
 	value: string;
 	icon: React.ReactNode;
+}
+
+interface DetailItem {
+	label: string;
+	value: string;
 }
 
 interface ProfessionalListingDetailsProps {
@@ -74,6 +80,13 @@ const isRentListing = (
 const isSellListing = (
 	listing: IUniversalListingType,
 ): listing is ISellListingType => listing.intent === "sell";
+
+const isVideoUrl = (url: string): boolean => {
+	const lower = url.toLowerCase();
+	if (lower.includes("/video/upload/")) return true;
+	if (lower.includes("/image/upload/")) return false;
+	return /\.(mp4|webm|mov|m4v|ogg)(\?|$)/i.test(lower);
+};
 
 const toNumber = (value: unknown): number | null => {
 	if (typeof value === "number" && Number.isFinite(value)) {
@@ -176,28 +189,28 @@ const getPrimaryFacts = (listing: IUniversalListingType): FeatureItem[] => {
 		listing.propertyCategory === "house" ||
 		listing.propertyCategory === "flat"
 	) {
-		if (listing.bedrooms !== undefined) {
+		if (typeof listing.bedrooms === "number" && listing.bedrooms > 0) {
 			facts.push({
 				label: "Bedrooms",
 				value: String(listing.bedrooms),
 				icon: <BedDouble className="h-5 w-5 text-sky-700" />,
 			});
 		}
-		if (listing.bathrooms !== undefined) {
+		if (typeof listing.bathrooms === "number" && listing.bathrooms > 0) {
 			facts.push({
 				label: "Bathrooms",
 				value: String(listing.bathrooms),
 				icon: <Bath className="h-5 w-5 text-sky-700" />,
 			});
 		}
-		if (listing.builtUpArea !== undefined) {
+		if (typeof listing.builtUpArea === "number" && listing.builtUpArea > 0) {
 			facts.push({
 				label: "Built-up Area",
 				value: `${listing.builtUpArea} sq ft`,
 				icon: <Ruler className="h-5 w-5 text-sky-700" />,
 			});
 		}
-		if (listing.floor !== undefined) {
+		if (typeof listing.floor === "number" && listing.floor >= 0) {
 			facts.push({
 				label: "Floor",
 				value: String(listing.floor),
@@ -207,22 +220,18 @@ const getPrimaryFacts = (listing: IUniversalListingType): FeatureItem[] => {
 	}
 
 	if (listing.propertyCategory === "shop") {
-		if (listing.shopArea !== undefined) {
+		if (typeof listing.shopArea === "number" && listing.shopArea > 0) {
 			facts.push({
 				label: "Shop Area",
 				value: `${listing.shopArea} sq ft`,
 				icon: <Store className="h-5 w-5 text-sky-700" />,
 			});
 		}
-		if (listing.hasShutter !== undefined) {
+		if (listing.hasShutter) {
 			facts.push({
 				label: "Shutter",
-				value: listing.hasShutter ? "Yes" : "No",
-				icon: listing.hasShutter ? (
-					<CheckCircle2 className="h-5 w-5 text-emerald-600" />
-				) : (
-					<XCircle className="h-5 w-5 text-rose-600" />
-				),
+				value: "Available",
+				icon: <CheckCircle2 className="h-5 w-5 text-emerald-600" />,
 			});
 		}
 	}
@@ -239,7 +248,7 @@ const getPrimaryFacts = (listing: IUniversalListingType): FeatureItem[] => {
 		if (pricePerUnit !== null) {
 			facts.push({
 				label: "Price / Unit",
-				value: `${formatIndianCurrency(pricePerUnit)}`,
+				value: `₹${formatIndianCurrency(pricePerUnit)}`,
 				icon: <IndianRupee className="h-5 w-5 text-sky-700" />,
 			});
 		}
@@ -253,23 +262,19 @@ const getPrimaryFacts = (listing: IUniversalListingType): FeatureItem[] => {
 		});
 	}
 
-	if (listing.parking !== undefined) {
+	if (listing.parking) {
 		facts.push({
 			label: "Parking",
-			value: listing.parking ? "Available" : "Not available",
+			value: "Available",
 			icon: <Car className="h-5 w-5 text-sky-700" />,
 		});
 	}
 
-	if (listing.attachedBathroom !== undefined) {
+	if (listing.attachedBathroom) {
 		facts.push({
 			label: "Attached Bathroom",
-			value: listing.attachedBathroom ? "Yes" : "No",
-			icon: listing.attachedBathroom ? (
-				<CheckCircle2 className="h-5 w-5 text-emerald-600" />
-			) : (
-				<XCircle className="h-5 w-5 text-rose-600" />
-			),
+			value: "Yes",
+			icon: <CheckCircle2 className="h-5 w-5 text-emerald-600" />,
 		});
 	}
 
@@ -352,10 +357,23 @@ const ProfessionalListingDetails: React.FC<ProfessionalListingDetailsProps> = ({
 		listing.pictures && listing.pictures.length > 0
 			? listing.pictures
 			: [propertyImagePlaceholder];
+	const videos = (listing.videos ?? []).filter((video) => isVideoUrl(video));
 
 	const selectedImage =
 		images[Math.min(selectedIndex, images.length - 1)] ??
 		propertyImagePlaceholder;
+	const heroImage = optimizeCloudinaryImage(selectedImage, {
+		width: 1800,
+		height: 1200,
+		crop: "fill",
+		quality: "auto:best",
+	});
+	const galleryMainImage = optimizeCloudinaryImage(selectedImage, {
+		width: 2600,
+		height: 1800,
+		crop: "limit",
+		quality: "auto:best",
+	});
 	const clampImageOffset = (offset: { x: number; y: number }, zoom: number) => {
 		const viewport = galleryViewportRef.current;
 		const image = galleryImageRef.current;
@@ -455,6 +473,54 @@ const ProfessionalListingDetails: React.FC<ProfessionalListingDetailsProps> = ({
 		return amenities;
 	}, [listing]);
 
+	const additionalDetails = useMemo<DetailItem[]>(() => {
+		const details: DetailItem[] = [];
+
+		details.push({
+			label: "Property Category",
+			value: categoryLabel,
+		});
+
+		if (listing.listingStatus && listing.listingStatus !== "available") {
+			details.push({
+				label: "Status",
+				value: toTitleCase(listing.listingStatus),
+			});
+		}
+
+		if (localityLabel) {
+			details.push({
+				label: "Locality",
+				value: localityLabel,
+			});
+		}
+
+		if (isRentListing(listing) && listing.frequency) {
+			details.push({
+				label: "Rent Billing",
+				value: toTitleCase(listing.frequency),
+			});
+		}
+
+		if (isSellListing(listing) && listing.propertyCategory === "land") {
+			if (listing.availableLandSpace && listing.availableLandSpaceUnit) {
+				details.push({
+					label: "Land Size",
+					value: `${listing.availableLandSpace} ${listing.availableLandSpaceUnit}`,
+				});
+			}
+			const totalPrice = toNumber(listing.totalPrice);
+			if (totalPrice !== null) {
+				details.push({
+					label: "Total Land Price",
+					value: `₹${formatIndianCurrency(totalPrice)}`,
+				});
+			}
+		}
+
+		return details;
+	}, [categoryLabel, listing, localityLabel]);
+
 	useEffect(() => {
 		const savedRaw = localStorage.getItem("savedListings");
 		if (!savedRaw) {
@@ -471,14 +537,23 @@ const ProfessionalListingDetails: React.FC<ProfessionalListingDetailsProps> = ({
 	}, [listing._id]);
 
 	useEffect(() => {
-		document.title = `${listing.title} | SiliguriProperty`;
-		const metaDescription = document.querySelector(
-			'meta[name="description"]',
-		) as HTMLMetaElement | null;
-		if (metaDescription) {
-			const price = getDisplayPrice(listing);
-			metaDescription.content = `${listing.title} in ${locationSummary}. ${price}. View property details, location, and contact information on SiliguriProperty.`;
-		}
+		const price = getDisplayPrice(listing);
+		const canonicalPath =
+			typeof window !== "undefined" && window.location?.pathname
+				? `${window.location.pathname}${window.location.search}`
+				: `/${listing.intent === "rent" ? "rentals" : "buys"}/${listing.propertyCategory}/${listing._id}`;
+
+		applySeoMeta({
+			title: `${listing.title} | Siliguri Property`,
+			description: `${listing.title} in ${locationSummary}. ${price}. View property details, photos, map location and enquiry options on Siliguri Property.`,
+			canonicalPath,
+			ogType: "article",
+			robots:
+				listing.approvalStatus === "approved" &&
+				listing.listingStatus !== "sold"
+					? "index, follow"
+					: "noindex, follow",
+		});
 	}, [listing, locationSummary]);
 
 	const handleShareListing = async () => {
@@ -880,9 +955,9 @@ const ProfessionalListingDetails: React.FC<ProfessionalListingDetailsProps> = ({
 	};
 
 	return (
-		<div className="min-h-screen bg-gradient-to-b from-slate-50 via-white to-slate-50">
-			<div className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
-				<div className="grid grid-cols-1 gap-6 lg:grid-cols-[1.5fr_0.8fr] lg:items-start">
+		<div className="min-h-screen bg-gradient-to-b from-slate-50 via-white to-slate-100">
+			<div className="mx-auto w-full max-w-[1720px] px-3 py-5 sm:px-6 lg:px-8 xl:px-12 2xl:px-16 lg:py-8">
+				<div className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1.8fr)_minmax(320px,0.9fr)] xl:items-start">
 					<div className="space-y-6">
 						<section className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-md shadow-slate-200/40">
 							<div className="p-2">
@@ -895,9 +970,9 @@ const ProfessionalListingDetails: React.FC<ProfessionalListingDetailsProps> = ({
 									className="group relative w-full overflow-hidden rounded-2xl"
 								>
 									<img
-										src={selectedImage}
+										src={heroImage}
 										alt={listing.title}
-										className="h-[320px] w-full object-cover transition-transform duration-300 group-hover:scale-[1.02] sm:h-[430px]"
+										className="h-[260px] w-full object-cover transition-transform duration-300 group-hover:scale-[1.02] sm:h-[380px] xl:h-[480px]"
 										onError={(event) => {
 											const target = event.target as HTMLImageElement;
 											target.src = propertyImagePlaceholder;
@@ -922,7 +997,12 @@ const ProfessionalListingDetails: React.FC<ProfessionalListingDetailsProps> = ({
 												}`}
 											>
 												<img
-													src={image}
+													src={optimizeCloudinaryImage(image, {
+														width: 360,
+														height: 240,
+														crop: "fill",
+														quality: "auto:good",
+													})}
 													alt={`${listing.title} image ${index + 1}`}
 													className="h-20 w-28 object-cover sm:h-24 sm:w-36"
 													onError={(event) => {
@@ -936,6 +1016,34 @@ const ProfessionalListingDetails: React.FC<ProfessionalListingDetailsProps> = ({
 								)}
 							</div>
 						</section>
+
+						{videos.length > 0 && (
+							<section className="rounded-3xl border border-slate-200 bg-white p-5 shadow-md shadow-slate-200/40 sm:p-6">
+								<div className="mb-4 flex items-center justify-between">
+									<h2 className="text-xl font-semibold text-slate-900">
+										Property Videos
+									</h2>
+									<span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">
+										{videos.length} video{videos.length > 1 ? "s" : ""}
+									</span>
+								</div>
+								<div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+									{videos.map((video, index) => (
+										<video
+											key={`listing-video-${index}`}
+											src={video}
+											controls
+											playsInline
+											preload="metadata"
+											className="h-[220px] w-full rounded-2xl border border-slate-200 bg-black object-cover sm:h-[260px]"
+											poster={heroImage}
+										>
+											Your browser does not support the video tag.
+										</video>
+									))}
+								</div>
+							</section>
+						)}
 
 						<section className="rounded-3xl border border-slate-200 bg-white p-5 shadow-md shadow-slate-200/40 sm:p-6">
 							<div className="flex flex-wrap items-center justify-between gap-3">
@@ -993,22 +1101,47 @@ const ProfessionalListingDetails: React.FC<ProfessionalListingDetailsProps> = ({
 								</div>
 							</div>
 
-							<div className="mt-5 grid grid-cols-2 gap-3 md:grid-cols-4">
-								{facts.slice(0, 8).map((fact) => (
-									<div
-										key={`${fact.label}-${fact.value}`}
-										className="rounded-xl border border-slate-200 bg-white p-3 shadow-sm"
-									>
-										<div className="mb-1 flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wide text-slate-600">
-											{fact.icon}
-											{fact.label}
+							{facts.length > 0 && (
+								<div className="mt-5 grid grid-cols-2 gap-3 md:grid-cols-4">
+									{facts.slice(0, 8).map((fact) => (
+										<div
+											key={`${fact.label}-${fact.value}`}
+											className="rounded-xl border border-slate-200 bg-white p-3 shadow-sm"
+										>
+											<div className="mb-1 flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wide text-slate-600">
+												{fact.icon}
+												{fact.label}
+											</div>
+											<p className="text-sm font-bold text-slate-900 sm:text-base">
+												{fact.value}
+											</p>
 										</div>
-										<p className="text-sm font-bold text-slate-900 sm:text-base">
-											{fact.value}
-										</p>
+									))}
+								</div>
+							)}
+
+							{additionalDetails.length > 0 && (
+								<div className="mt-6 border-t border-slate-200 pt-6">
+									<h2 className="text-xl font-semibold text-slate-900">
+										Property Details
+									</h2>
+									<div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
+										{additionalDetails.map((detail) => (
+											<div
+												key={`${detail.label}-${detail.value}`}
+												className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3"
+											>
+												<p className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">
+													{detail.label}
+												</p>
+												<p className="mt-1 text-sm font-semibold text-slate-900">
+													{detail.value}
+												</p>
+											</div>
+										))}
 									</div>
-								))}
-							</div>
+								</div>
+							)}
 
 							<div className="mt-6 border-t border-slate-200 pt-6">
 								<h2 className="text-xl font-semibold text-slate-900">
@@ -1043,13 +1176,13 @@ const ProfessionalListingDetails: React.FC<ProfessionalListingDetailsProps> = ({
 								)}
 							</div>
 
-							<div className="mt-6 border-t border-slate-200 pt-6">
-								<h2 className="text-xl font-semibold text-slate-900">
-									Amenities
-								</h2>
-								<div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-3">
-									{amenityItems.length > 0 ? (
-										amenityItems.map((amenity) => (
+							{amenityItems.length > 0 && (
+								<div className="mt-6 border-t border-slate-200 pt-6">
+									<h2 className="text-xl font-semibold text-slate-900">
+										Amenities
+									</h2>
+									<div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-3">
+										{amenityItems.map((amenity) => (
 											<div
 												key={amenity}
 												className="inline-flex items-center gap-2 rounded-xl border border-emerald-100 bg-emerald-50 px-3 py-2 text-sm font-medium text-emerald-800"
@@ -1057,14 +1190,10 @@ const ProfessionalListingDetails: React.FC<ProfessionalListingDetailsProps> = ({
 												<CheckCircle2 className="h-4 w-4" />
 												{amenity}
 											</div>
-										))
-									) : (
-										<p className="col-span-full text-sm text-slate-500">
-											No additional amenities listed for this property.
-										</p>
-									)}
+										))}
+									</div>
 								</div>
-							</div>
+							)}
 						</section>
 
 						<Dialog
@@ -1151,7 +1280,7 @@ const ProfessionalListingDetails: React.FC<ProfessionalListingDetailsProps> = ({
 
 									<img
 										ref={galleryImageRef}
-										src={selectedImage}
+										src={galleryMainImage}
 										alt={`${listing.title} image ${selectedIndex + 1}`}
 										className={`h-full w-full cursor-zoom-in object-contain ${isTouchInteracting ? "transition-none" : "transition-transform duration-200 ease-out"}`}
 										style={{
@@ -1220,7 +1349,12 @@ const ProfessionalListingDetails: React.FC<ProfessionalListingDetailsProps> = ({
 												}`}
 											>
 												<img
-													src={image}
+													src={optimizeCloudinaryImage(image, {
+														width: 280,
+														height: 176,
+														crop: "fill",
+														quality: "auto:good",
+													})}
 													alt={`Thumbnail ${index + 1}`}
 													className="h-11 w-full object-cover"
 												/>
